@@ -1,0 +1,11 @@
+name: beakerx
+prefix: /home/conda/conda/envs/jupyter
+channels:
+- conda-forge
+dependencies:
+- beakerx
+- bokeh
+- ipywidgets
+- jupyterhub
+- jupyterlab
+- pyarrow

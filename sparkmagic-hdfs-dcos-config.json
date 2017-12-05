@@ -1,0 +1,83 @@
+{
+  "kernel_python_credentials": {
+    "username": "",
+    "password": "",
+    "url": "http://livy.marathon.l4lb.thisdcos.directory:8998",
+    "auth": "None"
+  },
+  "kernel_scala_credentials": {
+    "username": "",
+    "password": "",
+    "url": "http://livy.marathon.l4lb.thisdcos.directory:8998",
+    "auth": "None"
+  },
+  "kernel_r_credentials": {
+    "username": "",
+    "password": "",
+    "url": "http://livy.marathon.l4lb.thisdcos.directory:8998",
+    "auth": "None"
+  },
+  "logging_config": {
+    "version": 1,
+    "formatters": {
+      "magicsFormatter": {
+        "format": "%(asctime)s\t%(levelname)s\t%(message)s",
+        "datefmt": ""
+      }
+    },
+    "handlers": {
+      "magicsHandler": {
+        "class": "hdijupyterutils.filehandler.MagicsFileHandler",
+        "formatter": "magicsFormatter",
+        "home_path": "~/.sparkmagic"
+      }
+    },
+    "loggers": {
+      "magicsLogger": {
+        "handlers": [
+          "magicsHandler"
+        ],
+        "level": "DEBUG",
+        "propagate": 0
+      }
+    }
+  },
+  "wait_for_idle_timeout_seconds": 15,
+  "livy_session_startup_timeout_seconds": 60,
+  "fatal_error_suggestion": "The code failed because of a fatal error:\n\t{}.\n\nSome things to try:\na) Make sure Spark has enough available resources for Jupyter to create a Spark context.\nb) Contact your Jupyter administrator to make sure the Spark magics library is configured correctly.\nc) Restart the kernel.",
+  "ignore_ssl_errors": false,
+  "session_configs": {
+    "driverCores": 1,
+    "driverMemory": "1g",
+    "executorCores": 1,
+    "executorMemory": "1g",
+    "conf": {
+      "spark.cores.max": "4",
+      "spark.executorEnv.JAVA_HOME": "/home/conda/conda/envs/livy",
+      "spark.executor.cores": "1",
+      "spark.executor.memory": "1g",
+      "spark.mesos.containerizer": "mesos",
+      "spark.mesos.executor.docker.image": "vishnumohan/livy-dcos:0.4.0-1.10.2-2.2.0",
+      "spark.mesos.executor.home": "/home/conda/conda/envs/livy/lib/python3.6/site-packages/pyspark",
+      "spark.mesos.uris": "http://api.hdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/hdfs-site.xml,http://api.hdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/core-site.xml"
+    }
+  },
+  "use_auto_viz": true,
+  "coerce_dataframe": true,
+  "max_results_sql": 2500,
+  "pyspark_dataframe_encoding": "utf-8",
+  "heartbeat_refresh_seconds": 30,
+  "livy_server_heartbeat_timeout_seconds": 0,
+  "heartbeat_retry_seconds": 10,
+  "server_extension_default_kernel_name": "pysparkkernel",
+  "custom_headers": {},
+  "retry_policy": "configurable",
+  "retry_seconds_to_sleep_list": [
+    0.2,
+    0.5,
+    1,
+    3,
+    5
+  ],
+  "configurable_retry_policy_max_retries": 8
+}

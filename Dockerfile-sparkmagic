@@ -1,0 +1,20 @@
+FROM vishnumohan/miniconda3:4.3.30-3.6.3
+
+MAINTAINER Vishnu Mohan <vishnu@mesosphere.com>
+
+COPY --chown="1000:100" beakerx-sparkmagic-conda-env.yml "${HOME}/work/"
+RUN mkdir -p $HOME/.sparkmagic \
+    && ${CONDA_DIR}/bin/conda env create --json -q -f beakerx-sparkmagic-conda-env.yml \
+    && ${CONDA_DIR}/bin/conda clean --json -tipsy \
+    && bash -c 'source activate beakerx \
+    && jupyter labextension install @jupyter-widgets/jupyterlab-manager \
+    && jupyter labextension install @jupyterlab/hub-extension \
+    && jupyter labextension install beakerx-jupyterlab \
+    && source deactivate'
+
+EXPOSE 8888
+CMD ["notebook.sh"]
+
+COPY --chown="1000:100" sparkmagic-dcos-config.json "${HOME}/.sparkmagic/config.json"
+COPY --chown="1000:100" jupyter_notebook_config.py "${HOME}/.jupyter/"
+COPY notebook.sh /usr/local/bin/
