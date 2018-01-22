@@ -1,5 +1,5 @@
 name: beakerx
-prefix: /home/conda/conda/envs/jupyter
+prefix: /home/conda/conda/envs/beakerx
 channels:
 - conda-forge
 dependencies:
@@ -8,4 +8,5 @@ dependencies:
 - ipywidgets
 - jupyterhub
 - jupyterlab
+- nbconvert
 - pyarrow

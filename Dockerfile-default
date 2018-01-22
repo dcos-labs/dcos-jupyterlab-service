@@ -1,4 +1,4 @@
-FROM vishnumohan/miniconda3:4.3.30-3.6.3
+FROM vishnumohan/miniconda3:4.3.31-3.6.3
 
 MAINTAINER Vishnu Mohan <vishnu@mesosphere.com>
 
@@ -9,6 +9,9 @@ RUN mkdir -p $HOME/.sparkmagic \
     && bash -c 'source activate beakerx \
     && jupyter labextension install @jupyter-widgets/jupyterlab-manager \
     && jupyter labextension install @jupyterlab/hub-extension \
+    && jupyter labextension install @jupyterlab/geojson-extension \
+    && jupyter labextension install @jupyterlab/github \
+    && jupyter labextension install jupyterlab_bokeh \
     && jupyter labextension install beakerx-jupyterlab \
     && source deactivate'
 

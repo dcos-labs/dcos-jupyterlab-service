@@ -57,7 +57,7 @@
       "spark.executor.cores": "1",
       "spark.executor.memory": "1g",
       "spark.mesos.containerizer": "mesos",
-      "spark.mesos.executor.docker.image": "vishnumohan/livy-dcos:0.4.0-1.10.2-2.2.0",
+      "spark.mesos.executor.docker.image": "vishnumohan/livy-dcos:0.4.0-1.10.4-2.2.1",
       "spark.mesos.executor.home": "/home/conda/conda/envs/livy/lib/python3.6/site-packages/pyspark",
       "spark.mesos.uris": "http://api.hdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/hdfs-site.xml,http://api.hdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/core-site.xml"
     }
