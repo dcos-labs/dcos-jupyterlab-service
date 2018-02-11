@@ -1,0 +1,153 @@
+FROM nvidia/cuda:9.1-cudnn7-devel
+
+LABEL maintainer="Vishnu Mohan <vishnu@mesosphere.com>"
+
+ARG CODENAME="xenial"
+ARG CONDA_DIR="/opt/conda"
+ARG CONDA_INSTALLER="Miniconda3-4.3.31-Linux-x86_64.sh"
+ARG CONDA_MD5="7fe70b214bee1143e3e3f0467b71453c"
+ARG CONDA_URL="https://repo.continuum.io/miniconda"
+ARG DISTRO="ubuntu"
+ARG DEBIAN_FRONTEND="noninteractive"
+ARG GPG_KEYSERVER="pgp.mit.edu"
+ARG HADOOP_CONF_DIR="/etc/hadoop/conf"
+ARG HOME="/home/beakerx"
+ARG LIBMESOS_BUNDLE_PREFIX="/opt/mesosphere"
+ARG LIBMESOS_BUNDLE_SHA256="875f6500101c7b219feebe05bd8ca68ea98682f974ca7f8efc14cb52790977b0"
+ARG LIBMESOS_BUNDLE_URL="https://downloads.mesosphere.com/libmesos-bundle"
+ARG LIBMESOS_BUNDLE_VERSION="master-28f8827"
+ARG MESOS_JAR_SHA1="23a6aa96dc84560c7145aa0260bfb50acfc38dc0"
+ARG MESOS_MAVEN_URL="https://repository.apache.org/service/local/repositories/releases/content/org/apache/mesos/mesos"
+ARG MESOS_PROTOBUF_JAR_SHA1="1b259b2a8e36351600687b1460d1c021dbd73c34"
+ARG MESOS_VERSION="1.4.1"
+ARG NB_GID="100"
+ARG NB_UID="1000"
+ARG NB_USER="beakerx"
+ARG REPO="http://archive.ubuntu.com"
+ARG TINI_GPG_KEY="6380DC428747F6C393FEACA59A84159D7001A4E5"
+ARG TINI_URL="https://github.com/krallin/tini/releases/download"
+ARG TINI_VERSION="v0.16.1"
+
+ENV CODENAME=${CODENAME:-"stretch"} \
+    CONDA_DIR=${CONDA_DIR:-"/opt/conda"} \
+    DEBIAN_FRONTEND=${DEBIAN_FRONTEND:-"noninteractive"} \
+    DISTRO=${DISTRO:-"debian"} \
+    GPG_KEYSERVER=${GPG_KEYSERVER:-"pgp.mit.edu"} \
+    HADOOP_CONF_DIR="${HADOOP_CONF_DIR:-/etc/hadoop/conf}" \
+    HOME=${HOME:-"/home/beakerx"} \
+    LANG="en_US.UTF-8" \
+    LANGUAGE="en_US.UTF-8" \
+    LC_ALL="en_US.UTF-8" \
+    LIBMESOS_BUNDLE_PREFIX="${LIBMESOS_BUNDLE_PREFIX:-/opt/mesosphere}" \
+    MESOS_NATIVE_LIBRARY="${LIBMESOS_BUNDLE_PREFIX}/libmesos-bundle/lib/libmesos.so" \
+    MESOS_NATIVE_JAVA_LIBRARY="${LIBMESOS_BUNDLE_PREFIX}/libmesos-bundle/lib/libmesos.so" \
+    NB_GID=${NB_GID:-"100"} \
+    NB_UID=${NB_UID:-"1000"} \
+    NB_USER=${NB_USER:-"beakerx"} \
+    PATH="${CONDA_DIR}/bin:${PATH}" \
+    SHELL="/bin/bash"
+
+RUN apt-get update -yq --fix-missing \
+    && apt-get install -yq --no-install-recommends locales \
+    && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
+    && locale-gen \
+    && apt-get install -yq --no-install-recommends apt-utils \
+    && apt-get -yq dist-upgrade \
+    && apt-get install -yq --no-install-recommends \
+       bash-completion \
+       bzip2 \
+       ca-certificates \
+       curl \
+       dirmngr \
+       fonts-dejavu \
+       fonts-liberation \
+       git \
+       gnupg \
+       jq \
+       openssh-client \
+       procps \
+       rsync \
+       sudo \
+       unzip \
+       vim \
+       wget \
+    && apt-key adv --keyserver "$GPG_KEYSERVER" --recv-keys "$TINI_GPG_KEY" \
+    && apt-get clean \
+    && rm -rf /var/apt/lists/*
+
+COPY fix-permissions "/usr/local/bin/"
+COPY --chown="1000:100" beakerx-root-cudnn7-conda-env.yml "${CONDA_DIR}/"
+
+RUN cd /tmp \
+    && curl --retry 3 -fsSL "$TINI_URL/$TINI_VERSION/tini" -o /usr/bin/tini \
+    && curl --retry 3 -fsSL -O "$TINI_URL/$TINI_VERSION/tini.asc" \
+    && export GNUPGHOME="$(mktemp -d)" \
+    && gpg --keyserver "$GPG_KEYSERVER" --recv-keys "$TINI_GPG_KEY" \
+    && gpg --batch --verify tini.asc /usr/bin/tini \
+    && rm -rf "$GNUPGHOME" tini.asc \
+    && chmod +x /usr/bin/tini \
+    && curl --retry 3 -fsSL -O "${LIBMESOS_BUNDLE_URL}/libmesos-bundle-${LIBMESOS_BUNDLE_VERSION}.tar.gz" \
+    && echo "${LIBMESOS_BUNDLE_SHA256}" "libmesos-bundle-${LIBMESOS_BUNDLE_VERSION}.tar.gz" | sha256sum -c - \
+    && mkdir -p "${HADOOP_CONF_DIR}" "${LIBMESOS_BUNDLE_PREFIX}" "${CONDA_DIR}" \
+    && tar xf "libmesos-bundle-${LIBMESOS_BUNDLE_VERSION}.tar.gz" -C "${LIBMESOS_BUNDLE_PREFIX}" \
+    && rm "libmesos-bundle-${LIBMESOS_BUNDLE_VERSION}.tar.gz" \
+    && cd "${LIBMESOS_BUNDLE_PREFIX}/libmesos-bundle/lib" \
+    && curl --retry 3 -fsSL -O "${MESOS_MAVEN_URL}/${MESOS_VERSION}/mesos-${MESOS_VERSION}.jar" \
+    && echo "${MESOS_JAR_SHA1} mesos-${MESOS_VERSION}.jar" | sha1sum -c - \
+    && curl --retry 3 -fsSL -O "${MESOS_MAVEN_URL}/${MESOS_VERSION}/mesos-${MESOS_VERSION}-shaded-protobuf.jar" \
+    && echo "${MESOS_PROTOBUF_JAR_SHA1} mesos-${MESOS_VERSION}-shaded-protobuf.jar" | sha1sum -c - \
+    && cd /tmp \
+    && rm -rf /tmp/* \
+    && useradd -m -N -u "$NB_UID" -g "$NB_GID" -s /bin/bash "$NB_USER" \
+    && chown $NB_UID:$NB_GID $CONDA_DIR \
+    && fix-permissions $HADOOP_CONF_DIR \
+    && fix-permissions $LIBMESOS_BUNDLE_PREFIX \
+    && fix-permissions $CONDA_DIR \
+    && fix-permissions $HOME
+
+USER $NB_UID
+RUN mkdir -p "$HOME/.jupyter" "$HOME/.sparkmagic" "$HOME/bin" "$HOME/work" \
+    && cd /tmp \
+    && curl --retry 3 -fsSL -O "$CONDA_URL/$CONDA_INSTALLER" \
+    && echo "$CONDA_MD5  $CONDA_INSTALLER" | md5sum -c - \
+    && bash "./$CONDA_INSTALLER" -u -b -p "$CONDA_DIR" \
+    && rm -f "$CONDA_INSTALLER" \
+    && $CONDA_DIR/bin/conda config --system --prepend channels conda-forge \
+    && $CONDA_DIR/bin/conda config --system --set auto_update_conda false \
+    && $CONDA_DIR/bin/conda config --system --set show_channel_urls true \
+    && $CONDA_DIR/bin/conda update --json --all -yq \
+    && $CONDA_DIR/bin/conda env update --json -q -f /opt/conda/beakerx-root-cudnn7-conda-env.yml \
+    && $CONDA_DIR/bin/jupyter labextension install @jupyter-widgets/jupyterlab-manager \
+    && $CONDA_DIR/bin/jupyter labextension install @jupyterlab/hub-extension \
+    && $CONDA_DIR/bin/jupyter labextension install @jupyterlab/geojson-extension \
+    && $CONDA_DIR/bin/jupyter labextension install @jupyterlab/github \
+    && $CONDA_DIR/bin/jupyter labextension install jupyterlab_bokeh \
+    && $CONDA_DIR/bin/jupyter labextension install beakerx-jupyterlab \
+    && $CONDA_DIR/bin/conda update --json --all -yq \
+    && $CONDA_DIR/bin/npm cache clean \
+    && rm -rf $CONDA_DIR/share/jupyter/lab/staging \
+    && $CONDA_DIR/bin/conda clean --json -tipsy \
+    && fix-permissions $CONDA_DIR \
+    && fix-permissions $HOME
+
+COPY --chown="1000:100" profile "$HOME/.profile"
+COPY --chown="1000:100" bash_profile "$HOME/.bash_profile"
+COPY --chown="1000:100" bashrc "$HOME/.bashrc"
+COPY --chown="1000:100" dircolors "$HOME/.dircolors"
+COPY --chown="1000:100" jupyter_notebook_config.py "${HOME}/.jupyter/"
+
+USER root
+
+EXPOSE 8888
+WORKDIR "$HOME"
+
+ENTRYPOINT ["tini", "--"]
+CMD ["start-notebook.sh"]
+
+COPY start.sh /usr/local/bin/
+COPY start-notebook.sh /usr/local/bin/
+COPY start-singleuser.sh /usr/local/bin/
+COPY jupyter_notebook_config.py /etc/jupyter/
+RUN fix-permissions /etc/jupyter/
+
+USER $NB_UID
