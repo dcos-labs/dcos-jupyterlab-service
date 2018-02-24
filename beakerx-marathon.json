@@ -3,11 +3,11 @@
   "instances": 1,
   "cpus": 1,
   "mem": 2048,
-  "cmd": "tini -s -- /usr/local/bin/notebook.sh",
+  "cmd": "/usr/local/bin/start.sh jupyter lab",
   "container": {
     "type": "MESOS",
     "docker": {
-      "image": "vishnumohan/beakerx-dcos:0.11.1-1.10.4",
+      "image": "vishnumohan/beakerx-dcos",
       "forcePullImage": false
     }
   },

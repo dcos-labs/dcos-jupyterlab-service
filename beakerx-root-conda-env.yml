@@ -2,11 +2,17 @@ name: root
 channels:
 - conda-forge
 dependencies:
+- awscli
 - beakerx
 - bokeh
+- dask
+- distributed
 - ipywidgets
+- libhdfs3
 - jupyterhub
 - jupyterlab
 - nbconvert
 - pyarrow
 - pyspark
+- s3fs
+- xgboost
