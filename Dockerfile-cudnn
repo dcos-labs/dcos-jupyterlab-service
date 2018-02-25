@@ -28,9 +28,7 @@ ARG NB_USER="beakerx"
 ARG NVIDIA_CUDA_MAJOR_VERSION="8-0"
 ARG NVIDIA_CUDA_PKG_VERSION="8.0.61-1"
 ARG NVIDIA_CUDA_VERSION="8.0"
-ARG NVIDIA_CUDA_TOOLS_GPGKEY="7fa2af80"
-ARG NVIDIA_CUDA_TOOLS_GPGKEY_FPR="ae09fe4bbd223a84b2ccfce3f60f4b3d7fa2af80"
-ARG NVIDIA_CUDA_TOOLS_GPGKEY_SUM="d1be581509378368edeec8c1eb2958702feedf3bc3d17011adbf24efacce4ab5"
+ARG NVIDIA_CUDA_TOOLS_GPG_KEY="7fa2af80"
 ARG NVIDIA_CUDNN_MAJOR_VERSION="6"
 ARG NVIDIA_CUDNN_PKG_VERSION="6.0.21-1+cuda8.0"
 ARG NVIDIA_DISTRO="ubuntu1604"
@@ -109,7 +107,7 @@ ENV HOME="/home/$NB_USER"
 COPY fix-permissions "/usr/local/bin/"
 COPY --chown="1000:100" beakerx-root-conda-env.yml "${CONDA_DIR}/"
 
-RUN apt-key adv --keyserver "$GPG_KEYSERVER" --recv-keys "$NVIDIA_CUDA_TOOLS_GPGKEY" \
+RUN apt-key adv --keyserver "$GPG_KEYSERVER" --recv-keys "$NVIDIA_CUDA_TOOLS_GPG_KEY" \
     && echo "deb $NVIDIA_URL/cuda/repos/${NVIDIA_DISTRO}/x86_64 /" > /etc/apt/sources.list.d/nvidia-cuda.list \
     && echo "deb $NVIDIA_URL/machine-learning/repos/${NVIDIA_DISTRO}/x86_64 /" > /etc/apt/sources.list.d/nvidia-ml.list \
     && apt-get update -yq --fix-missing \
@@ -198,9 +196,6 @@ COPY start-notebook.sh /usr/local/bin/
 COPY start-singleuser.sh /usr/local/bin/
 COPY jupyter_notebook_config.py /etc/jupyter/
 RUN echo "${LIBMESOS_BUNDLE_PREFIX}/libmesos-bundle/lib" >> /etc/ld.so.conf.d/libmesos.conf \
-    && cd /usr/local \
-    && ln -s "cuda-${NVIDIA_CUDA_VERSION}" "cuda" \
-    && echo "/usr/local/cuda/lib64" >> /etc/ld.so.conf.d/cuda.conf \
     && echo "/usr/local/nvidia/lib" >> /etc/ld.so.conf.d/nvidia.conf \
     && echo "/usr/local/nvidia/lib64" >> /etc/ld.so.conf.d/nvidia.conf \
     && ldconfig \
