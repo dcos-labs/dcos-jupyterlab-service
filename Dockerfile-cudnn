@@ -1,15 +1,17 @@
-FROM nvidia/cuda:9.1-cudnn7-devel
+# debian:9.3 - linux; amd64
+# https://github.com/docker-library/repo-info/blob/master/repos/debian/tag-details.md#debian93---linux-amd64
+FROM debian@sha256:02741df16aee1b81c4aaff4c48d75cc2c308bade918b22679df570c170feef7c
 
 LABEL maintainer="Vishnu Mohan <vishnu@mesosphere.com>"
 
-ARG CODENAME="xenial"
+ARG CODENAME="stretch"
 ARG CONDA_DIR="/opt/conda"
 ARG CONDA_INSTALLER="Miniconda3-4.3.31-Linux-x86_64.sh"
 ARG CONDA_MD5="7fe70b214bee1143e3e3f0467b71453c"
 ARG CONDA_URL="https://repo.continuum.io/miniconda"
-ARG DISTRO="ubuntu"
+ARG DISTRO="debian"
 ARG DEBIAN_FRONTEND="noninteractive"
-ARG GPG_KEYSERVER="pgp.mit.edu"
+ARG GPG_KEYSERVER="hkps://pgp.mit.edu"
 ARG HADOOP_CONF_DIR="/etc/hadoop/conf"
 ARG HOME="/home/beakerx"
 ARG LIBMESOS_BUNDLE_PREFIX="/opt/mesosphere"
@@ -23,18 +25,29 @@ ARG MESOS_VERSION="1.4.1"
 ARG NB_GID="100"
 ARG NB_UID="1000"
 ARG NB_USER="beakerx"
-ARG REPO="http://archive.ubuntu.com"
+ARG NVIDIA_CUDA_MAJOR_VERSION="8-0"
+ARG NVIDIA_CUDA_PKG_VERSION="8.0.61-1"
+ARG NVIDIA_CUDA_VERSION="8.0"
+ARG NVIDIA_CUDA_TOOLS_GPGKEY="7fa2af80"
+ARG NVIDIA_CUDA_TOOLS_GPGKEY_FPR="ae09fe4bbd223a84b2ccfce3f60f4b3d7fa2af80"
+ARG NVIDIA_CUDA_TOOLS_GPGKEY_SUM="d1be581509378368edeec8c1eb2958702feedf3bc3d17011adbf24efacce4ab5"
+ARG NVIDIA_CUDNN_MAJOR_VERSION="6"
+ARG NVIDIA_CUDNN_PKG_VERSION="6.0.21-1+cuda8.0"
+ARG NVIDIA_DISTRO="ubuntu1604"
+ARG NVIDIA_URL="http://developer.download.nvidia.com/compute"
+ARG REPO="http://cdn-fastly.deb.debian.org"
 ARG TINI_GPG_KEY="6380DC428747F6C393FEACA59A84159D7001A4E5"
 ARG TINI_URL="https://github.com/krallin/tini/releases/download"
 ARG TINI_VERSION="v0.16.1"
+ARG VCS_REF
+ARG VERSION
 
 ENV CODENAME=${CODENAME:-"stretch"} \
     CONDA_DIR=${CONDA_DIR:-"/opt/conda"} \
     DEBIAN_FRONTEND=${DEBIAN_FRONTEND:-"noninteractive"} \
     DISTRO=${DISTRO:-"debian"} \
-    GPG_KEYSERVER=${GPG_KEYSERVER:-"pgp.mit.edu"} \
+    GPG_KEYSERVER=${GPG_KEYSERVER:-"hkps://pgp.mit.edu"} \
     HADOOP_CONF_DIR="${HADOOP_CONF_DIR:-/etc/hadoop/conf}" \
-    HOME=${HOME:-"/home/beakerx"} \
     LANG="en_US.UTF-8" \
     LANGUAGE="en_US.UTF-8" \
     LC_ALL="en_US.UTF-8" \
@@ -47,7 +60,11 @@ ENV CODENAME=${CODENAME:-"stretch"} \
     PATH="${CONDA_DIR}/bin:${PATH}" \
     SHELL="/bin/bash"
 
-RUN apt-get update -yq --fix-missing \
+RUN echo "deb ${REPO}/${DISTRO} ${CODENAME} main" \
+         >> /etc/apt/sources.list \
+    echo "deb ${REPO}/${DISTRO}-security ${CODENAME}/updates main" \
+         >> /etc/apt/sources.list \
+    && apt-get update -yq --fix-missing \
     && apt-get install -yq --no-install-recommends locales \
     && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
     && locale-gen \
@@ -64,6 +81,8 @@ RUN apt-get update -yq --fix-missing \
        git \
        gnupg \
        jq \
+       libav-tools \
+       lmodern \
        openssh-client \
        procps \
        rsync \
@@ -71,14 +90,44 @@ RUN apt-get update -yq --fix-missing \
        unzip \
        vim \
        wget \
-    && apt-key adv --keyserver "$GPG_KEYSERVER" --recv-keys "$TINI_GPG_KEY" \
     && apt-get clean \
     && rm -rf /var/apt/lists/*
 
-COPY fix-permissions "/usr/local/bin/"
-COPY --chown="1000:100" beakerx-root-cudnn7-conda-env.yml "${CONDA_DIR}/"
+LABEL org.label-schema.build-date="${BUILD_DATE}" \
+      org.label-schema.name="BeakerX" \
+      org.label-schema.description="BeakerX is a collection of kernels and extensions to the Jupyter interactive computing environment. It provides JVM support, interactive plots, tables, forms, publishing, and more." \
+      org.label-schema.url="http://beakerx.com" \
+      org.label-schema.vcs-ref="${VCS_REF}" \
+      org.label-schema.vcs-url="https://github.com/vishnu2kmohan/beakerx-dcos-docker" \
+      org.label-schema.version="${VERSION}" \
+      org.label-schema.schema-version="1.0" \
+      com.nvidia.cuda.version="${NVIDIA_CUDA_PKG_VERSION}" \
+      com.nvidia.cudnn.version="${NVIDIA_CUDNN_VERSION}"
 
-RUN cd /tmp \
+ENV HOME="/home/$NB_USER"
+
+COPY fix-permissions "/usr/local/bin/"
+COPY --chown="1000:100" beakerx-root-conda-env.yml "${CONDA_DIR}/"
+
+RUN apt-key adv --keyserver "$GPG_KEYSERVER" --recv-keys "$NVIDIA_CUDA_TOOLS_GPGKEY" \
+    && echo "deb $NVIDIA_URL/cuda/repos/${NVIDIA_DISTRO}/x86_64 /" > /etc/apt/sources.list.d/nvidia-cuda.list \
+    && echo "deb $NVIDIA_URL/machine-learning/repos/${NVIDIA_DISTRO}/x86_64 /" > /etc/apt/sources.list.d/nvidia-ml.list \
+    && apt-get update -yq --fix-missing \
+    && apt-get install -yq --no-install-recommends \
+       "cuda-nvrtc-${NVIDIA_CUDA_MAJOR_VERSION}=${NVIDIA_CUDA_PKG_VERSION}" \
+       "cuda-nvgraph-${NVIDIA_CUDA_MAJOR_VERSION}=${NVIDIA_CUDA_PKG_VERSION}" \
+       "cuda-cusolver-${NVIDIA_CUDA_MAJOR_VERSION}=${NVIDIA_CUDA_PKG_VERSION}" \
+       "cuda-cublas-${NVIDIA_CUDA_MAJOR_VERSION}=${NVIDIA_CUDA_PKG_VERSION}" \
+       "cuda-cufft-${NVIDIA_CUDA_MAJOR_VERSION}=${NVIDIA_CUDA_PKG_VERSION}" \
+       "cuda-curand-${NVIDIA_CUDA_MAJOR_VERSION}=${NVIDIA_CUDA_PKG_VERSION}" \
+       "cuda-cusparse-${NVIDIA_CUDA_MAJOR_VERSION}=${NVIDIA_CUDA_PKG_VERSION}" \
+       "cuda-npp-${NVIDIA_CUDA_MAJOR_VERSION}=${NVIDIA_CUDA_PKG_VERSION}" \
+       "cuda-cudart-${NVIDIA_CUDA_MAJOR_VERSION}=${NVIDIA_CUDA_PKG_VERSION}" \
+       "libcudnn${NVIDIA_CUDNN_MAJOR_VERSION}=${NVIDIA_CUDNN_PKG_VERSION}" \
+    && apt-get clean \
+    && rm -rf /var/apt/lists/* \
+    && cd /tmp \
+    && apt-key adv --keyserver "$GPG_KEYSERVER" --recv-keys "$TINI_GPG_KEY" \
     && curl --retry 3 -fsSL "$TINI_URL/$TINI_VERSION/tini" -o /usr/bin/tini \
     && curl --retry 3 -fsSL -O "$TINI_URL/$TINI_VERSION/tini.asc" \
     && export GNUPGHOME="$(mktemp -d)" \
@@ -87,7 +136,7 @@ RUN cd /tmp \
     && rm -rf "$GNUPGHOME" tini.asc \
     && chmod +x /usr/bin/tini \
     && curl --retry 3 -fsSL -O "${LIBMESOS_BUNDLE_URL}/libmesos-bundle-${LIBMESOS_BUNDLE_VERSION}.tar.gz" \
-    && echo "${LIBMESOS_BUNDLE_SHA256}" "libmesos-bundle-${LIBMESOS_BUNDLE_VERSION}.tar.gz" | sha256sum -c - \
+    && echo "${LIBMESOS_BUNDLE_SHA256}" "libmesos-bundle-${LIBMESOS_BUNDLE_VERSION}.tar.gz" | sha256sum --strict -c - \
     && mkdir -p "${HADOOP_CONF_DIR}" "${LIBMESOS_BUNDLE_PREFIX}" "${CONDA_DIR}" \
     && tar xf "libmesos-bundle-${LIBMESOS_BUNDLE_VERSION}.tar.gz" -C "${LIBMESOS_BUNDLE_PREFIX}" \
     && rm "libmesos-bundle-${LIBMESOS_BUNDLE_VERSION}.tar.gz" \
@@ -96,7 +145,6 @@ RUN cd /tmp \
     && echo "${MESOS_JAR_SHA1} mesos-${MESOS_VERSION}.jar" | sha1sum -c - \
     && curl --retry 3 -fsSL -O "${MESOS_MAVEN_URL}/${MESOS_VERSION}/mesos-${MESOS_VERSION}-shaded-protobuf.jar" \
     && echo "${MESOS_PROTOBUF_JAR_SHA1} mesos-${MESOS_VERSION}-shaded-protobuf.jar" | sha1sum -c - \
-    && cd /tmp \
     && rm -rf /tmp/* \
     && useradd -m -N -u "$NB_UID" -g "$NB_GID" -s /bin/bash "$NB_USER" \
     && chown $NB_UID:$NB_GID $CONDA_DIR \
@@ -116,7 +164,7 @@ RUN mkdir -p "$HOME/.jupyter" "$HOME/.sparkmagic" "$HOME/bin" "$HOME/work" \
     && $CONDA_DIR/bin/conda config --system --set auto_update_conda false \
     && $CONDA_DIR/bin/conda config --system --set show_channel_urls true \
     && $CONDA_DIR/bin/conda update --json --all -yq \
-    && $CONDA_DIR/bin/conda env update --json -q -f /opt/conda/beakerx-root-cudnn7-conda-env.yml \
+    && $CONDA_DIR/bin/conda env update --json -q -f /opt/conda/beakerx-root-conda-env.yml \
     && $CONDA_DIR/bin/jupyter labextension install @jupyter-widgets/jupyterlab-manager \
     && $CONDA_DIR/bin/jupyter labextension install @jupyterlab/hub-extension \
     && $CONDA_DIR/bin/jupyter labextension install @jupyterlab/geojson-extension \
@@ -126,6 +174,7 @@ RUN mkdir -p "$HOME/.jupyter" "$HOME/.sparkmagic" "$HOME/bin" "$HOME/work" \
     && $CONDA_DIR/bin/conda update --json --all -yq \
     && $CONDA_DIR/bin/npm cache clean \
     && rm -rf $CONDA_DIR/share/jupyter/lab/staging \
+    && rm -rf $HOME/.cache/yarn $HOME/.node-gyp \
     && $CONDA_DIR/bin/conda clean --json -tipsy \
     && fix-permissions $CONDA_DIR \
     && fix-permissions $HOME
@@ -148,6 +197,18 @@ COPY start.sh /usr/local/bin/
 COPY start-notebook.sh /usr/local/bin/
 COPY start-singleuser.sh /usr/local/bin/
 COPY jupyter_notebook_config.py /etc/jupyter/
-RUN fix-permissions /etc/jupyter/
+RUN echo "${LIBMESOS_BUNDLE_PREFIX}/libmesos-bundle/lib" >> /etc/ld.so.conf.d/libmesos.conf \
+    && cd /usr/local \
+    && ln -s "cuda-${NVIDIA_CUDA_VERSION}" "cuda" \
+    && echo "/usr/local/cuda/lib64" >> /etc/ld.so.conf.d/cuda.conf \
+    && echo "/usr/local/nvidia/lib" >> /etc/ld.so.conf.d/nvidia.conf \
+    && echo "/usr/local/nvidia/lib64" >> /etc/ld.so.conf.d/nvidia.conf \
+    && ldconfig \
+    && fix-permissions /etc/jupyter/
+
+ENV PATH="/usr/local/nvidia/bin:/usr/local/cuda/bin:$PATH" \
+    NVIDIA_VISIBLE_DEVICES="all" \
+    NVIDIA_DRIVER_CAPABILITIES="compute,utility" \
+    NVIDIA_REQUIRE_CUDA="cuda>=8.0"
 
 USER $NB_UID
