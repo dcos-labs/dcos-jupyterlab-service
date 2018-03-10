@@ -17,7 +17,7 @@ if [ $(id -u) == 0 ] ; then
     # Handle username change. Since this is cheap, do this unconditionally
     echo "Set username to: $NB_USER"
     usermod -d /home/$NB_USER -l $NB_USER beakerx
-    
+
     # Handle case where provisioned storage does not have the correct permissions by default
     # Ex: default NFS/EFS (no auto-uid/gid)
     if [[ "$CHOWN_HOME" == "1" || "$CHOWN_HOME" == 'yes' ]]; then
@@ -54,28 +54,66 @@ if [ $(id -u) == 0 ] ; then
     fi
 
     # Enable sudo if requested
-    if [[ "$GRANT_SUDO" == "1" || "$GRANT_SUDO" == 'yes' ]]; then
-        echo "Granting $NB_USER sudo access and appending $CONDA_DIR/bin to sudo PATH"
-        echo "$NB_USER ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/notebook
-    fi
+    #if [[ "$GRANT_SUDO" == "1" || "$GRANT_SUDO" == 'yes' ]]; then
+    #    echo "Granting $NB_USER sudo access and appending $CONDA_DIR/bin to sudo PATH"
+    #    echo "$NB_USER ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/notebook
+    #fi
 
     # Add $CONDA_DIR/bin to sudo secure_path
-    sed -ri "s#Defaults\s+secure_path=\"([^\"]+)\"#Defaults secure_path=\"\1:$CONDA_DIR/bin\"#" /etc/sudoers
+    #sed -r "s#Defaults\s+secure_path=\"([^\"]+)\"#Defaults secure_path=\"\1:$CONDA_DIR/bin\"#" /etc/sudoers | grep secure_path > /etc/sudoers.d/path
 
     # Exec the command as NB_USER with the PATH and the rest of
     # the environment preserved
     echo "Executing the command: $cmd"
     exec sudo -E -H -u $NB_USER PATH=$PATH PYTHONPATH=$PYTHONPATH $cmd
 else
-    if [[ ! -z "$NB_UID" && "$NB_UID" != "$(id -u)" ]]; then
-        echo 'Container must be run as root to set $NB_UID'
+    if [[ "$NB_UID" == "$(id -u beakerx)" && "$NB_GID" == "$(id -g beakerx)" ]]; then
+        # User is not attempting to override user/group via environment
+        # variables, but they could still have overridden the uid/gid that
+        # container runs as. Check that the user has an entry in the passwd
+        # file and if not add an entry. Also add a group file entry if the
+        # uid has its own distinct group but there is no entry.
+	whoami &> /dev/null || STATUS=$? && true
+	if [[ "$STATUS" != "0" ]]; then
+            if [[ -w /etc/passwd ]]; then
+                echo "Adding passwd file entry for $(id -u)"
+                cat /etc/passwd | sed -e "s/^beakerx:/xrekaeb:/" > /tmp/passwd
+                echo "beakerx:x:$(id -u):$(id -g):,,,:/home/beakerx:/bin/bash" >> /tmp/passwd
+                cat /tmp/passwd > /etc/passwd
+                rm /tmp/passwd
+                id -G -n 2>/dev/null | grep -q -w $(id -u) || STATUS=$? && true
+                if [[ "$STATUS" != "0" && "$(id -g)" == "0" ]]; then
+                    echo "Adding group file entry for $(id -u)"
+                    echo "beakerx:x:$(id -u):" >> /etc/group
+                fi
+            else
+                echo 'Container must be run with group root to update passwd file'
+            fi
+        fi
+
+        # Warn if the user isn't going to be able to write files to $HOME.
+        if [[ ! -w /home/beakerx ]]; then
+            echo 'Container must be run with group users to update files'
+        fi
+    else
+        # Warn if looks like user want to override uid/gid but hasn't
+        # run the container as root.
+        if [[ ! -z "$NB_UID" && "$NB_UID" != "$(id -u)" ]]; then
+            echo 'Container must be run as root to set $NB_UID'
+        fi
+        if [[ ! -z "$NB_GID" && "$NB_GID" != "$(id -g)" ]]; then
+            echo 'Container must be run as root to set $NB_GID'
+        fi
     fi
-    if [[ ! -z "$NB_GID" && "$NB_GID" != "$(id -g)" ]]; then
-        echo 'Container must be run as root to set $NB_GID'
-    fi
-    if [[ "$GRANT_SUDO" == "1" || "$GRANT_SUDO" == 'yes' ]]; then
-        echo 'Container must be run as root to grant sudo permissions'
-    fi
+
+    # Warn if looks like user want to run in sudo mode but hasn't run
+    # the container as root.
+    #if [[ "$GRANT_SUDO" == "1" || "$GRANT_SUDO" == 'yes' ]]; then
+    #    echo 'Container must be run as root to grant sudo permissions'
+    #fi
+
+    # Change ownership of $MESOS_SANDBOX so that $NB_USER can write to it
+    chown $NB_UID:$NB_GID $MESOS_SANDBOX
 
     # Execute the command
     echo "Executing the command: $cmd"
