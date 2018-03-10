@@ -15,4 +15,5 @@ dependencies:
 - pyarrow
 - pyspark
 - s3fs
+- tensorflow=1.5.0=py36_0
 - xgboost

@@ -8,7 +8,7 @@ ARG AWS_JAVA_SDK_VERSION="1.7.5"
 ARG BUILD_DATE
 ARG CODENAME="stretch"
 ARG CONDA_DIR="/opt/conda"
-ARG CONDA_ENV_YML="beakerx-root-conda-env.yml"
+ARG CONDA_ENV_YML="beakerx-root-conda-base-env.yml"
 ARG CONDA_INSTALLER="Miniconda3-4.3.31-Linux-x86_64.sh"
 ARG CONDA_MD5="7fe70b214bee1143e3e3f0467b71453c"
 ARG CONDA_URL="https://repo.continuum.io/miniconda"
@@ -155,7 +155,6 @@ RUN cd /tmp \
     && rm -rf /tmp/* \
     && useradd -m -N -u "$NB_UID" -g "$NB_GID" -s /bin/bash "$NB_USER" \
     && chown $NB_UID:$NB_GID $CONDA_DIR \
-    && fix-permissions $MESOSPHERE_PREFIX \
     && fix-permissions $CONDA_DIR \
     && fix-permissions $HOME
 

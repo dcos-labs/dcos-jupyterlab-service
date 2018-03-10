@@ -17,11 +17,6 @@ if [ -d "$HOME/bin" ] ; then
     PATH="$HOME/bin:$PATH"
 fi
 
-# set PATH so it includes conda's bin if it exists
-if [ -d "$HOME/conda/bin" ] ; then
-    PATH="$HOME/conda/bin:$PATH"
-fi
-
 export PATH
 
 # if running bash
