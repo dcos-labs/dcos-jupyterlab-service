@@ -3,7 +3,7 @@
   "instances": 1,
   "cpus": 1,
   "mem": 2048,
-  "cmd": "/usr/local/bin/start.sh jupyter lab",
+  "cmd": "/usr/local/bin/start.sh ${CONDA_DIR}/bin/jupyter lab",
   "container": {
     "type": "MESOS",
     "docker": {
