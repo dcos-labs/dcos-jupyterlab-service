@@ -12,48 +12,50 @@ else
 fi
 
 # Handle special flags if we're root
-if [ $(id -u) == 0 ] ; then
+if [ "$(id -u)" == '0' ] ; then
 
     # Handle username change. Since this is cheap, do this unconditionally
     echo "Set username to: $NB_USER"
-    usermod -d /home/$NB_USER -l $NB_USER beakerx
+    usermod -d "/home/${NB_USER}" -l "${NB_USER}" beakerx
 
     # Handle case where provisioned storage does not have the correct permissions by default
     # Ex: default NFS/EFS (no auto-uid/gid)
-    if [[ "$CHOWN_HOME" == "1" || "$CHOWN_HOME" == 'yes' ]]; then
-        echo "Changing ownership of /home/$NB_USER to $NB_UID:$NB_GID"
-        chown $NB_UID:$NB_GID /home/$NB_USER
+    if [[ "${CHOWN_HOME}" == "1" || "${CHOWN_HOME}" == 'yes' ]]; then
+        echo "Changing ownership of /home/${NB_USER} to ${NB_UID}:${NB_GID}"
+        chown "${NB_UID}:${NB_GID}" "/home/${NB_USER}"
     fi
 
-    # Change ownership of $MESOS_SANDBOX so that $NB_USER can write to it
-    chown $NB_UID:$NB_GID $MESOS_SANDBOX
+    if [ -d "${MESOS_SANDBOX}" ];then
+        # Change ownership of $MESOS_SANDBOX so that $NB_USER can write to it
+        chown "${NB_UID}:${NB_GID}" "${MESOS_SANDBOX}"
+    fi
 
     # handle home and working directory if the username changed
-    if [[ "$NB_USER" != "beakerx" ]]; then
+    if [[ "${NB_USER}" != "beakerx" ]]; then
         # changing username, make sure homedir exists
         # (it could be mounted, and we shouldn't create it if it already exists)
-        if [[ ! -e "/home/$NB_USER" ]]; then
-            echo "Relocating home dir to /home/$NB_USER"
-            mv /home/beakerx "/home/$NB_USER"
+        if [[ ! -e "/home/${NB_USER}" ]]; then
+            echo "Relocating home dir to /home/${NB_USER}"
+            mv /home/beakerx "/home/${NB_USER}"
         fi
         # if workdir is in /home/beakerx, cd to /home/$NB_USER
-        if [[ "$PWD/" == "/home/beakerx/"* ]]; then
-            newcwd="/home/$NB_USER/${PWD:13}"
-            echo "Setting CWD to $newcwd"
-            cd "$newcwd"
+        if [[ "${PWD}/" == "/home/beakerx/"* ]]; then
+            newcwd="/home/${NB_USER}/${PWD:13}"
+            echo "Setting CWD to ${newcwd}"
+            cd "${newcwd}"
         fi
     fi
 
     # Change UID of NB_USER to NB_UID if it does not match
-    if [ "$NB_UID" != $(id -u $NB_USER) ] ; then
-        echo "Set $NB_USER UID to: $NB_UID"
-        usermod -u $NB_UID $NB_USER
+    if [ "${NB_UID}" != "$(id -u ${NB_USER})" ] ; then
+        echo "Set ${NB_USER} UID to: ${NB_UID}"
+        usermod -u "${NB_UID}" "${NB_USER}"
     fi
 
     # Change GID of NB_USER to NB_GID if it does not match
-    if [ "$NB_GID" != $(id -g $NB_USER) ] ; then
-        echo "Set $NB_USER GID to: $NB_GID"
-        groupmod -g $NB_GID -o $(id -g -n $NB_USER)
+    if [ "${NB_GID}" != "$(id -g ${NB_USER})" ] ; then
+        echo "Set ${NB_USER} GID to: ${NB_GID}"
+        groupmod -g "${NB_GID}" -o "$(id -g -n ${NB_USER})"
     fi
 
     # Enable sudo if requested
@@ -67,25 +69,25 @@ if [ $(id -u) == 0 ] ; then
 
     # Exec the command as NB_USER with the PATH and the rest of
     # the environment preserved
-    echo "Executing the command: $cmd"
-    exec sudo -E -H -u $NB_USER PATH=$PATH PYTHONPATH=$PYTHONPATH $cmd
+    echo "Executing the command: ${cmd}"
+    exec sudo -E -H -u "${NB_USER}" PATH="${PATH}" PYTHONPATH="${PYTHONPATH}" "${cmd}"
 else
-    if [[ "$NB_UID" == "$(id -u beakerx)" && "$NB_GID" == "$(id -g beakerx)" ]]; then
+    if [[ "${NB_UID}" == "$(id -u beakerx)" && "${NB_GID}" == "$(id -g beakerx)" ]]; then
         # User is not attempting to override user/group via environment
         # variables, but they could still have overridden the uid/gid that
         # container runs as. Check that the user has an entry in the passwd
         # file and if not add an entry. Also add a group file entry if the
         # uid has its own distinct group but there is no entry.
 	whoami &> /dev/null || STATUS=$? && true
-	if [[ "$STATUS" != "0" ]]; then
+	if [[ "${STATUS}" != "0" ]]; then
             if [[ -w /etc/passwd ]]; then
                 echo "Adding passwd file entry for $(id -u)"
-                cat /etc/passwd | sed -e "s/^beakerx:/xrekaeb:/" > /tmp/passwd
+                sed -e "s/^beakerx:/xrekaeb:/" /etc/passwd > /tmp/passwd
                 echo "beakerx:x:$(id -u):$(id -g):,,,:/home/beakerx:/bin/bash" >> /tmp/passwd
                 cat /tmp/passwd > /etc/passwd
                 rm /tmp/passwd
-                id -G -n 2>/dev/null | grep -q -w $(id -u) || STATUS=$? && true
-                if [[ "$STATUS" != "0" && "$(id -g)" == "0" ]]; then
+                id -G -n 2>/dev/null | grep -q -w "$(id -u)" || STATUS=$? && true
+                if [[ "${STATUS}" != "0" && "$(id -g)" == "0" ]]; then
                     echo "Adding group file entry for $(id -u)"
                     echo "beakerx:x:$(id -u):" >> /etc/group
                 fi
@@ -101,21 +103,21 @@ else
     else
         # Warn if looks like user want to override uid/gid but hasn't
         # run the container as root.
-        if [[ ! -z "$NB_UID" && "$NB_UID" != "$(id -u)" ]]; then
-            echo 'Container must be run as root to set $NB_UID'
+        if [[ ! -z "${NB_UID}" && "${NB_UID}" != "$(id -u)" ]]; then
+            echo 'Container must be run as root to set ${NB_UID}'
         fi
-        if [[ ! -z "$NB_GID" && "$NB_GID" != "$(id -g)" ]]; then
+        if [[ ! -z "${NB_GID}" && "${NB_GID}" != "$(id -g)" ]]; then
             echo 'Container must be run as root to set $NB_GID'
         fi
     fi
 
     # Warn if looks like user want to run in sudo mode but hasn't run
     # the container as root.
-    #if [[ "$GRANT_SUDO" == "1" || "$GRANT_SUDO" == 'yes' ]]; then
+    #if [[ "${GRANT_SUDO}" == "1" || "${GRANT_SUDO}" == 'yes' ]]; then
     #    echo 'Container must be run as root to grant sudo permissions'
     #fi
 
     # Execute the command
-    echo "Executing the command: $cmd"
-    exec $cmd
+    echo "Executing the command: ${cmd}"
+    exec "${cmd}"
 fi
