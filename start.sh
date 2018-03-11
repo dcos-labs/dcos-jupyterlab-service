@@ -25,6 +25,9 @@ if [ $(id -u) == 0 ] ; then
         chown $NB_UID:$NB_GID /home/$NB_USER
     fi
 
+    # Change ownership of $MESOS_SANDBOX so that $NB_USER can write to it
+    chown $NB_UID:$NB_GID $MESOS_SANDBOX
+
     # handle home and working directory if the username changed
     if [[ "$NB_USER" != "beakerx" ]]; then
         # changing username, make sure homedir exists
@@ -111,9 +114,6 @@ else
     #if [[ "$GRANT_SUDO" == "1" || "$GRANT_SUDO" == 'yes' ]]; then
     #    echo 'Container must be run as root to grant sudo permissions'
     #fi
-
-    # Change ownership of $MESOS_SANDBOX so that $NB_USER can write to it
-    chown $NB_UID:$NB_GID $MESOS_SANDBOX
 
     # Execute the command
     echo "Executing the command: $cmd"
