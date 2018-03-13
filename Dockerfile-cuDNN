@@ -8,33 +8,41 @@ ARG NVIDIA_CUDA_TOOLS_GPG_KEY="7fa2af80"
 ARG NVIDIA_CUDNN_MAJOR_VERSION="7"
 ARG NVIDIA_CUDNN_PKG_VERSION="7.1.1.5-1+cuda9.0"
 ARG NVIDIA_DISTRO="ubuntu1604"
-ARG NVIDIA_NCCL_VERSION="2.1.2-1+cuda9.0"
+ARG NVIDIA_DRIVER_CAPABILITIES="compute,utility"
+ARG NVIDIA_NCCL_MAJOR_VERSION="2"
+ARG NVIDIA_NCCL_PKG_VERSION="2.1.2-1+cuda9.0"
+ARG NVIDIA_REQUIRE_CUDA="cuda>=9.0"
 ARG NVIDIA_URL="http://developer.download.nvidia.com/compute"
+ARG NVIDIA_VISIBLE_DEVICES="all"
+ARG NVIDIA_VOLUMES_NEEDED="nvidia_driver"
 
-ENV NVIDIA_VISIBLE_DEVICES=all \
-    NVIDIA_DRIVER_CAPABILITIES=compute,utility \
-    NVIDIA_REQUIRE_CUDA="cuda>=9.0"
+ENV NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES:-"all"} \
+    NVIDIA_DRIVER_CAPABILITIES=${NVIDIA_DRIVER_CAPABILITIES:-"compute,utility"} \
+    NVIDIA_REQUIRE_CUDA=${NVIDIA_REQUIRE_CUDA:-"cuda>=9.0"}
 
-LABEL com.nvidia.volumes.needed="nvidia_driver" \
+LABEL com.nvidia.volumes.needed=${NVIDIA_VOLUMES_NEEDED:-"nvidia_driver"} \
       com.nvidia.cuda.version="${NVIDIA_CUDA_PKG_VERSION}" \
       com.nvidia.cudnn.version="${NVIDIA_CUDNN_VERSION}"
 
 USER root
 
-# Need to unset LD_LIBRARY_PATH first so that libraries in /opt/mesosphere/libmesos-bundle lib don't interfere with apt
+# Need to unset LD_LIBRARY_PATH first so that libraries in ${MESOSPHERE_PREFIX}/libmesos-bundle/lib don't interfere with apt
 RUN unset LD_LIBRARY_PATH \
-    && apt-key adv --keyserver "$GPG_KEYSERVER" --recv-keys "$NVIDIA_CUDA_TOOLS_GPG_KEY" \
-    && echo "deb $NVIDIA_URL/cuda/repos/${NVIDIA_DISTRO}/x86_64 /" > /etc/apt/sources.list.d/nvidia-cuda.list \
-    && echo "deb $NVIDIA_URL/machine-learning/repos/${NVIDIA_DISTRO}/x86_64 /" > /etc/apt/sources.list.d/nvidia-ml.list \
+    && apt-key adv --keyserver "${GPG_KEYSERVER}" --recv-keys "${NVIDIA_CUDA_TOOLS_GPG_KEY}" \
+    && echo "deb ${NVIDIA_URL}/cuda/repos/${NVIDIA_DISTRO}/x86_64 /" > /etc/apt/sources.list.d/nvidia-cuda.list \
+    && echo "deb ${NVIDIA_URL}/machine-learning/repos/${NVIDIA_DISTRO}/x86_64 /" > /etc/apt/sources.list.d/nvidia-ml.list \
     && apt-get update -yq --fix-missing \
     && apt-get install -yq --no-install-recommends \
        "cuda-cudart-${NVIDIA_CUDA_MAJOR_VERSION}=${NVIDIA_CUDA_PKG_VERSION}" \
        "cuda-libraries-${NVIDIA_CUDA_MAJOR_VERSION}=${NVIDIA_CUDA_PKG_VERSION}" \
        "cuda-libraries-dev-${NVIDIA_CUDA_MAJOR_VERSION}=${NVIDIA_CUDA_PKG_VERSION}" \
-       "libnccl2=${NVIDIA_NCCL_VERSION}" \
-       "libcudnn7=${NVIDIA_CUDNN_PKG_VERSION}" \
-    && ln -s /usr/local/cuda-9.0 /usr/local/cuda \
-    && ln -s /usr/local/cuda-9.0/targets/x86_64-linux/lib/stubs/libcuda.so /usr/local/cuda-9.0/targets/x86_64-linux/lib/libcuda.so.1 \
+       "libnccl${NVIDIA_NCCL_MAJOR_VERSION}=${NVIDIA_NCCL_PKG_VERSION}" \
+       "libcudnn${NVIDIA_CUDNN_MAJOR_VERSION}=${NVIDIA_CUDNN_PKG_VERSION}" \
+    && cd /usr/local \
+    && ln -s "cuda-${NVIDIA_CUDA_VERSION}" cuda \
+    && cd cuda-"${NVIDIA_CUDA_VERSION}/targets/x86_64-linux/lib" \
+    && ln -s stubs/libcuda.so libcuda.so.1 \
+    && ldconfig \
     && apt-get clean \
     && rm -rf /var/apt/lists/*
 
@@ -42,11 +50,11 @@ COPY --chown="1000:100" "${CONDA_ENV_YML}" "${CONDA_DIR}/"
 
 USER $NB_UID
 
-RUN $CONDA_DIR/bin/conda env update --json -q -f "${CONDA_DIR}/${CONDA_ENV_YML}" \
-    && $CONDA_DIR/bin/conda update --json --all -yq \
-    && $CONDA_DIR/bin/npm cache clean \
-    && rm -rf $CONDA_DIR/share/jupyter/lab/staging \
-    && rm -rf $HOME/.cache/yarn $HOME/.node-gyp \
-    && $CONDA_DIR/bin/conda clean --json -tipsy \
-    && fix-permissions $CONDA_DIR \
-    && fix-permissions $HOME
+RUN ${CONDA_DIR}/bin/conda env update --json -q -f "${CONDA_DIR}/${CONDA_ENV_YML}" \
+    && ${CONDA_DIR}/bin/conda update --json --all -yq \
+    && ${CONDA_DIR}/bin/npm cache clean \
+    && rm -rf "${CONDA_DIR}/share/jupyter/lab/staging" \
+    && rm -rf "${HOME}/.cache/yarn" "${HOME}/.node-gyp" \
+    && ${CONDA_DIR}/bin/conda clean --json -tipsy \
+    && fix-permissions ${CONDA_DIR} \
+    && fix-permissions ${HOME}
