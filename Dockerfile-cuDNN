@@ -44,7 +44,7 @@ RUN unset LD_LIBRARY_PATH \
     && ln -s stubs/libcuda.so libcuda.so.1 \
     && ldconfig \
     && apt-get clean \
-    && rm -rf /var/apt/lists/*
+    && rm -rf /var/lib/apt/lists/*
 
 COPY --chown="1000:100" "${CONDA_ENV_YML}" "${CONDA_DIR}/"
 

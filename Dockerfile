@@ -118,7 +118,7 @@ RUN echo "deb ${REPO}/${DISTRO} ${CODENAME} main" \
        vim \
        wget \
     && apt-get clean \
-    && rm -rf /var/apt/lists/* \
+    && rm -rf /var/lib/apt/lists/* \
     && usermod -u 99 nobody \
     && addgroup --gid 99 nobody \
     && usermod -g nobody nobody \
