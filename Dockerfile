@@ -1,6 +1,6 @@
-# debian:9.3 - linux; amd64
-# https://github.com/docker-library/repo-info/blob/master/repos/debian/tag-details.md#debian93---linux-amd64
-FROM debian@sha256:02741df16aee1b81c4aaff4c48d75cc2c308bade918b22679df570c170feef7c
+# debian:9.4 - linux; amd64
+# https://github.com/docker-library/repo-info/blob/master/repos/debian/tag-details.md#debian94---linux-amd64
+FROM debian@sha256:316ebb92ca66bb8ddc79249fb29872bece4be384cb61b5344fac4e84ca4ed2b2
 
 ARG AWS_JAVA_SDK_JAR_SHA1="650f07e69b071cbf41c32d4ea35fd6bbba8e6793"
 ARG AWS_JAVA_SDK_URL="https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk"
@@ -13,15 +13,19 @@ ARG CONDA_INSTALLER="Miniconda3-4.3.31-Linux-x86_64.sh"
 ARG CONDA_MD5="7fe70b214bee1143e3e3f0467b71453c"
 ARG CONDA_URL="https://repo.continuum.io/miniconda"
 ARG DCOS_COMMONS_URL="https://downloads.mesosphere.com/dcos-commons"
-ARG DCOS_COMMONS_VERSION="0.40.3"
+ARG DCOS_COMMONS_VERSION="0.40.5"
 ARG DISTRO="debian"
 ARG DEBCONF_NONINTERACTIVE_SEEN="true"
 ARG DEBIAN_FRONTEND="noninteractive"
-ARG GPG_KEYSERVER="hkps://pgp.mit.edu"
+ARG GPG_KEYSERVER="hkps://zimmermann.mayfirst.org"
 ARG HADOOP_AWS_JAR_SHA1="cfb9d10d22cccdfcb98345c1861912aec86710c8"
 ARG HADOOP_AWS_URL="https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws"
 ARG HADOOP_AWS_VERSION="2.7.5"
-ARG HADOOP_VERSION="2.7"
+ARG HADOOP_HDFS_HOME="/opt/hadoop"
+ARG HADOOP_MAJOR_VERSION="2.7"
+ARG HADOOP_SHA256="0bfc4d9b04be919be2fdf36f67fa3b4526cdbd406c512a7a1f5f1b715661f831"
+ARG HADOOP_URL="http://www-us.apache.org/dist/hadoop/common"
+ARG HADOOP_VERSION="2.7.5"
 ARG HOME="/home/beakerx"
 ARG JAVA_HOME="/opt/jdk"
 ARG JAVA_URL="https://downloads.mesosphere.com/java"
@@ -29,9 +33,9 @@ ARG JAVA_VERSION="8u162"
 ARG LANG="en_US.UTF-8"
 ARG LANGUAGE="en_US.UTF-8"
 ARG LC_ALL="en_US.UTF-8"
-ARG LIBMESOS_BUNDLE_SHA256="875f6500101c7b219feebe05bd8ca68ea98682f974ca7f8efc14cb52790977b0"
+ARG LIBMESOS_BUNDLE_SHA256="bd4a785393f0477da7f012bf9624aa7dd65aa243c94d38ffe94adaa10de30274"
 ARG LIBMESOS_BUNDLE_URL="https://downloads.mesosphere.com/libmesos-bundle"
-ARG LIBMESOS_BUNDLE_VERSION="master-28f8827"
+ARG LIBMESOS_BUNDLE_VERSION="1.11.0"
 ARG MESOSPHERE_PREFIX="/opt/mesosphere"
 ARG MESOS_JAR_SHA1="0cef8031567f2ef367e8b6424a94d518e76fb8dc"
 ARG MESOS_MAVEN_URL="https://repo1.maven.org/maven2/org/apache/mesos/mesos"
@@ -43,21 +47,23 @@ ARG NB_USER="beakerx"
 ARG REPO="http://cdn-fastly.deb.debian.org"
 ARG SPARK_DIST_URL="https://downloads.mesosphere.com/spark"
 ARG SPARK_HOME="/opt/spark"
-ARG SPARK_VERSION="2.2.1-2-beta"
+ARG SPARK_VERSION="2.2.1-2"
+ARG TENSORFLOW_SERVING_APT_URL="http://storage.googleapis.com/tensorflow-serving-apt"
+ARG TENSORFLOW_SERVING_VERSION=1.5.0
 ARG TINI_GPG_KEY="6380DC428747F6C393FEACA59A84159D7001A4E5"
 ARG TINI_URL="https://github.com/krallin/tini/releases/download"
-ARG TINI_VERSION="v0.16.1"
+ARG TINI_VERSION="v0.17.0"
 ARG VCS_REF
-ARG VERSION="0.13.0-1.10.5"
+ARG BEAKERX_DCOS_VERSION="0.14.0-1.11.0"
 
 LABEL maintainer="Vishnu Mohan <vishnu@mesosphere.com>" \
-      org.label-schema.build-date=$BUILD_DATE \
+      org.label-schema.build-date="${BUILD_DATE}" \
       org.label-schema.name="BeakerX" \
       org.label-schema.description="BeakerX is a collection of kernels and extensions to the Jupyter interactive computing environment. It provides JVM support, interactive plots, tables, forms, publishing, and more." \
       org.label-schema.url="http://beakerx.com" \
-      org.label-schema.vcs-ref=$VCS_REF \
+      org.label-schema.vcs-ref="${VCS_REF}" \
       org.label-schema.vcs-url="https://github.com/vishnu2kmohan/beakerx-dcos-docker" \
-      org.label-schema.version=$VERSION \
+      org.label-schema.version="${BEAKERX_DCOS_VERSION}" \
       org.label-schema.schema-version="1.0"
 
 ENV BOOTSTRAP="${MESOSPHERE_PREFIX}/bin/bootstrap" \
@@ -66,7 +72,8 @@ ENV BOOTSTRAP="${MESOSPHERE_PREFIX}/bin/bootstrap" \
     DEBCONF_NONINTERACTIVE_SEEN=${DEBCONF_NONINTERACTIVE_SEEN:-"true"} \
     DEBIAN_FRONTEND=${DEBIAN_FRONTEND:-"noninteractive"} \
     DISTRO=${DISTRO:-"debian"} \
-    GPG_KEYSERVER=${GPG_KEYSERVER:-"hkps://pgp.mit.edu"} \
+    GPG_KEYSERVER=${GPG_KEYSERVER:-"hkps://zimmermann.mayfirst.org"} \
+    HADOOP_HDFS_HOME=${HADOOP_HDFS_HOME:-"/opt/hadoop"} \
     HOME="/home/$NB_USER" \
     JAVA_HOME=${JAVA_HOME:-"/opt/jdk"} \
     LANG=${LANG:-"en_US.UTF-8"} \
@@ -135,11 +142,10 @@ RUN cd /tmp \
     && gpg --batch --verify tini.asc /usr/bin/tini \
     && rm -rf "${GNUPGHOME}" tini.asc \
     && chmod +x /usr/bin/tini \
-    && mkdir -p "${JAVA_HOME}" "${SPARK_HOME}" "${MESOSPHERE_PREFIX}/bin" "${CONDA_DIR}" \
+    && mkdir -p "${CONDA_DIR}" "${HADOOP_HDFS_HOME}" "${JAVA_HOME}" "${MESOSPHERE_PREFIX}/bin" "${SPARK_HOME}" \
     && curl --retry 3 -fsSL -O "${LIBMESOS_BUNDLE_URL}/libmesos-bundle-${LIBMESOS_BUNDLE_VERSION}.tar.gz" \
     && echo "${LIBMESOS_BUNDLE_SHA256}" "libmesos-bundle-${LIBMESOS_BUNDLE_VERSION}.tar.gz" | sha256sum -c - \
     && tar xf "libmesos-bundle-${LIBMESOS_BUNDLE_VERSION}.tar.gz" -C "${MESOSPHERE_PREFIX}" \
-    && rm "libmesos-bundle-${LIBMESOS_BUNDLE_VERSION}.tar.gz" \
     && cd "${MESOSPHERE_PREFIX}/libmesos-bundle/lib" \
     && curl --retry 3 -fsSL -O "${MESOS_MAVEN_URL}/${MESOS_VERSION}/mesos-${MESOS_VERSION}.jar" \
     && echo "${MESOS_JAR_SHA1} mesos-${MESOS_VERSION}.jar" | sha1sum -c - \
@@ -150,8 +156,11 @@ RUN cd /tmp \
     && unzip "bootstrap.zip" -d "${MESOSPHERE_PREFIX}/bin/" \
     && curl --retry 3 -fsSL -O "${JAVA_URL}/server-jre-${JAVA_VERSION}-linux-x64.tar.gz" \
     && tar xf "server-jre-${JAVA_VERSION}-linux-x64.tar.gz" -C "${JAVA_HOME}" --strip-components=1 \
-    && curl --retry 3 -fsSL -O "${SPARK_DIST_URL}/assets/spark-${SPARK_VERSION}-bin-${HADOOP_VERSION}.tgz" \
-    && tar xf "spark-${SPARK_VERSION}-bin-${HADOOP_VERSION}.tgz" -C "${SPARK_HOME}" --strip-components=1 \
+    && curl --retry 3 -fsSL -O "${HADOOP_URL}/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz" \
+    && echo "${HADOOP_SHA256}" "hadoop-${HADOOP_VERSION}.tar.gz" | sha256sum -c - \
+    && tar xf "hadoop-${HADOOP_VERSION}.tar.gz" -C "${HADOOP_HDFS_HOME}" --strip-components=1 \
+    && curl --retry 3 -fsSL -O "${SPARK_DIST_URL}/assets/spark-${SPARK_VERSION}-bin-${HADOOP_MAJOR_VERSION}.tgz" \
+    && tar xf "spark-${SPARK_VERSION}-bin-${HADOOP_MAJOR_VERSION}.tgz" -C "${SPARK_HOME}" --strip-components=1 \
     && cd "${SPARK_HOME}/jars" \
     && curl --retry 3 -fsSL -O "${AWS_JAVA_SDK_URL}/${AWS_JAVA_SDK_VERSION}/aws-java-sdk-${AWS_JAVA_SDK_VERSION}.jar" \
     && echo "${AWS_JAVA_SDK_JAR_SHA1} aws-java-sdk-${AWS_JAVA_SDK_VERSION}.jar" | sha1sum -c - \
@@ -162,6 +171,16 @@ RUN cd /tmp \
     && chown "${NB_UID}:${NB_GID}" "${CONDA_DIR}" \
     && fix-permissions "${CONDA_DIR}" \
     && fix-permissions "${HOME}"
+
+RUN echo "deb [arch=amd64] ${TENSORFLOW_SERVING_APT_URL} stable tensorflow-model-server tensorflow-model-server-universal" > /etc/apt/sources.list.d/tensorflow-serving.list \
+    && curl --retry 3 -fsSL ${TENSORFLOW_SERVING_APT_URL}/tensorflow-serving.release.pub.gpg | apt-key add - \
+    && apt-get update \
+    && TENSORFLOW_SERVING_DEB="$(mktemp)" \
+    && curl --retry 3 -fsSL "${TENSORFLOW_SERVING_APT_URL}/pool/tensorflow-model-server-${TENSORFLOW_SERVING_VERSION}/t/tensorflow-model-server/tensorflow-model-server_${TENSORFLOW_SERVING_VERSION}_all.deb" -o "${TENSORFLOW_SERVING_DEB}"\
+    && dpkg -i "${TENSORFLOW_SERVING_DEB}" \
+    && rm -f "${TENSORFLOW_SERVING_DEB}" \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY --chown="1000:100" "${CONDA_ENV_YML}" "${CONDA_DIR}/"
 
@@ -175,6 +194,7 @@ RUN cd /tmp \
     && ${CONDA_DIR}/bin/conda config --system --set auto_update_conda false \
     && ${CONDA_DIR}/bin/conda config --system --set show_channel_urls true \
     && ${CONDA_DIR}/bin/conda update --json --all -yq \
+    && ${CONDA_DIR}/bin/conda install --json -yq pandas \
     && ${CONDA_DIR}/bin/conda env update --json -q -f "${CONDA_DIR}/${CONDA_ENV_YML}" \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyter-widgets/jupyterlab-manager \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/hub-extension \
@@ -182,7 +202,6 @@ RUN cd /tmp \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/github \
     && ${CONDA_DIR}/bin/jupyter labextension install jupyterlab_bokeh \
     && ${CONDA_DIR}/bin/jupyter labextension install beakerx-jupyterlab \
-    && ${CONDA_DIR}/bin/conda update --json --all -yq \
     && ${CONDA_DIR}/bin/npm cache clean \
     && rm -rf "${CONDA_DIR}/share/jupyter/lab/staging" \
     && rm -rf "${HOME}/.cache/yarn ${HOME}/.node-gyp" \
@@ -215,6 +234,6 @@ RUN fix-permissions /etc/jupyter/ \
     && cp "${CONDA_DIR}/share/examples/krb5/krb5.conf" /etc \
     && chmod ugo+rw /etc/krb5.conf
 
-ENV LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${MESOSPHERE_PREFIX}/libmesos-bundle/lib"
+ENV LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${MESOSPHERE_PREFIX}/libmesos-bundle/lib:${JAVA_HOME}/jre/lib/amd64/server"
 WORKDIR "${HOME}"
 USER "${NB_UID}"

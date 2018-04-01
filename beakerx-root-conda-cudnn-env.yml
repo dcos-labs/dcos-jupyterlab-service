@@ -1,6 +1,8 @@
 name: root
 channels:
 - conda-forge
+- defaults
 dependencies:
+- numba
 - pip:
   - tensorflow-gpu==1.5.0

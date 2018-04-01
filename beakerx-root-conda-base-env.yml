@@ -1,17 +1,22 @@
 name: root
 channels:
 - conda-forge
+- defaults
 dependencies:
 - awscli
+- bazel=0.11.1
 - beakerx
 - bokeh
 - dask
 - distributed
+- grpcio=1.10.0
 - ipywidgets
 - libhdfs3
+- matplotlib
 - jupyterhub
 - jupyterlab
 - nbconvert
+- pandas
 - pyarrow
 - s3fs
 - tensorflow=1.5.0=py36_0

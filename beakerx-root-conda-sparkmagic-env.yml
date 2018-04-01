@@ -1,6 +1,6 @@
-name: beakerx
-prefix: /home/conda/conda/envs/beakerx
+name: root
 channels:
 - conda-forge
+- defaults
 dependencies:
 - sparkmagic
