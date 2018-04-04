@@ -16,10 +16,6 @@ ARG NVIDIA_URL="http://developer.download.nvidia.com/compute"
 ARG NVIDIA_VISIBLE_DEVICES="all"
 ARG NVIDIA_VOLUMES_NEEDED="nvidia_driver"
 
-ENV NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES:-"all"} \
-    NVIDIA_DRIVER_CAPABILITIES=${NVIDIA_DRIVER_CAPABILITIES:-"compute,utility"} \
-    NVIDIA_REQUIRE_CUDA=${NVIDIA_REQUIRE_CUDA:-"cuda>=9.0"}
-
 LABEL com.nvidia.volumes.needed=${NVIDIA_VOLUMES_NEEDED:-"nvidia_driver"} \
       com.nvidia.cuda.version="${NVIDIA_CUDA_PKG_VERSION}" \
       com.nvidia.cudnn.version="${NVIDIA_CUDNN_VERSION}"
@@ -42,6 +38,8 @@ RUN unset LD_LIBRARY_PATH \
     && ln -s "cuda-${NVIDIA_CUDA_VERSION}" cuda \
     && cd cuda-"${NVIDIA_CUDA_VERSION}/targets/x86_64-linux/lib" \
     && ln -s stubs/libcuda.so libcuda.so.1 \
+    && echo "/usr/local/nvidia/lib" >> /etc/ld.so.conf.d/nvidia.conf \
+    && echo "/usr/local/nvidia/lib64" >> /etc/ld.so.conf.d/nvidia.conf \
     && ldconfig \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
@@ -58,3 +56,9 @@ RUN ${CONDA_DIR}/bin/conda env update --json -q -f "${CONDA_DIR}/${CONDA_ENV_YML
     && ${CONDA_DIR}/bin/conda clean --json -tipsy \
     && fix-permissions ${CONDA_DIR} \
     && fix-permissions ${HOME}
+
+ENV NVIDIA_VISIBLE_DEVICES=${NVIDIA_VISIBLE_DEVICES:-"all"} \
+    NVIDIA_DRIVER_CAPABILITIES=${NVIDIA_DRIVER_CAPABILITIES:-"compute,utility"} \
+    NVIDIA_REQUIRE_CUDA=${NVIDIA_REQUIRE_CUDA:-"cuda>=9.0"} \
+    PATH="/usr/local/nvidia/bin:/usr/local/cuda/bin:${PATH}" \
+    LD_LIBRARY_PATH="/usr/local/nvidia/lib:/usr/local/nvidia/lib64:${LD_LIBRARY_PATH}"
