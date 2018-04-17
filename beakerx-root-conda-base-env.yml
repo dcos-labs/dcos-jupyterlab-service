@@ -20,5 +20,6 @@ dependencies:
 - pandas
 - pyarrow
 - s3fs
-- tensorflow=1.5.0=py36_0
 - xgboost
+- pip:
+  - tensorflow==1.7.0

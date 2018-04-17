@@ -13,7 +13,7 @@ ARG CONDA_INSTALLER="Miniconda3-4.3.31-Linux-x86_64.sh"
 ARG CONDA_MD5="7fe70b214bee1143e3e3f0467b71453c"
 ARG CONDA_URL="https://repo.continuum.io/miniconda"
 ARG DCOS_COMMONS_URL="https://downloads.mesosphere.com/dcos-commons"
-ARG DCOS_COMMONS_VERSION="0.40.5"
+ARG DCOS_COMMONS_VERSION="0.41.0"
 ARG DISTRO="debian"
 ARG DEBCONF_NONINTERACTIVE_SEEN="true"
 ARG DEBIAN_FRONTEND="noninteractive"
@@ -49,12 +49,12 @@ ARG SPARK_DIST_URL="https://downloads.mesosphere.com/spark"
 ARG SPARK_HOME="/opt/spark"
 ARG SPARK_VERSION="2.2.1-2"
 ARG TENSORFLOW_SERVING_APT_URL="http://storage.googleapis.com/tensorflow-serving-apt"
-ARG TENSORFLOW_SERVING_VERSION=1.5.0
+ARG TENSORFLOW_SERVING_VERSION="1.6.0"
 ARG TINI_GPG_KEY="6380DC428747F6C393FEACA59A84159D7001A4E5"
 ARG TINI_URL="https://github.com/krallin/tini/releases/download"
 ARG TINI_VERSION="v0.17.0"
 ARG VCS_REF
-ARG BEAKERX_DCOS_VERSION="0.14.0-1.11.0"
+ARG BEAKERX_DCOS_VERSION="0.15.2-1.11.0"
 
 LABEL maintainer="Vishnu Mohan <vishnu@mesosphere.com>" \
       org.label-schema.build-date="${BUILD_DATE}" \
@@ -197,14 +197,13 @@ RUN cd /tmp \
     && ${CONDA_DIR}/bin/conda install --json -yq pandas \
     && ${CONDA_DIR}/bin/conda env update --json -q -f "${CONDA_DIR}/${CONDA_ENV_YML}" \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyter-widgets/jupyterlab-manager \
-    && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/hub-extension \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/geojson-extension \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/github \
     && ${CONDA_DIR}/bin/jupyter labextension install jupyterlab_bokeh \
     && ${CONDA_DIR}/bin/jupyter labextension install beakerx-jupyterlab \
     && ${CONDA_DIR}/bin/npm cache clean \
     && rm -rf "${CONDA_DIR}/share/jupyter/lab/staging" \
-    && rm -rf "${HOME}/.cache/yarn ${HOME}/.node-gyp" \
+    && rm -rf "${HOME}/.cache/pip" "${HOME}/.cache/yarn" "${HOME}/.node-gyp" \
     && ${CONDA_DIR}/bin/conda clean --json -tipsy \
     && mkdir -p "${HOME}/.jupyter" "${HOME}/.sparkmagic" "${HOME}/bin" "${HOME}/work" \
     && fix-permissions "${CONDA_DIR}" \
@@ -234,6 +233,6 @@ RUN fix-permissions /etc/jupyter/ \
     && cp "${CONDA_DIR}/share/examples/krb5/krb5.conf" /etc \
     && chmod ugo+rw /etc/krb5.conf
 
-ENV LD_LIBRARY_PATH="${MESOSPHERE_PREFIX}/libmesos-bundle/lib:${JAVA_HOME}/jre/lib/amd64/server"
+ENV LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:${MESOSPHERE_PREFIX}/libmesos-bundle/lib:${JAVA_HOME}/jre/lib/amd64/server"
 WORKDIR "${HOME}"
 USER "${NB_UID}"
