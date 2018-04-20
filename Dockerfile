@@ -5,6 +5,7 @@ FROM debian@sha256:316ebb92ca66bb8ddc79249fb29872bece4be384cb61b5344fac4e84ca4ed
 ARG AWS_JAVA_SDK_JAR_SHA1="650f07e69b071cbf41c32d4ea35fd6bbba8e6793"
 ARG AWS_JAVA_SDK_URL="https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk"
 ARG AWS_JAVA_SDK_VERSION="1.7.5"
+ARG BEAKERX_DCOS_VERSION="0.15.2-1.11.0"
 ARG BUILD_DATE
 ARG CODENAME="stretch"
 ARG CONDA_DIR="/opt/conda"
@@ -18,18 +19,18 @@ ARG DISTRO="debian"
 ARG DEBCONF_NONINTERACTIVE_SEEN="true"
 ARG DEBIAN_FRONTEND="noninteractive"
 ARG GPG_KEYSERVER="hkps://zimmermann.mayfirst.org"
-ARG HADOOP_AWS_JAR_SHA1="cfb9d10d22cccdfcb98345c1861912aec86710c8"
+ARG HADOOP_AWS_JAR_SHA1="d997f4cf765ca360b69c8bbcaab8785e7c37a55d"
 ARG HADOOP_AWS_URL="https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws"
-ARG HADOOP_AWS_VERSION="2.7.5"
+ARG HADOOP_AWS_VERSION="2.7.6"
 ARG HADOOP_HDFS_HOME="/opt/hadoop"
 ARG HADOOP_MAJOR_VERSION="2.7"
-ARG HADOOP_SHA256="0bfc4d9b04be919be2fdf36f67fa3b4526cdbd406c512a7a1f5f1b715661f831"
+ARG HADOOP_SHA256="f2327ea93f4bc5a5d7150dee8e0ede196d3a77ff8526a7dd05a48a09aae25669"
 ARG HADOOP_URL="http://www-us.apache.org/dist/hadoop/common"
-ARG HADOOP_VERSION="2.7.5"
+ARG HADOOP_VERSION="2.7.6"
 ARG HOME="/home/beakerx"
 ARG JAVA_HOME="/opt/jdk"
 ARG JAVA_URL="https://downloads.mesosphere.com/java"
-ARG JAVA_VERSION="8u162"
+ARG JAVA_VERSION="8u172"
 ARG LANG="en_US.UTF-8"
 ARG LANGUAGE="en_US.UTF-8"
 ARG LC_ALL="en_US.UTF-8"
@@ -49,12 +50,15 @@ ARG SPARK_DIST_URL="https://downloads.mesosphere.com/spark"
 ARG SPARK_HOME="/opt/spark"
 ARG SPARK_VERSION="2.2.1-2"
 ARG TENSORFLOW_SERVING_APT_URL="http://storage.googleapis.com/tensorflow-serving-apt"
-ARG TENSORFLOW_SERVING_VERSION="1.7.0"
+ARG TENSORFLOW_SERVING_VERSION="1.5.0"
 ARG TINI_GPG_KEY="6380DC428747F6C393FEACA59A84159D7001A4E5"
 ARG TINI_URL="https://github.com/krallin/tini/releases/download"
 ARG TINI_VERSION="v0.17.0"
 ARG VCS_REF
-ARG BEAKERX_DCOS_VERSION="0.15.2-1.11.0"
+ARG XGBOOST_JAVA_JAR_SHA256="4a6599ee3f1bd10d984e8b03747d5bc3cb637aeb791474178de2c285857bf69e"
+ARG XGBOOST_SPARK_JAR_SHA256="cd31fb96b26fee197e126215949bc4f5c9a3cafd7ff157ab0037a63777c2935e"
+ARG XGBOOST_URL="https://s3.amazonaws.com/vishnu-mohan/xgboost"
+ARG XGBOOST_VERSION="0.71"
 
 LABEL maintainer="Vishnu Mohan <vishnu@mesosphere.com>" \
       org.label-schema.build-date="${BUILD_DATE}" \
@@ -166,6 +170,10 @@ RUN cd /tmp \
     && echo "${AWS_JAVA_SDK_JAR_SHA1} aws-java-sdk-${AWS_JAVA_SDK_VERSION}.jar" | sha1sum -c - \
     && curl --retry 3 -fsSL -O "${HADOOP_AWS_URL}/${HADOOP_AWS_VERSION}/hadoop-aws-${HADOOP_AWS_VERSION}.jar" \
     && echo "${HADOOP_AWS_JAR_SHA1} hadoop-aws-${HADOOP_AWS_VERSION}.jar" | sha1sum -c - \
+    && curl --retry 3 -fsSL -O "${XGBOOST_URL}/${XGBOOST_VERSION}/xgboost4j-${XGBOOST_VERSION}.jar" \
+    && echo "${XGBOOST_JAVA_JAR_SHA256}" "xgboost4j-${XGBOOST_VERSION}.jar" | sha256sum -c - \
+    && curl --retry 3 -fsSL -O "${XGBOOST_URL}/${XGBOOST_VERSION}/xgboost4j-spark-${XGBOOST_VERSION}.jar" \
+    && echo "${XGBOOST_SPARK_JAR_SHA256}" "xgboost4j-spark-${XGBOOST_VERSION}.jar" | sha256sum -c - \
     && rm -rf /tmp/* \
     && useradd -m -N -u "${NB_UID}" -g "${NB_GID}" -s /bin/bash "${NB_USER}" \
     && chown "${NB_UID}:${NB_GID}" "${CONDA_DIR}" \
@@ -194,7 +202,6 @@ RUN cd /tmp \
     && ${CONDA_DIR}/bin/conda config --system --set auto_update_conda false \
     && ${CONDA_DIR}/bin/conda config --system --set show_channel_urls true \
     && ${CONDA_DIR}/bin/conda update --json --all -yq \
-    && ${CONDA_DIR}/bin/conda install --json -yq pandas \
     && ${CONDA_DIR}/bin/conda env update --json -q -f "${CONDA_DIR}/${CONDA_ENV_YML}" \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyter-widgets/jupyterlab-manager \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/geojson-extension \
@@ -231,7 +238,9 @@ COPY krb5.conf.mustache /etc/
 RUN fix-permissions /etc/jupyter/ \
     && chmod -R ugo+rw "${SPARK_HOME}/conf" \
     && cp "${CONDA_DIR}/share/examples/krb5/krb5.conf" /etc \
-    && chmod ugo+rw /etc/krb5.conf
+    && chmod ugo+rw /etc/krb5.conf \
+    && mv /usr/lib/x86_64-linux-gnu/libcurl.so.4.4.0 /usr/lib/x86_64-linux-gnu/libcurl.so.4.4.0.bak \
+    && cp "${MESOSPHERE_PREFIX}/libmesos-bundle/lib/libcurl.so.4" /usr/lib/x86_64-linux-gnu/libcurl.so.4.4.0
 
 ENV LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:${MESOSPHERE_PREFIX}/libmesos-bundle/lib:${JAVA_HOME}/jre/lib/amd64/server"
 WORKDIR "${HOME}"
