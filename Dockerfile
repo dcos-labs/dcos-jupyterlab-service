@@ -235,7 +235,8 @@ COPY jupyter_notebook_config.py /etc/jupyter/
 COPY conf/ "${SPARK_HOME}/conf/"
 COPY krb5.conf.mustache /etc/
 
-RUN fix-permissions /etc/jupyter/ \
+RUN mkdir -p /usr/local/bin/start-notebook.d \
+    && fix-permissions /etc/jupyter/ \
     && chmod -R ugo+rw "${SPARK_HOME}/conf" \
     && cp "${CONDA_DIR}/share/examples/krb5/krb5.conf" /etc \
     && chmod ugo+rw /etc/krb5.conf \

@@ -11,23 +11,43 @@ else
     cmd=$*
 fi
 
+# Run additional scripts in /usr/local/bin/start-notebook.d/
+for f in /usr/local/bin/start-notebook.d/*; do
+    case "$f" in
+        *.sh)
+            echo "$0: running $f"; . "$f"
+            ;;
+        *)
+            if [ -x $f ]; then
+                echo "$0: running $f"
+                $f
+            else
+                echo "$0: ignoring $f"
+            fi
+            ;;
+    esac
+    echo
+done
+
 # Handle special flags if we're root
 if [ "$(id -u)" == '0' ] ; then
 
-    # Handle username change. Since this is cheap, do this unconditionally
-    echo "Set username to: $NB_USER"
-    usermod -d "/home/${NB_USER}" -l "${NB_USER}" beakerx
+    # Only attempt to change the beakerx username if it exists
+    if id beakerx &> /dev/null ; then
+        echo "Set username to: ${NB_USER}"
+        usermod -d "/home/${NB_USER}" -l "${NB_USER}" beakerx
+    fi
 
     # Handle case where provisioned storage does not have the correct permissions by default
     # Ex: default NFS/EFS (no auto-uid/gid)
     if [[ "${CHOWN_HOME}" == "1" || "${CHOWN_HOME}" == 'yes' ]]; then
         echo "Changing ownership of /home/${NB_USER} to ${NB_UID}:${NB_GID}"
-        chown "${NB_UID}:${NB_GID}" "/home/${NB_USER}"
+        chown -R "${NB_UID}:${NB_GID}" "/home/${NB_USER}"
     fi
 
     if [ -d "${MESOS_SANDBOX}" ];then
         # Change ownership of $MESOS_SANDBOX so that $NB_USER can write to it
-        chown "${NB_UID}:${NB_GID}" "${MESOS_SANDBOX}"
+        chown -R "${NB_UID}:${NB_GID}" "${MESOS_SANDBOX}"
     fi
 
     # handle home and working directory if the username changed
