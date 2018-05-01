@@ -5,7 +5,7 @@ FROM debian@sha256:316ebb92ca66bb8ddc79249fb29872bece4be384cb61b5344fac4e84ca4ed
 ARG AWS_JAVA_SDK_JAR_SHA1="650f07e69b071cbf41c32d4ea35fd6bbba8e6793"
 ARG AWS_JAVA_SDK_URL="https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk"
 ARG AWS_JAVA_SDK_VERSION="1.7.5"
-ARG BEAKERX_DCOS_VERSION="0.15.2-1.11.0"
+ARG BEAKERX_DCOS_VERSION="0.16.0-1.11.0"
 ARG BUILD_DATE
 ARG CODENAME="stretch"
 ARG CONDA_DIR="/opt/conda"
@@ -208,7 +208,7 @@ RUN cd /tmp \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/github \
     && ${CONDA_DIR}/bin/jupyter labextension install jupyterlab_bokeh \
     && ${CONDA_DIR}/bin/jupyter labextension install beakerx-jupyterlab \
-    && ${CONDA_DIR}/bin/npm cache clean \
+    && ${CONDA_DIR}/bin/npm cache clean --force \
     && rm -rf "${CONDA_DIR}/share/jupyter/lab/staging" \
     && rm -rf "${HOME}/.cache/pip" "${HOME}/.cache/yarn" "${HOME}/.node-gyp" \
     && ${CONDA_DIR}/bin/conda clean --json -tipsy \
