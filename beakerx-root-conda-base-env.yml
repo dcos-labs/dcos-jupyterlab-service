@@ -4,12 +4,12 @@ channels:
 - defaults
 dependencies:
 - awscli
-- bazel=0.11.1
+- bazel
 - beakerx
 - bokeh
 - dask
 - distributed
-- grpcio=1.10.0
+- grpcio
 - ipywidgets
 - libhdfs3
 - keras
@@ -18,8 +18,11 @@ dependencies:
 - jupyterlab
 - nbconvert
 - pandas
+- pillow
 - pyarrow
 - s3fs
+- scikit-learn
+- scipy
 - xgboost
 - pip:
   - tensorflow==1.8.0
