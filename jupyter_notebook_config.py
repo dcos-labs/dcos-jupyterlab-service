@@ -12,6 +12,9 @@ c.NotebookApp.ip = '*'  # noqa: F821
 c.NotebookApp.port = 8888
 c.NotebookApp.open_browser = False
 
+# https://github.com/jupyter/notebook/issues/3130
+c.FileContentsManager.delete_to_trash = False
+
 # Configure Networking while running under Marathon:
 if 'MARATHON_APP_ID' in os.environ:
     if 'PORT0' in os.environ:
