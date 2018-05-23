@@ -6,15 +6,9 @@
   "user": "nobody",
   "cmd": "/usr/local/bin/start.sh ${CONDA_DIR}/bin/jupyter lab",
   "container": {
-    "type": "DOCKER",
+    "type": "MESOS",
     "docker": {
       "image": "vishnumohan/beakerx-dcos:0.17.1-1.11.2",
-      "parameters": [
-        {
-          "key": "user",
-          "value": "65534"
-        }
-      ],
       "forcePullImage": false
     }
   },
@@ -40,6 +34,9 @@
       "secret": "serviceCredential"
     },
     "AWS_REGION": "us-east-1",
+    "CONDA_ENVS_PATH": "/mnt/mesos/sandbox/conda/envs:/opt/conda/envs",
+    "CONDA_PKGS_DIRS": "/mnt/mesos/sandbox/conda/pkgs:/opt/conda/pkgs",
+    "HOME": "/mnt/mesos/sandbox",
     "S3_ENDPOINT": "s3.us-east-1.amazonaws.com",
     "S3_USE_HTTPS": "1",
     "S3_VERIFY_SSL": "1",
@@ -67,7 +64,13 @@
     "HAPROXY_GROUP": "external",
     "HAPROXY_0_ENABLED": "true",
     "HAPROXY_0_REDIRECT_TO_HTTPS": "true",
-    "HAPROXY_0_VHOST": "vhost.example.com"
+    "HAPROXY_0_VHOST": "vhost.example.com",
+    "HAPROXY_0_PATH": "/service/dev/beakerx/notebook",
+    "HAPROXY_2_ENABLED": "true",
+    "HAPROXY_2_REDIRECT_TO_HTTPS": "true",
+    "HAPROXY_2_VHOST": "vhost.example.com",
+    "HAPROXY_2_PATH": "/service/dev/beakerx/spark",
+    "HAPROXY_2_HTTP_BACKEND_PROXYPASS_PATH": "/service/dev/beakerx/spark"
   },
   "portDefinitions": [
     {
@@ -99,7 +102,7 @@
     {
       "portIndex": 0,
       "protocol": "MESOS_HTTP",
-      "path": "/api",
+      "path": "/service/dev/beakerx/notebook/api",
       "gracePeriodSeconds": 30,
       "intervalSeconds": 20,
       "timeoutSeconds": 10,
