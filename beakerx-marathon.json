@@ -1,17 +1,42 @@
 {
-  "id": "/beakerx",
+  "id": "/dev/beakerx/notebook",
   "instances": 1,
-  "cpus": 1,
-  "mem": 2048,
-  "cmd": "/usr/local/bin/start.sh ${CONDA_DIR}/bin/jupyter lab",
+  "cpus": 2,
+  "mem": 8192,
+  "user": "nobody",
+  "cmd": "/usr/local/bin/start.sh ${CONDA_DIR}/bin/beakerx lab",
   "container": {
     "type": "MESOS",
     "docker": {
-      "image": "vishnumohan/beakerx-dcos",
-      "forcePullImage": false
+      "image": "vishnumohan/beakerx-dcos:0.17.1-1.11.2",
+      "forcePullImage": true
+    }
+  },
+  "secrets": {
+    "awsAccessKeyId": {
+      "source": "dev/AWS_ACCESS_KEY_ID"
+    },
+    "awsSecretAccessKey": {
+      "source": "dev/AWS_SECRET_ACCESS_KEY"
+    },
+    "serviceCredential": {
+      "source": "dev/beakerx/serviceCredential"
     }
   },
   "env": {
+    "AWS_ACCESS_KEY_ID": {
+      "secret": "awsAccessKeyId"
+    },
+    "AWS_SECRET_ACCESS_KEY": {
+      "secret": "awsSecretAccessKey"
+    },
+    "DCOS_SERVICE_ACCOUNT_CREDENTIAL": {
+      "secret": "serviceCredential"
+    },
+    "AWS_REGION": "us-east-1",
+    "S3_ENDPOINT": "s3.us-east-1.amazonaws.com",
+    "S3_USE_HTTPS": "1",
+    "S3_VERIFY_SSL": "1",
     "TERM": "xterm-256color"
   },
   "labels": {
@@ -25,9 +50,25 @@
     {
       "port": 0,
       "protocol": "tcp",
-      "name": "jupyter",
+      "name": "notebook",
       "labels": {
-        "VIP_0": "/beakerx:8888"
+        "VIP_0": "/dev/beakerx/notebook:8888"
+      }
+    },
+    {
+      "port": 0,
+      "protocol": "tcp",
+      "name": "spark-driver",
+      "labels": {
+        "VIP_0": "/dev/beakerx/spark-driver:7077"
+      }
+    },
+    {
+      "port": 0,
+      "protocol": "tcp",
+      "name": "spark-ui",
+      "labels": {
+        "VIP_0": "/dev/beakerx/spark-ui:4040"
       }
     }
   ],

@@ -5,13 +5,13 @@ FROM debian@sha256:316ebb92ca66bb8ddc79249fb29872bece4be384cb61b5344fac4e84ca4ed
 ARG AWS_JAVA_SDK_JAR_SHA1="650f07e69b071cbf41c32d4ea35fd6bbba8e6793"
 ARG AWS_JAVA_SDK_URL="https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk"
 ARG AWS_JAVA_SDK_VERSION="1.7.5"
-ARG BEAKERX_DCOS_VERSION="0.16.1-1.11.1"
+ARG BEAKERX_DCOS_VERSION="0.17.1-1.11.2"
 ARG BUILD_DATE
 ARG CODENAME="stretch"
 ARG CONDA_DIR="/opt/conda"
 ARG CONDA_ENV_YML="beakerx-root-conda-base-env.yml"
-ARG CONDA_INSTALLER="Miniconda3-4.3.31-Linux-x86_64.sh"
-ARG CONDA_MD5="7fe70b214bee1143e3e3f0467b71453c"
+ARG CONDA_INSTALLER="Miniconda3-4.5.1-Linux-x86_64.sh"
+ARG CONDA_MD5="0c28787e3126238df24c5d4858bd0744"
 ARG CONDA_URL="https://repo.continuum.io/miniconda"
 ARG DCOS_COMMONS_URL="https://downloads.mesosphere.com/dcos-commons"
 ARG DCOS_COMMONS_VERSION="0.42.1"
@@ -118,22 +118,23 @@ RUN echo "deb ${REPO}/${DISTRO} ${CODENAME} main" \
        gnupg \
        jq \
        less \
-       libav-tools \
+       ffmpeg \
        lmodern \
        openssh-client \
        procps \
        rsync \
        r-base \
        sudo \
+       sssd \
        unzip \
        vim \
        wget \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
-    && usermod -u 99 nobody \
     && addgroup --gid 99 nobody \
-    && usermod -g nobody nobody \
-    && echo "nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin" >> /etc/passwd
+    && usermod -u 99 -g 99 nobody \
+    && echo "nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin" >> /etc/passwd \
+    && usermod -a -G users nobody
 
 COPY fix-permissions /usr/local/bin/
 
@@ -176,6 +177,7 @@ RUN cd /tmp \
     && echo "${XGBOOST_SPARK_JAR_SHA256}" "xgboost4j-spark-${XGBOOST_VERSION}.jar" | sha256sum -c - \
     && rm -rf /tmp/* \
     && useradd -m -N -u "${NB_UID}" -g "${NB_GID}" -s /bin/bash "${NB_USER}" \
+    && usermod -a -G 99,65534 "${NB_USER}" \
     && chown "${NB_UID}:${NB_GID}" "${CONDA_DIR}" \
     && fix-permissions "${CONDA_DIR}" \
     && fix-permissions "${HOME}"
@@ -203,7 +205,9 @@ RUN cd /tmp \
     && ${CONDA_DIR}/bin/conda config --system --set show_channel_urls true \
     && ${CONDA_DIR}/bin/conda update --json --all -yq \
     && ${CONDA_DIR}/bin/conda env update --json -q -f "${CONDA_DIR}/${CONDA_ENV_YML}" \
+    && ${CONDA_DIR}/bin/jupyter toree install --sys-prefix \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyter-widgets/jupyterlab-manager \
+    && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/hub-extension \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/geojson-extension \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/github \
     && ${CONDA_DIR}/bin/jupyter labextension install jupyterlab_bokeh \
@@ -212,7 +216,9 @@ RUN cd /tmp \
     && rm -rf "${CONDA_DIR}/share/jupyter/lab/staging" \
     && rm -rf "${HOME}/.cache/pip" "${HOME}/.cache/yarn" "${HOME}/.node-gyp" \
     && ${CONDA_DIR}/bin/conda clean --json -tipsy \
-    && mkdir -p "${HOME}/.jupyter" "${HOME}/.sparkmagic" "${HOME}/bin" "${HOME}/work" \
+    && for dir in .jupyter .local/share/jupyter/runtime .sparkmagic bin work; \
+       do mkdir -p "${HOME}/${dir}"; done \
+    && find "${HOME}" -type d -a ! -perm -o+rwX -exec chmod go+rwX {} \; \
     && fix-permissions "${CONDA_DIR}" \
     && fix-permissions "${HOME}" \
     && rm -rf /tmp/*

@@ -23,6 +23,8 @@ dependencies:
 - s3fs
 - scikit-learn
 - scipy
+- xlrd
 - xgboost
 - pip:
   - tensorflow==1.8.0
+  - https://dist.apache.org/repos/dist/dev/incubator/toree/0.2.0-incubating-rc5/toree-pip/toree-0.2.0.tar.gz

@@ -52,6 +52,18 @@ if 'MARATHON_APP_ID' in os.environ:
         c.NotebookApp.base_url = \
             os.environ['MARATHON_APP_LABEL_HAPROXY_0_PATH']
 
+    # Tidy up Mesos Env Vars that will interfere with Spark Drivers
+    os.environ['MESOS_DIRECTORY'] = '/mnt/mesos/sandbox'
+    try:
+        for env in ['MESOS_EXECUTOR_ID',
+                    'MESOS_FRAMEWORK_ID',
+                    'MESOS_SLAVE_ID',
+                    'MESOS_SLAVE_PID'
+                    'MESOS_TASK_ID']:
+            del os.environ[env]
+    except KeyError:
+        pass
+
 # Set a certificate if USE_HTTPS is set to any value
 PEM_FILE = os.path.join(jupyter_data_dir(), 'notebook.pem')
 if 'USE_HTTPS' in os.environ:
