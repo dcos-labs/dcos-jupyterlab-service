@@ -12,7 +12,7 @@
       "parameters": [
         {
           "key": "user",
-          "value": "nobody"
+          "value": "65534"
         }
       ],
       "forcePullImage": false
@@ -43,6 +43,23 @@
     "S3_ENDPOINT": "s3.us-east-1.amazonaws.com",
     "S3_USE_HTTPS": "1",
     "S3_VERIFY_SSL": "1",
+    "SPARK_MASTER": "mesos://zk://zk-1.zk:2181,zk-2.zk:2181,zk-3.zk:2181,zk-4.zk:2181,zk-5.zk:2181/mesos",
+    "SPARK_MESOS_CONTAINERIZER": "mesos",
+    "SPARK_MESOS_PRINCIPAL": "dev_beakerx",
+    "SPARK_MESOS_ROLE": "dev-beakerx",
+    "SPARK_CORES_MAX": "4",
+    "SPARK_DRIVER_CORES": "2",
+    "SPARK_DRIVER_MEMORY": "4g",
+    "SPARK_EXECUTOR_CORES": "2",
+    "SPARK_EXECUTOR_MEMORY": "4g",
+    "SPARK_MESOS_EXECUTOR_DOCKER_IMAGE":"vishnumohan/spark-dcos:2.2.1-1.11.0",
+    "SPARK_EXECUTOR_HOME": "/opt/spark",
+    "SPARK_MESOS_DRIVER_LABELS": "DCOS_SPACE:/dev/beakerx",
+    "SPARK_MESOS_DRIVER_SECRET_NAMES": "/dev/AWS_ACCESS_KEY_ID,/dev/AWS_SECRET_ACCESS_KEY",
+    "SPARK_MESOS_DRIVER_SECRET_ENVKEYS": "AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY",
+    "SPARK_MESOS_KRB5_CONF_BASE64": "dmlzaG51Cg==",
+    "SPARK_EVENTLOG_ENABLED": "true",
+    "SPARK_EVENTLOG_DIR": "s3a://vishnu-mohan/spark/history",
     "TERM": "xterm-256color"
   },
   "labels": {
