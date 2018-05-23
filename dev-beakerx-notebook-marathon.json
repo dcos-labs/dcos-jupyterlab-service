@@ -4,12 +4,12 @@
   "cpus": 2,
   "mem": 8192,
   "user": "nobody",
-  "cmd": "/usr/local/bin/start.sh ${CONDA_DIR}/bin/beakerx lab",
+  "cmd": "/usr/local/bin/start.sh ${CONDA_DIR}/bin/jupyter lab",
   "container": {
     "type": "MESOS",
     "docker": {
       "image": "vishnumohan/beakerx-dcos:0.17.1-1.11.2",
-      "forcePullImage": true
+      "forcePullImage": false
     }
   },
   "secrets": {
@@ -58,17 +58,17 @@
     {
       "port": 0,
       "protocol": "tcp",
-      "name": "spark-driver",
+      "name": "sparkdriver",
       "labels": {
-        "VIP_0": "/dev/beakerx/spark-driver:7077"
+        "VIP_1": "/dev/beakerx/sparkdriver:7077"
       }
     },
     {
       "port": 0,
       "protocol": "tcp",
-      "name": "spark-ui",
+      "name": "sparkui",
       "labels": {
-        "VIP_0": "/dev/beakerx/spark-ui:4040"
+        "VIP_2": "/dev/beakerx/sparkui:4040"
       }
     }
   ],
