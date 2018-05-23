@@ -216,8 +216,9 @@ RUN cd /tmp \
     && rm -rf "${CONDA_DIR}/share/jupyter/lab/staging" \
     && rm -rf "${HOME}/.cache/pip" "${HOME}/.cache/yarn" "${HOME}/.node-gyp" \
     && ${CONDA_DIR}/bin/conda clean --json -tipsy \
-    && for dir in .jupyter .local/share/jupyter/runtime .sparkmagic bin work; \
+    && for dir in .conda/envs .jupyter .local/share/jupyter/runtime .sparkmagic bin work; \
        do mkdir -p "${HOME}/${dir}"; done \
+    && chmod o+w "${HOME}/.conda/environments.txt" \
     && find "${HOME}" -type d -a ! -perm -o+rwX -exec chmod go+rwX {} \; \
     && fix-permissions "${CONDA_DIR}" \
     && fix-permissions "${HOME}" \

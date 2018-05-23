@@ -6,9 +6,15 @@
   "user": "nobody",
   "cmd": "/usr/local/bin/start.sh ${CONDA_DIR}/bin/jupyter lab",
   "container": {
-    "type": "MESOS",
+    "type": "DOCKER",
     "docker": {
       "image": "vishnumohan/beakerx-dcos:0.17.1-1.11.2",
+      "parameters": [
+        {
+          "key": "user",
+          "value": "nobody"
+        }
+      ],
       "forcePullImage": false
     }
   },
