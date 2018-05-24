@@ -96,6 +96,11 @@
       "labels": {
         "VIP_2": "/dev/beakerx/sparkui:4040"
       }
+    },
+    {
+      "port": 0,
+      "protocol": "tcp",
+      "name": "sparkblockmanager"
     }
   ],
   "healthChecks": [
