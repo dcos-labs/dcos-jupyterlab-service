@@ -1,5 +1,6 @@
 import errno
 import os
+import re
 import stat
 import subprocess
 
@@ -63,6 +64,103 @@ if 'MARATHON_APP_ID' in os.environ:
             del os.environ[env]
     except KeyError:
         pass
+
+    spark_conf_env_pattern = re.compile(r'^SPARK_CONF')
+
+    spark_conf_envs = [env for env in os.environ if spark_conf_env_pattern.match(env)]
+
+    spark_opts = []
+
+    if os.environ.get('SPARK_MASTER_URL'):
+        spark_opts.append('--master={}'.format(os.environ.get('SPARK_MASTER_URL')))
+
+    if os.environ.get('SPARK_DEPLOY_MODE'):
+        spark_opts.append('--deploy-mode={}'.format(os.environ.get('SPARK_DEPLOY_MODE')))
+
+    if os.environ.get('SPARK_CLASS'):
+        spark_opts.append('--class={}'.format(os.environ.get('SPARK_CLASS')))
+
+    if os.environ.get('SPARK_APP_NAME'):
+        spark_opts.append('--name={}'.format(os.environ.get('SPARK_APP_NAME')))
+
+    if os.environ.get('SPARK_JARS'):
+        spark_opts.append('--jars={}'.format(os.environ.get('SPARK_JARS')))
+
+    if os.environ.get('SPARK_PACKAGES'):
+        spark_opts.append('--packages={}'.format(os.environ.get('SPARK_PACKAGES')))
+
+    if os.environ.get('SPARK_EXCLUDE_PACKAGES'):
+        spark_opts.append('--exclude-packages={}'.format(os.environ.get('SPARK_EXCLUDE_PACKAGES')))
+
+    if os.environ.get('SPARK_REPOSITORIES'):
+        spark_opts.append('--repositories={}'.format(os.environ.get('SPARK_REPOSITORIES')))
+
+    if os.environ.get('SPARK_PY_FILES'):
+        spark_opts.append('--py-files={}'.format(os.environ.get('SPARK_PY_FILES')))
+
+    if os.environ.get('SPARK_FILES'):
+        spark_opts.append('--files={}'.format(os.environ.get('SPARK_FILES')))
+
+    if os.environ.get('SPARK_PROPERTIES_FILE'):
+        spark_opts.append('--properties-file={}'.format(os.environ.get('SPARK_PROPERTIES_FILE')))
+
+    if os.environ.get('SPARK_DRIVER_CORES'):
+        spark_opts.append('--driver-cores={}'.format(os.environ.get('SPARK_DRIVER_CORES')))
+
+    if os.environ.get('SPARK_DRIVER_MEMORY'):
+        spark_opts.append('--driver-memory={}'.format(os.environ.get('SPARK_DRIVER_MEMORY')))
+
+    if os.environ.get('SPARK_DRIVER_JAVA_OPTIONS'):
+        spark_opts.append('--driver-java-options={}'.format(os.environ.get('SPARK_DRIVER_JAVA_OPTIONS')))
+
+    if os.environ.get('SPARK_DRIVER_LIBRARY_PATH'):
+        spark_opts.append('--driver-library-path={}'.format(os.environ.get('SPARK_DRIVER_LIBRARY_PATH')))
+
+    if os.environ.get('SPARK_DRIVER_CLASS_PATH'):
+        spark_opts.append('--driver-class-path={}'.format(os.environ.get('SPARK_DRIVER_CLASS_PATH')))
+
+    if os.environ.get('SPARK_TOTAL_EXECUTOR_CORES'):
+        spark_opts.append('--total-executor-cores={}'.format(os.environ.get('SPARK_TOTAL_EXECUTOR_CORES')))
+
+    if os.environ.get('SPARK_EXECUTOR_CORES'):
+        spark_opts.append('--executor-cores={}'.format(os.environ.get('SPARK_EXECUTOR_CORES')))
+
+    if os.environ.get('SPARK_EXECUTOR_MEMORY'):
+        spark_opts.append('--executor-memory={}'.format(os.environ.get('SPARK_EXECUTOR_MEMORY')))
+
+    if os.environ.get('SPARK_PROXY_USER'):
+        spark_opts.append('--proxy-user={}'.format(os.environ.get('SPARK_PROXY_USER')))
+
+    if os.environ.get('SPARK_SUPERVISE'):
+        spark_opts.append('--supervise={}'.format(os.environ.get('SPARK_SUPERVISE')))
+
+    if os.environ.get('SPARK_YARN_QUEUE'):
+        spark_opts.append('--queue={}'.format(os.environ.get('SPARK_YARN_QUEUE')))
+
+    if os.environ.get('SPARK_YARN_NUM_EXECUTORS'):
+        spark_opts.append('--num-executors={}'.format(os.environ.get('SPARK_YARN_NUM_EXECUTORS')))
+
+    if os.environ.get('SPARK_YARN_PRINCIPAL'):
+        spark_opts.append('--principal={}'.format(os.environ.get('SPARK_YARN_PRINCIPAL')))
+
+    if os.environ.get('SPARK_YARN_KEYTAB'):
+        spark_opts.append('--keytab={}'.format(os.environ.get('SPARK_YARN_KEYTAB')))
+
+    if os.environ.get('PORT_SPARKDRIVER'):
+        spark_opts.append('--conf spark.driver.port={}'.format(os.environ.get('PORT_SPARKDRIVER')))
+
+    if os.environ.get('PORT_SPARKBLOCKMANAGER'):
+        spark_opts.append('--conf spark.driver.blockManager.port={}'.format(os.environ.get('PORT_SPARKBLOCKMANAGER')))
+
+    if os.environ.get('PORT_SPARKUI'):
+        spark_opts.append('--conf spark.ui.port={}'.format(os.environ.get('PORT_SPARKUI')))
+
+    for env in spark_conf_envs:
+        spark_opts.append('--conf {}'.format(os.environ.get(env)))
+
+    os.environ['SPARK_OPTS'] = ' '.join(spark_opts)
+
+    os.environ['PYSPARK_SUBMIT_ARGS'] = '{} pyspark-shell'.format(os.environ['SPARK_OPTS'])
 
 # Set a certificate if USE_HTTPS is set to any value
 PEM_FILE = os.path.join(jupyter_data_dir(), 'notebook.pem')
