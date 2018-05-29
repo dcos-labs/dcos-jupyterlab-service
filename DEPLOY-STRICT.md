@@ -40,13 +40,16 @@ spark-submit \
   --conf spark.mesos.role=dev-beakerx \
   --conf spark.cores.max=4 \
   --conf spark.executor.cores=2 \
-  --conf spark.mesos.executor.docker.image=vishnumohan/spark-dcos:2.2.1-1.11.0 \
+  --conf spark.mesos.executor.docker.image=vishnumohan/spark-dcos:tfos \
   --conf spark.executor.home=/opt/spark \
   --conf spark.mesos.driver.labels=DCOS_SPACE:/dev/beakerx \
+  --conf spark.mesos.task.labels=DCOS_SPACE:/dev/beakerx \
   --conf spark.mesos.driverEnv.SPARK_MESOS_KRB5_CONF_BASE64=dmlzaG51Cg== \
   --conf spark.executorEnv.SPARK_MESOS_KRB5_CONF_BASE64=dmlzaG51Cg== \
   --conf spark.mesos.driver.secret.names=/dev/AWS_ACCESS_KEY_ID,/dev/AWS_SECRET_ACCESS_KEY \
   --conf spark.mesos.driver.secret.envkeys=AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY \
+  --conf spark.mesos.executor.secret.names=/dev/AWS_ACCESS_KEY_ID,/dev/AWS_SECRET_ACCESS_KEY \
+  --conf spark.mesos.executor.secret.envkeys=AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY \
   --conf spark.eventLog.enabled=true \
   --conf spark.eventLog.dir=s3a://vishnu-mohan/spark/history \
   --class org.apache.spark.examples.SparkPi \
