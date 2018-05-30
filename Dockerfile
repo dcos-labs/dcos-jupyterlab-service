@@ -100,7 +100,7 @@ ENV BOOTSTRAP="${MESOSPHERE_PREFIX}/bin/bootstrap" \
     NB_GID=${NB_GID:-"100"} \
     NB_UID=${NB_UID:-"1000"} \
     NB_USER=${NB_USER:-"beakerx"} \
-    PATH="${JAVA_HOME}/bin:${SPARK_HOME}/bin:${CONDA_DIR}/bin:${MESOSPHERE_PREFIX}/bin:${PATH}" \
+    PATH="${JAVA_HOME}/bin:${SPARK_HOME}/bin:${HADOOP_HDFS_HOME}/bin:${CONDA_DIR}/bin:${MESOSPHERE_PREFIX}/bin:${PATH}" \
     SHELL="/bin/bash" \
     SPARK_HOME=${SPARK_HOME:-"/opt/spark"}
 
@@ -198,7 +198,7 @@ RUN cd /tmp \
     && curl --retry 3 -fsSL -O "${TENSORFLOW_URL}/libtensorflow/libtensorflow_jni-${TENSORFLOW_VARIANT}-linux-x86_64-${TENSORFLOW_VERSION}.tar.gz" \
     && echo "${TENSORFLOW_JNI_SHA256}" "libtensorflow_jni-${TENSORFLOW_VARIANT}-linux-x86_64-${TENSORFLOW_VERSION}.tar.gz" | sha256sum -c - \
     && tar xf "libtensorflow_jni-${TENSORFLOW_VARIANT}-linux-x86_64-${TENSORFLOW_VERSION}.tar.gz" "./libtensorflow_jni.so" \
-    && mv "libtensorflow_jni.so" "/usr/local/lib" \
+    && mv "libtensorflow_jni.so" "/usr/lib" \
     && rm -rf /tmp/* \
     && useradd -m -N -u "${NB_UID}" -g "${NB_GID}" -s /bin/bash "${NB_USER}" \
     && usermod -a -G 99,65534 "${NB_USER}" \
