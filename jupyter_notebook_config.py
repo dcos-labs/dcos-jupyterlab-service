@@ -161,6 +161,7 @@ if 'MARATHON_APP_ID' in os.environ:
     os.environ['SPARK_OPTS'] = ' '.join(spark_opts)
 
     os.environ['PYSPARK_SUBMIT_ARGS'] = '{} pyspark-shell'.format(os.environ['SPARK_OPTS'])
+    os.environ['SPARKR_SUBMIT_ARGS'] = '{} sparkr-shell'.format(os.environ['SPARK_OPTS'])
 
 # Set a certificate if USE_HTTPS is set to any value
 PEM_FILE = os.path.join(jupyter_data_dir(), 'notebook.pem')
