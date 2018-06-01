@@ -237,6 +237,7 @@ RUN cd /tmp \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/github \
     && ${CONDA_DIR}/bin/jupyter labextension install jupyterlab_bokeh \
     && ${CONDA_DIR}/bin/jupyter labextension install beakerx-jupyterlab \
+    && ${CONDA_DIR}/bin/conda remove --force --json -yq openjdk \
     && ${CONDA_DIR}/bin/npm cache clean --force \
     && rm -rf "${CONDA_DIR}/share/jupyter/lab/staging" \
     && rm -rf "${HOME}/.cache/pip" "${HOME}/.cache/yarn" "${HOME}/.node-gyp" \
