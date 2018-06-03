@@ -5,7 +5,7 @@ channels:
 dependencies:
 - awscli
 - bazel
-- beakerx
+- beakerx=0.17.1
 - bokeh
 - cython
 - dask
@@ -24,8 +24,8 @@ dependencies:
 - s3fs
 - scikit-learn
 - scipy
-- xlrd
 - xgboost
+- xlrd
 - pip:
   - https://dist.apache.org/repos/dist/dev/incubator/toree/0.2.0-incubating-rc5/toree-pip/toree-0.2.0.tar.gz
   - tensorflow==1.8.0
