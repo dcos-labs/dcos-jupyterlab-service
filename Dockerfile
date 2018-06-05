@@ -13,6 +13,8 @@ ARG CONDA_ENV_YML="beakerx-root-conda-base-env.yml"
 ARG CONDA_INSTALLER="Miniconda3-4.5.1-Linux-x86_64.sh"
 ARG CONDA_MD5="0c28787e3126238df24c5d4858bd0744"
 ARG CONDA_URL="https://repo.continuum.io/miniconda"
+ARG DCOS_CLI_URL="https://downloads.dcos.io/binaries/cli/linux/x86-64"
+ARG DCOS_CLI_VERSION="1.11"
 ARG DCOS_COMMONS_URL="https://downloads.mesosphere.com/dcos-commons"
 ARG DCOS_COMMONS_VERSION="0.42.1"
 ARG DISTRO="debian"
@@ -172,6 +174,8 @@ RUN cd /tmp \
     && cd /tmp \
     && curl --retry 3 -fsSL -O "${DCOS_COMMONS_URL}/artifacts/${DCOS_COMMONS_VERSION}/bootstrap.zip" \
     && unzip "bootstrap.zip" -d "${MESOSPHERE_PREFIX}/bin/" \
+    && curl --retry 3 -fsSL "${DCOS_CLI_URL}/dcos-${DCOS_CLI_VERSION}/dcos" -o ${MESOSPHERE_PREFIX}/bin/dcos \
+    && chmod +x ${MESOSPHERE_PREFIX}/bin/dcos \
     && curl --retry 3 -fsSL -O "${JAVA_URL}/server-jre-${JAVA_VERSION}-linux-x64.tar.gz" \
     && tar xf "server-jre-${JAVA_VERSION}-linux-x64.tar.gz" -C "${JAVA_HOME}" --strip-components=1 \
     && curl --retry 3 -fsSL -O "${HADOOP_URL}/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz" \
