@@ -297,7 +297,6 @@ spark-submit \
   --conf spark.executorEnv.HADOOP_OPTS="-Djava.library.path=${HADOOP_HDFS_HOME}/lib/native -Djava.security.krb5.conf=${MESOS_SANDBOX}/krb5.conf" \
   --conf spark.mesos.driver.secret.names=/dev/AWS_ACCESS_KEY_ID,/dev/AWS_SECRET_ACCESS_KEY \
   --conf spark.mesos.driver.secret.envkeys=AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY \
-  --conf spark.mesos.uris=http://api.devhdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/hdfs-site.xml,http://api.devhdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/core-site.xml \
   --conf spark.eventLog.enabled=true \
   --conf spark.eventLog.dir=s3a://vishnu-mohan/spark/history \
   --conf spark.driver.port=${PORT_SPARKDRIVER} \
@@ -306,8 +305,7 @@ spark-submit \
   --py-files $(pwd)/TensorFlowOnSpark/examples/mnist/spark/mnist_dist.py \
   $(pwd)/TensorFlowOnSpark/examples/mnist/spark/mnist_spark.py \
   --cluster_size 5 \
-  --images s3a://vishnu-mohan/tensorflow/mnist/tfr/train/images \
-  --labels s3a://vishnu-mohan/tensorflow/mnist/tfr/train/labels \
+  --images s3a://vishnu-mohan/tensorflow/mnist/tfr/train \
   --format tfr \
   --mode train \
   --model s3a://vishnu-mohan/tensorflow/mnist/mnist_tfr_model
@@ -405,7 +403,6 @@ spark-submit \
   --conf spark.executorEnv.HADOOP_OPTS="-Djava.library.path=${HADOOP_HDFS_HOME}/lib/native -Djava.security.krb5.conf=${MESOS_SANDBOX}/krb5.conf" \
   --conf spark.mesos.driver.secret.names=/dev/AWS_ACCESS_KEY_ID,/dev/AWS_SECRET_ACCESS_KEY \
   --conf spark.mesos.driver.secret.envkeys=AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY \
-  --conf spark.mesos.uris=http://api.devhdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/hdfs-site.xml,http://api.devhdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/core-site.xml \
   --conf spark.eventLog.enabled=true \
   --conf spark.eventLog.dir=s3a://vishnu-mohan/spark/history \
   --conf spark.driver.port=${PORT_SPARKDRIVER} \
@@ -414,8 +411,7 @@ spark-submit \
   --py-files $(pwd)/TensorFlowOnSpark/examples/mnist/spark/mnist_dist.py \
   $(pwd)/TensorFlowOnSpark/examples/mnist/spark/mnist_spark.py \
   --cluster_size 5 \
-  --images mnist/tfr/train/images \
-  --labels mnist/tfr/train/labels \
+  --images mnist/tfr/train \
   --format tfr \
   --mode train \
   --model mnist/mnist_tfr_model
