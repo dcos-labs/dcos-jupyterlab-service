@@ -78,11 +78,11 @@ unzip mnist.zip
 aws s3 rm --recursive s3://vishnu-mohan/tensorflow/mnist/csv 
 ```
 
-### Prepare in CSV for S3
+### Prepare MINST as CSV for S3
 ```bash
 spark-submit \
   --verbose \
-  --name MNIST-CSV-S3 \
+  --name MNIST-Prepare-CSV-S3 \
   --master mesos://zk://zk-1.zk:2181,zk-2.zk:2181,zk-3.zk:2181,zk-4.zk:2181,zk-5.zk:2181/mesos \
   --conf spark.mesos.containerizer=mesos \
   --conf spark.mesos.principal=dev_beakerx \
@@ -113,11 +113,11 @@ aws s3 ls --recursive s3://vishnu-mohan/tensorflow/mnist/csv
 hdfs dfs -rm -R -skipTrash mnist/csv
 ```
 
-### Prepare in CSV for HDFS
+### Prepare MNIST as CSV for HDFS
 ```bash
 spark-submit \
   --verbose \
-  --name MNIST-CSV-HDFS \
+  --name MNIST-Prepare-CSV-HDFS \
   --master mesos://zk://zk-1.zk:2181,zk-2.zk:2181,zk-3.zk:2181,zk-4.zk:2181,zk-5.zk:2181/mesos \
   --conf spark.mesos.containerizer=mesos \
   --conf spark.mesos.principal=dev_beakerx \
@@ -126,6 +126,7 @@ spark-submit \
   --conf spark.executor.cores=2 \
   --conf spark.mesos.executor.docker.image=vishnumohan/spark-dcos:tfos \
   --conf spark.executor.home=/opt/spark \
+  --conf spark.mesos.uris=http://api.devhdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/hdfs-site.xml,http://api.devhdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/core-site.xml \
   --conf spark.mesos.driver.labels=DCOS_SPACE:/dev/beakerx \
   --conf spark.mesos.driverEnv.SPARK_MESOS_KRB5_CONF_BASE64=dmlzaG51Cg== \
   --conf spark.executorEnv.SPARK_MESOS_KRB5_CONF_BASE64=dmlzaG51Cg== \
@@ -134,7 +135,6 @@ spark-submit \
   --conf spark.mesos.driver.secret.envkeys=AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY \
   --conf spark.eventLog.enabled=true \
   --conf spark.eventLog.dir=s3a://vishnu-mohan/spark/history \
-  --conf spark.mesos.uris=http://api.devhdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/hdfs-site.xml,http://api.devhdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/core-site.xml \
   $(pwd)/TensorFlowOnSpark/examples/mnist/mnist_data_setup.py \
     --output mnist/csv \
     --format csv
@@ -152,11 +152,11 @@ hdfs dfs -ls -R mnist/csv
 aws s3 rm --recursive s3://vishnu-mohan/tensorflow/mnist/tfr
 ```
 
-### Prepare in TFRecord for S3
+### Prepare MNIST as TFRecord for S3
 ```bash
 spark-submit \
   --verbose \
-  --name MNIST-TFR-S3 \
+  --name MNIST-Prepare-TFR-S3 \
   --master mesos://zk://zk-1.zk:2181,zk-2.zk:2181,zk-3.zk:2181,zk-4.zk:2181,zk-5.zk:2181/mesos \
   --conf spark.mesos.containerizer=mesos \
   --conf spark.mesos.principal=dev_beakerx \
@@ -187,11 +187,11 @@ aws s3 ls --recursive s3://vishnu-mohan/tensorflow/mnist/tfr
 hdfs dfs -rm -R -skipTrash mnist/tfr
 ```
 
-### Prepare TFRecords for HDFS
+### Prepare MNIST as TFRecords for HDFS
 ```bash
 spark-submit \
   --verbose \
-  --name MNIST-TFR-HDFS \
+  --name MNIST-Prepare-TFR-HDFS \
   --master mesos://zk://zk-1.zk:2181,zk-2.zk:2181,zk-3.zk:2181,zk-4.zk:2181,zk-5.zk:2181/mesos \
   --conf spark.mesos.containerizer=mesos \
   --conf spark.mesos.principal=dev_beakerx \
@@ -200,6 +200,7 @@ spark-submit \
   --conf spark.executor.cores=2 \
   --conf spark.mesos.executor.docker.image=vishnumohan/spark-dcos:tfos \
   --conf spark.executor.home=/opt/spark \
+  --conf spark.mesos.uris=http://api.devhdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/hdfs-site.xml,http://api.devhdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/core-site.xml \
   --conf spark.mesos.driver.labels=DCOS_SPACE:/dev/beakerx \
   --conf spark.mesos.driverEnv.SPARK_MESOS_KRB5_CONF_BASE64=dmlzaG51Cg== \
   --conf spark.executorEnv.SPARK_MESOS_KRB5_CONF_BASE64=dmlzaG51Cg== \
@@ -208,7 +209,6 @@ spark-submit \
   --conf spark.mesos.driver.secret.envkeys=AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY \
   --conf spark.eventLog.enabled=true \
   --conf spark.eventLog.dir=s3a://vishnu-mohan/spark/history \
-  --conf spark.mesos.uris=https://s3.amazonaws.com/vishnu-mohan/tensorflow/mnist/mnist.zip,http://api.devhdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/hdfs-site.xml,http://api.devhdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/core-site.xml \
   $(pwd)/TensorFlowOnSpark/examples/mnist/mnist_data_setup.py \
     --output mnist/tfr \
     --format tfr
@@ -221,9 +221,9 @@ hdfs dfs -ls -R mnist/tfr
 
 # Train MNIST with Tensorflow on Spark
 
-## Train MNIST from S3 in CSV format and store model in S3
+## Train MNIST from S3 in CSV format and store model in S3 (DO NOT USE!)
 
-### Remove existing csv folder in S3 bucket (if present)
+### Remove existing CSV model folder in S3 bucket (if present)
 ```bash
 aws s3 rm --recursive s3://vishnu-mohan/tensorflow/mnist/mnist_csv_model
 ```
@@ -266,9 +266,9 @@ spark-submit \
 aws s3 ls --recursive s3://vishnu-mohan/tensorflow/mnist/mnist_csv_model
 ```
 
-## Train MNIST from S3 in TFRecord format and store model in S3
+## Train MNIST from S3 in TFRecord format and store model in S3 (DO NOT USE!)
 
-### Remove existing csv folder in S3 bucket (if present)
+### Remove existing TFR model folder in S3 bucket (if present)
 ```bash
 aws s3 rm --recursive s3://vishnu-mohan/tensorflow/mnist/mnist_tfr_model
 ```
@@ -317,7 +317,7 @@ aws s3 ls --recursive s3://vishnu-mohan/tensorflow/mnist/mnist_tfr_model
 
 ## Train MNIST from CSV on HDFS and store the model on HDFS (under hdfs://user/${USER}/mnist/mnist_csv_model)
 
-### Remove existing folder (if present)
+### Remove existing CSV model folder on HDFS (if present)
 ```bash
 hdfs dfs -rm -R -skipTrash user/${USER}/mnist/mnist_csv_model
 ```
@@ -337,6 +337,7 @@ spark-submit \
   --conf spark.executor.memory=4g \
   --conf spark.mesos.executor.docker.image=vishnumohan/spark-dcos:tfos \
   --conf spark.executor.home=/opt/spark \
+  --conf spark.mesos.uris=http://api.devhdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/hdfs-site.xml,http://api.devhdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/core-site.xml \
   --conf spark.mesos.driver.labels=DCOS_SPACE:/dev/beakerx \
   --conf spark.mesos.driverEnv.SPARK_MESOS_KRB5_CONF_BASE64=dmlzaG51Cg== \
   --conf spark.executorEnv.SPARK_MESOS_KRB5_CONF_BASE64=dmlzaG51Cg== \
@@ -348,7 +349,6 @@ spark-submit \
   --conf spark.executorEnv.HADOOP_OPTS="-Djava.library.path=${HADOOP_HDFS_HOME}/lib/native -Djava.security.krb5.conf=${MESOS_SANDBOX}/krb5.conf" \
   --conf spark.mesos.driver.secret.names=/dev/AWS_ACCESS_KEY_ID,/dev/AWS_SECRET_ACCESS_KEY \
   --conf spark.mesos.driver.secret.envkeys=AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY \
-  --conf spark.mesos.uris=http://api.devhdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/hdfs-site.xml,http://api.devhdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/core-site.xml \
   --conf spark.eventLog.enabled=true \
   --conf spark.eventLog.dir=s3a://vishnu-mohan/spark/history \
   --conf spark.driver.port=${PORT_SPARKDRIVER} \
@@ -371,7 +371,7 @@ hdfs dfs -ls -R mnist/mnist_csv_model
 
 ## Train MNIST from TFRecord on HDFS and store the model on HDFS (under hdfs://user/${USER}/mnist/mnist_tfr_model)
 
-### Remove existing folder (if present)
+### Remove existing TFR model folder on HDFS (if present)
 ```bash
 hdfs dfs -rm -R -skipTrash user/${USER}/mnist/mnist_tfr_model
 ```
@@ -391,6 +391,7 @@ spark-submit \
   --conf spark.executor.memory=4g \
   --conf spark.mesos.executor.docker.image=vishnumohan/spark-dcos:tfos \
   --conf spark.executor.home=/opt/spark \
+  --conf spark.mesos.uris=http://api.devhdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/hdfs-site.xml,http://api.devhdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/core-site.xml \
   --conf spark.mesos.driver.labels=DCOS_SPACE:/dev/beakerx \
   --conf spark.mesos.driverEnv.SPARK_MESOS_KRB5_CONF_BASE64=dmlzaG51Cg== \
   --conf spark.executorEnv.SPARK_MESOS_KRB5_CONF_BASE64=dmlzaG51Cg== \
