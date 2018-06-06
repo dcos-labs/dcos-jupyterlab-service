@@ -50,6 +50,7 @@ spark-submit \
   --conf spark.mesos.task.labels=DCOS_SPACE:/dev/beakerx \
   --conf spark.mesos.driverEnv.SPARK_MESOS_KRB5_CONF_BASE64=dmlzaG51Cg== \
   --conf spark.executorEnv.SPARK_MESOS_KRB5_CONF_BASE64=dmlzaG51Cg== \
+  --conf spark.executorEnv.KRB5_CONFIG=${MESOS_SANDBOX}/krb5.conf \
   --conf spark.mesos.driver.secret.names=/dev/AWS_ACCESS_KEY_ID,/dev/AWS_SECRET_ACCESS_KEY \
   --conf spark.mesos.driver.secret.envkeys=AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY \
   --conf spark.mesos.executor.secret.names=/dev/AWS_ACCESS_KEY_ID,/dev/AWS_SECRET_ACCESS_KEY \
@@ -91,8 +92,6 @@ spark-submit \
   --conf spark.mesos.executor.docker.image=vishnumohan/spark-dcos:tfos \
   --conf spark.executor.home=/opt/spark \
   --conf spark.mesos.driver.labels=DCOS_SPACE:/dev/beakerx \
-  --conf spark.mesos.driverEnv.SPARK_MESOS_KRB5_CONF_BASE64=dmlzaG51Cg== \
-  --conf spark.executorEnv.SPARK_MESOS_KRB5_CONF_BASE64=dmlzaG51Cg== \
   --conf spark.mesos.driver.secret.names=/dev/AWS_ACCESS_KEY_ID,/dev/AWS_SECRET_ACCESS_KEY \
   --conf spark.mesos.driver.secret.envkeys=AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY \
   --conf spark.eventLog.enabled=true \
@@ -130,6 +129,7 @@ spark-submit \
   --conf spark.mesos.driver.labels=DCOS_SPACE:/dev/beakerx \
   --conf spark.mesos.driverEnv.SPARK_MESOS_KRB5_CONF_BASE64=dmlzaG51Cg== \
   --conf spark.executorEnv.SPARK_MESOS_KRB5_CONF_BASE64=dmlzaG51Cg== \
+  --conf spark.executorEnv.KRB5_CONFIG=${MESOS_SANDBOX}/krb5.conf \
   --conf spark.mesos.driver.secret.names=/dev/AWS_ACCESS_KEY_ID,/dev/AWS_SECRET_ACCESS_KEY \
   --conf spark.mesos.driver.secret.envkeys=AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY \
   --conf spark.eventLog.enabled=true \
@@ -166,8 +166,6 @@ spark-submit \
   --conf spark.mesos.executor.docker.image=vishnumohan/spark-dcos:tfos \
   --conf spark.executor.home=/opt/spark \
   --conf spark.mesos.driver.labels=DCOS_SPACE:/dev/beakerx \
-  --conf spark.mesos.driverEnv.SPARK_MESOS_KRB5_CONF_BASE64=dmlzaG51Cg== \
-  --conf spark.executorEnv.SPARK_MESOS_KRB5_CONF_BASE64=dmlzaG51Cg== \
   --conf spark.mesos.driver.secret.names=/dev/AWS_ACCESS_KEY_ID,/dev/AWS_SECRET_ACCESS_KEY \
   --conf spark.mesos.driver.secret.envkeys=AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY \
   --conf spark.eventLog.enabled=true \
@@ -205,6 +203,7 @@ spark-submit \
   --conf spark.mesos.driver.labels=DCOS_SPACE:/dev/beakerx \
   --conf spark.mesos.driverEnv.SPARK_MESOS_KRB5_CONF_BASE64=dmlzaG51Cg== \
   --conf spark.executorEnv.SPARK_MESOS_KRB5_CONF_BASE64=dmlzaG51Cg== \
+  --conf spark.executorEnv.KRB5_CONFIG=${MESOS_SANDBOX}/krb5.conf \
   --conf spark.mesos.driver.secret.names=/dev/AWS_ACCESS_KEY_ID,/dev/AWS_SECRET_ACCESS_KEY \
   --conf spark.mesos.driver.secret.envkeys=AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY \
   --conf spark.eventLog.enabled=true \
@@ -243,8 +242,11 @@ spark-submit \
   --conf spark.mesos.executor.docker.image=vishnumohan/spark-dcos:tfos \
   --conf spark.executor.home=/opt/spark \
   --conf spark.mesos.driver.labels=DCOS_SPACE:/dev/beakerx \
-  --conf spark.mesos.driverEnv.SPARK_MESOS_KRB5_CONF_BASE64=dmlzaG51Cg== \
-  --conf spark.executorEnv.SPARK_MESOS_KRB5_CONF_BASE64=dmlzaG51Cg== \
+  --conf spark.executorEnv.JAVA_HOME=${JAVA_HOME} \
+  --conf spark.executorEnv.HADOOP_HDFS_HOME=${HADOOP_HDFS_HOME} \
+  --conf spark.executorEnv.LD_LIBRARY_PATH=${LD_LIBRARY_PATH} \
+  --conf spark.executorEnv.CLASSPATH=${MESOS_SANDBOX}:$(${HADOOP_HDFS_HOME}/bin/hadoop classpath --glob):${CLASSPATH} \
+  --conf spark.executorEnv.HADOOP_OPTS="-Djava.library.path=${HADOOP_HDFS_HOME}/lib/native -Djava.security.krb5.conf=${MESOS_SANDBOX}/krb5.conf" \
   --conf spark.mesos.driver.secret.names=/dev/AWS_ACCESS_KEY_ID,/dev/AWS_SECRET_ACCESS_KEY \
   --conf spark.mesos.driver.secret.envkeys=AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY \
   --conf spark.eventLog.enabled=true \
@@ -287,9 +289,6 @@ spark-submit \
   --conf spark.mesos.executor.docker.image=vishnumohan/spark-dcos:tfos \
   --conf spark.executor.home=/opt/spark \
   --conf spark.mesos.driver.labels=DCOS_SPACE:/dev/beakerx \
-  --conf spark.mesos.driverEnv.SPARK_MESOS_KRB5_CONF_BASE64=dmlzaG51Cg== \
-  --conf spark.executorEnv.SPARK_MESOS_KRB5_CONF_BASE64=dmlzaG51Cg== \
-  --conf spark.executorEnv.KRB5_CONFIG=${MESOS_SANDBOX}/krb5.conf \
   --conf spark.executorEnv.JAVA_HOME=${JAVA_HOME} \
   --conf spark.executorEnv.HADOOP_HDFS_HOME=${HADOOP_HDFS_HOME} \
   --conf spark.executorEnv.LD_LIBRARY_PATH=${LD_LIBRARY_PATH} \
