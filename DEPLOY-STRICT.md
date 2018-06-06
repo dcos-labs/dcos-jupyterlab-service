@@ -238,8 +238,8 @@ spark-submit \
   --conf spark.mesos.containerizer=mesos \
   --conf spark.mesos.principal=dev_beakerx \
   --conf spark.mesos.role=dev-beakerx \
-  --conf spark.cores.max=10 \
-  --conf spark.executor.cores=2 \
+  --conf spark.cores.max=5 \
+  --conf spark.executor.cores=1 \
   --conf spark.mesos.executor.docker.image=vishnumohan/spark-dcos:tfos \
   --conf spark.executor.home=/opt/spark \
   --conf spark.mesos.driver.labels=DCOS_SPACE:/dev/beakerx \
