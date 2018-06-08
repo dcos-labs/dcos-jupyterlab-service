@@ -1,4 +1,4 @@
-FROM vishnumohan/beakerx-dcos:tfos
+FROM vishnumohan/beakerx-dcos
 
 ARG CONDA_ENV_YML="beakerx-root-conda-cudnn-env.yml"
 ARG IBM_GPU_ENABLER_JAR_SHA256="4d5919003fdf915a747f51af83d851bc07588706b415f2a8a24c666bb5a7f977"

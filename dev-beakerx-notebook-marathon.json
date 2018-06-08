@@ -8,7 +8,7 @@
   "container": {
     "type": "MESOS",
     "docker": {
-      "image": "vishnumohan/beakerx-dcos:tfos",
+      "image": "vishnumohan/beakerx-dcos:0.17.1-1.11.2",
       "forcePullImage": true
     }
   },
