@@ -1,6 +1,9 @@
 FROM vishnumohan/beakerx-dcos
 
 ARG CONDA_ENV_YML="beakerx-root-conda-cudnn-env.yml"
+ARG IBM_GPU_ENABLER_JAR_SHA256="4d5919003fdf915a747f51af83d851bc07588706b415f2a8a24c666bb5a7f977"
+ARG IBM_GPU_ENABLER_URL="https://s3.amazonaws.com/vishnu-mohan/ibm/gpu-enabler"
+ARG IBM_GPU_ENABLER_VERSION="2.0.0"
 ARG NVIDIA_CUDA_MAJOR_VERSION="9-0"
 ARG NVIDIA_CUDA_PKG_VERSION="9.0.176-1"
 ARG NVIDIA_CUDA_VERSION="9.0"
@@ -15,6 +18,10 @@ ARG NVIDIA_REQUIRE_CUDA="cuda>=9.0"
 ARG NVIDIA_URL="http://developer.download.nvidia.com/compute"
 ARG NVIDIA_VISIBLE_DEVICES="all"
 ARG NVIDIA_VOLUMES_NEEDED="nvidia_driver"
+ARG TENSORFLOW_JNI_SHA256="e657b0966c963cb9a0e5ff42917b589268b361bf463604c34e5fcf85ac87007e"
+ARG TENSORFLOW_URL="https://storage.googleapis.com/tensorflow"
+ARG TENSORFLOW_VARIANT="gpu"
+ARG TENSORFLOW_VERSION="1.8.0"
 
 LABEL com.nvidia.volumes.needed=${NVIDIA_VOLUMES_NEEDED:-"nvidia_driver"} \
       com.nvidia.cuda.version="${NVIDIA_CUDA_PKG_VERSION}" \
@@ -40,6 +47,18 @@ RUN unset LD_LIBRARY_PATH \
     && ln -s stubs/libcuda.so libcuda.so.1 \
     && echo "/usr/local/nvidia/lib" >> /etc/ld.so.conf.d/nvidia.conf \
     && echo "/usr/local/nvidia/lib64" >> /etc/ld.so.conf.d/nvidia.conf \
+    && cd /opt/spark/jars \
+    && curl --retry 3 -fsSL -O "${IBM_GPU_ENABLER_URL}/${IBM_GPU_ENABLER_VERSION}/gpu-enabler_2.11-${IBM_GPU_ENABLER_VERSION}.jar" \
+    && echo "${IBM_GPU_ENABLER_JAR_SHA256}" "gpu-enabler_2.11-${IBM_GPU_ENABLER_VERSION}.jar" | sha256sum -c - \
+    && cd /tmp \
+    && curl --retry 3 -fsSL -O "${TENSORFLOW_URL}/libtensorflow/libtensorflow_jni-${TENSORFLOW_VARIANT}-linux-x86_64-${TENSORFLOW_VERSION}.tar.gz" \
+    && echo "${TENSORFLOW_JNI_SHA256}" "libtensorflow_jni-${TENSORFLOW_VARIANT}-linux-x86_64-${TENSORFLOW_VERSION}.tar.gz" | sha256sum -c - \
+    && tar xf "libtensorflow_jni-${TENSORFLOW_VARIANT}-linux-x86_64-${TENSORFLOW_VERSION}.tar.gz" "./libtensorflow_jni.so" \
+    && mv "libtensorflow_jni.so" "/usr/lib" \
+    && rm "libtensorflow_jni-${TENSORFLOW_VARIANT}-linux-x86_64-${TENSORFLOW_VERSION}.tar.gz" \
+    && rm /usr/lib/x86_64-linux-gnu/libcurl.so.4 \
+    && cp "${MESOSPHERE_PREFIX}/libmesos-bundle/lib/libcurl.so.4" /usr/lib/x86_64-linux-gnu/libcurl.so.4.4.0 \
+    && ln -s /usr/lib/x86_64-linux-gnu/libcurl.so.4.4.0 /usr/lib/x86_64-linux-gnu/libcurl.so.4 \
     && ldconfig \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*

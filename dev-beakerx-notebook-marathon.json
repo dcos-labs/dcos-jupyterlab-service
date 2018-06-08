@@ -4,14 +4,28 @@
   "cpus": 2,
   "mem": 8192,
   "user": "nobody",
-  "cmd": "/usr/local/bin/start.sh ${CONDA_DIR}/bin/jupyter lab",
+  "cmd": "export SPARK_CONF_SPARK_EXECUTORENV_CLASSPATH=\"spark.executorEnv.CLASSPATH=$(${HADOOP_HDFS_HOME}/bin/hadoop classpath --glob):${CLASSPATH}\" && export SPARK_CONF_SPARK_EXECUTORENV_LD_LIBRARY_PATH=\"spark.executorEnv.LD_LIBRARY_PATH=${LD_LIBRARY_PATH}\" && env | sort && /usr/local/bin/start.sh ${CONDA_DIR}/bin/jupyter lab --notebook-dir=\"/mnt/mesos/sandbox\"",
   "container": {
     "type": "MESOS",
     "docker": {
       "image": "vishnumohan/beakerx-dcos:0.17.1-1.11.2",
-      "forcePullImage": false
+      "forcePullImage": true
     }
   },
+  "fetch": [
+    {
+      "uri": "http://api.devhdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/core-site.xml",
+      "executable": false,
+      "extract": false,
+      "cache": false
+    },
+    {
+      "uri": "http://api.devhdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/hdfs-site.xml",
+      "executable": false,
+      "extract": false,
+      "cache": false
+    }
+  ],
   "secrets": {
     "awsAccessKeyId": {
       "source": "dev/AWS_ACCESS_KEY_ID"
@@ -36,27 +50,47 @@
     "AWS_REGION": "us-east-1",
     "CONDA_ENVS_PATH": "/mnt/mesos/sandbox/conda/envs:/opt/conda/envs",
     "CONDA_PKGS_DIRS": "/mnt/mesos/sandbox/conda/pkgs:/opt/conda/pkgs",
+    "DCOS_DIR": "/mnt/mesos/sandbox/.dcos",
+    "HADOOP_CONF_DIR": "/mnt/mesos/sandbox",
     "HOME": "/mnt/mesos/sandbox",
+    "JAVA_OPTS": "'-XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/mnt/mesos/sandbox'",
+    "JUPYTER_CONFIG_DIR": "/mnt/mesos/sandbox/.jupyter",
+    "JUPYTER_RUNTIME_DIR": "/mnt/mesos/sandbox/.local/share/jupyter/runtime",
+    "USER": "nobody",
     "S3_ENDPOINT": "s3.us-east-1.amazonaws.com",
     "S3_USE_HTTPS": "1",
     "S3_VERIFY_SSL": "1",
-    "SPARK_MASTER": "mesos://zk://zk-1.zk:2181,zk-2.zk:2181,zk-3.zk:2181,zk-4.zk:2181,zk-5.zk:2181/mesos",
-    "SPARK_MESOS_CONTAINERIZER": "mesos",
-    "SPARK_MESOS_PRINCIPAL": "dev_beakerx",
-    "SPARK_MESOS_ROLE": "dev-beakerx",
-    "SPARK_CORES_MAX": "4",
+    "SPARK_MASTER_URL": "mesos://zk://zk-1.zk:2181,zk-2.zk:2181,zk-3.zk:2181,zk-4.zk:2181,zk-5.zk:2181/mesos",
+    "SPARK_USER": "nobody",
     "SPARK_DRIVER_CORES": "2",
     "SPARK_DRIVER_MEMORY": "4g",
-    "SPARK_EXECUTOR_CORES": "2",
-    "SPARK_EXECUTOR_MEMORY": "4g",
-    "SPARK_MESOS_EXECUTOR_DOCKER_IMAGE":"vishnumohan/spark-dcos:2.2.1-1.11.0",
-    "SPARK_EXECUTOR_HOME": "/opt/spark",
-    "SPARK_MESOS_DRIVER_LABELS": "DCOS_SPACE:/dev/beakerx",
-    "SPARK_MESOS_DRIVER_SECRET_NAMES": "/dev/AWS_ACCESS_KEY_ID,/dev/AWS_SECRET_ACCESS_KEY",
-    "SPARK_MESOS_DRIVER_SECRET_ENVKEYS": "AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY",
-    "SPARK_MESOS_KRB5_CONF_BASE64": "dmlzaG51Cg==",
-    "SPARK_EVENTLOG_ENABLED": "true",
-    "SPARK_EVENTLOG_DIR": "s3a://vishnu-mohan/spark/history",
+    "SPARK_DRIVER_JAVA_OPTIONS": "'-XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/mnt/mesos/sandbox'",
+    "SPARK_CONF_SPARK_SCHEDULER_MINREGISTEREDRESOURCESRATIO": "spark.scheduler.minRegisteredResourcesRatio=1.0",
+    "SPARK_CONF_CORES_MAX": "spark.cores.max=5",
+    "SPARK_CONF_EXECUTOR_CORES": "spark.executor.cores=1",
+    "SPARK_CONF_EXECUTOR_MEMORY": "spark.executor.memory=4g",
+    "SPARK_CONF_EXECUTOR_JAVA_OPTIONS": "spark.executor.extraJavaOptions='-XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/mnt/mesos/sandbox'",
+    "SPARK_CONF_EVENTLOG_ENABLED": "spark.eventLog.enabled=true",
+    "SPARK_CONF_EVENTLOG_DIR": "spark.eventLog.dir=s3a://vishnu-mohan/spark/history",
+    "SPARK_CONF_MESOS_EXECUTOR_DOCKER_IMAGE":"spark.mesos.executor.docker.image=vishnumohan/spark-dcos:tfos",
+    "SPARK_CONF_MESOS_EXECUTOR_HOME": "spark.mesos.executor.home=/opt/spark",
+    "SPARK_CONF_MESOS_CONTAINERIZER": "spark.mesos.containerizer=mesos",
+    "SPARK_CONF_MESOS_PRINCIPAL": "spark.mesos.principal=dev_beakerx",
+    "SPARK_CONF_MESOS_ROLE": "spark.mesos.role=dev-beakerx",
+    "SPARK_CONF_MESOS_DRIVER_LABELS": "spark.mesos.driver.labels=DCOS_SPACE:/dev/beakerx",
+    "SPARK_CONF_MESOS_TASK_LABELS": "spark.mesos.task.labels=DCOS_SPACE:/dev/beakerx",
+    "SPARK_CONF_MESOS_DRIVER_SECRET_NAMES": "spark.mesos.driver.secret.names=dev/AWS_ACCESS_KEY_ID,dev/AWS_SECRET_ACCESS_KEY",
+    "SPARK_CONF_MESOS_DRIVER_SECRET_ENVKEYS": "spark.mesos.driver.secret.envkeys=AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY",
+    "SPARK_CONF_MESOS_EXECUTOR_SECRET_NAMES": "spark.mesos.executor.secret.names=dev/AWS_ACCESS_KEY_ID,dev/AWS_SECRET_ACCESS_KEY",
+    "SPARK_CONF_MESOS_EXECUTOR_SECRET_ENVKEYS": "spark.mesos.executor.secret.envkeys=AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY",
+    "SPARK_CONF_SPARK_MESOS_DRIVERENV_SPARK_MESOS_KRB5_CONF_BASE64": "spark.mesos.driverEnv.SPARK_MESOS_KRB5_CONF_BASE64=W2xpYmRlZmF1bHRzXQoJZGVmYXVsdF9yZWFsbSA9IEFUSEVOQS5NSVQuRURVCgpbcmVhbG1zXQojIHVzZSAia2RjID0gLi4uIiBpZiByZWFsbSBhZG1pbnMgaGF2ZW4ndCBwdXQgU1JWIHJlY29yZHMgaW50byBETlMKCUFUSEVOQS5NSVQuRURVID0gewoJCWFkbWluX3NlcnZlciA9IGtlcmJlcm9zLm1pdC5lZHUKCX0KCUFORFJFVy5DTVUuRURVID0gewoJCWFkbWluX3NlcnZlciA9IGtkYy0wMS5hbmRyZXcuY211LmVkdQoJfQoKW2RvbWFpbl9yZWFsbV0KCW1pdC5lZHUgPSBBVEhFTkEuTUlULkVEVQoJY3NhaWwubWl0LmVkdSA9IENTQUlMLk1JVC5FRFUKCS51Y3NjLmVkdSA9IENBVFMuVUNTQy5FRFUKCltsb2dnaW5nXQojCWtkYyA9IENPTlNPTEUK",
+    "SPARK_CONF_SPARK_EXECUTORENV_SPARK_MESOS_KRB5_CONF_BASE64": "spark.executorEnv.SPARK_MESOS_KRB5_CONF_BASE64=W2xpYmRlZmF1bHRzXQoJZGVmYXVsdF9yZWFsbSA9IEFUSEVOQS5NSVQuRURVCgpbcmVhbG1zXQojIHVzZSAia2RjID0gLi4uIiBpZiByZWFsbSBhZG1pbnMgaGF2ZW4ndCBwdXQgU1JWIHJlY29yZHMgaW50byBETlMKCUFUSEVOQS5NSVQuRURVID0gewoJCWFkbWluX3NlcnZlciA9IGtlcmJlcm9zLm1pdC5lZHUKCX0KCUFORFJFVy5DTVUuRURVID0gewoJCWFkbWluX3NlcnZlciA9IGtkYy0wMS5hbmRyZXcuY211LmVkdQoJfQoKW2RvbWFpbl9yZWFsbV0KCW1pdC5lZHUgPSBBVEhFTkEuTUlULkVEVQoJY3NhaWwubWl0LmVkdSA9IENTQUlMLk1JVC5FRFUKCS51Y3NjLmVkdSA9IENBVFMuVUNTQy5FRFUKCltsb2dnaW5nXQojCWtkYyA9IENPTlNPTEUK",
+    "SPARK_CONF_SPARK_EXECUTORENV_KRB5_CONFIG": "spark.executorEnv.KRB5_CONFIG=/mnt/mesos/sandbox/krb5.conf",
+    "SPARK_CONF_SPARK_EXECUTORENV_JAVA_HOME": "spark.executorEnv.JAVA_HOME=/opt/jdk",
+    "SPARK_CONF_SPARK_EXECUTORENV_HADOOP_HDFS_HOME": "spark.executorEnv.HADOOP_HDFS_HOME=/opt/hadoop",
+    "SPARK_CONF_SPARK_EXECUTORENV_HADOOP_OPTS": "spark.executorEnv.HADOOP_OPTS='-Djava.library.path=/opt/hadoop/lib/native -Djava.security.krb5.conf=/mnt/mesos/sandbox/krb5.conf'",
+    "SPARK_CONF_SPARK_MESOS_URIS": "spark.mesos.uris=http://api.devhdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/hdfs-site.xml,http://api.devhdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/core-site.xml",
+    "SPARK_MESOS_KRB5_CONF_BASE64": "W2xpYmRlZmF1bHRzXQoJZGVmYXVsdF9yZWFsbSA9IEFUSEVOQS5NSVQuRURVCgpbcmVhbG1zXQojIHVzZSAia2RjID0gLi4uIiBpZiByZWFsbSBhZG1pbnMgaGF2ZW4ndCBwdXQgU1JWIHJlY29yZHMgaW50byBETlMKCUFUSEVOQS5NSVQuRURVID0gewoJCWFkbWluX3NlcnZlciA9IGtlcmJlcm9zLm1pdC5lZHUKCX0KCUFORFJFVy5DTVUuRURVID0gewoJCWFkbWluX3NlcnZlciA9IGtkYy0wMS5hbmRyZXcuY211LmVkdQoJfQoKW2RvbWFpbl9yZWFsbV0KCW1pdC5lZHUgPSBBVEhFTkEuTUlULkVEVQoJY3NhaWwubWl0LmVkdSA9IENTQUlMLk1JVC5FRFUKCS51Y3NjLmVkdSA9IENBVFMuVUNTQy5FRFUKCltsb2dnaW5nXQojCWtkYyA9IENPTlNPTEUK",
     "TERM": "xterm-256color"
   },
   "labels": {
@@ -67,10 +101,7 @@
     "HAPROXY_0_VHOST": "vhost.example.com",
     "HAPROXY_0_PATH": "/service/dev/beakerx/notebook",
     "HAPROXY_2_ENABLED": "true",
-    "HAPROXY_2_REDIRECT_TO_HTTPS": "true",
-    "HAPROXY_2_VHOST": "vhost.example.com",
-    "HAPROXY_2_PATH": "/service/dev/beakerx/spark",
-    "HAPROXY_2_HTTP_BACKEND_PROXYPASS_PATH": "/service/dev/beakerx/spark"
+    "HAPROXY_2_REDIRECT_TO_HTTPS": "true"
   },
   "portDefinitions": [
     {

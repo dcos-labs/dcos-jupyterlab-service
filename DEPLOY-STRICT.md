@@ -1,16 +1,19 @@
+# Jupyter Notebooks with the BeakerX JVM Kernels on Mesosphere DC/OS
+
+## Setup Service Account for BeakerX
+
 ```bash
 dcos security org service-accounts keypair beakerx-private-key.pem beakerx-public-key.pem
 
 dcos security org service-accounts create -p beakerx-public-key.pem -d "Dev BeakerX Service Account" dev_beakerx
-dcos security org service-accounts show
-
 dcos security secrets create-sa-secret --strict beakerx-private-key.pem dev_beakerx dev/beakerx/serviceCredential
-dcos security secrets list /dev/beakerx
-
 dcos security org users grant dev_beakerx dcos:mesos:master:task:user:nobody create --description "Allow dev_beakerx to launch tasks under the Linux user: nobody"
 dcos security org users grant dev_beakerx dcos:mesos:master:framework:role:dev-beakerx create --description "Allow dev_beakerx to register with Mesos and consume resources from the dev-beakerx role"
 dcos security org users grant dev_beakerx dcos:mesos:master:task:app_id:/dev/beakerx create --description "Allow dev_beakerx to create tasks under the /dev/beakerx namespace"
+```
 
+## (Optional) Setup Quota for BeakerX
+```bash
 tee dev-beakerx-quota.json <<- 'EOF'
 {
  "role": "dev-beakerx",
@@ -30,25 +33,233 @@ tee dev-beakerx-quota.json <<- 'EOF'
 EOF
 
 curl --cacert dcos-ca.crt -fsSL -X POST -H "Authorization: token=$(dcos config show core.dcos_acs_token)" -H "Content-Type: application/json" $(dcos config show core.dcos_url)/mesos/quota -d @dev-beakerx-quota.json
+```
 
-spark-submit \
+## Submit a test SparkPi Job
+```bash
+eval \
+  spark-submit \
+  ${SPARK_OPTS} \
   --verbose \
-  --name SparkPi-Client-2-2-1 \
-  --master mesos://zk://zk-1.zk:2181,zk-2.zk:2181,zk-3.zk:2181,zk-4.zk:2181,zk-5.zk:2181/mesos \
-  --conf spark.mesos.containerizer=mesos \
-  --conf spark.mesos.principal=dev_beakerx \
-  --conf spark.mesos.role=dev-beakerx \
-  --conf spark.cores.max=4 \
-  --conf spark.executor.cores=2 \
-  --conf spark.mesos.executor.docker.image=vishnumohan/spark-dcos:2.2.1-1.11.0 \
-  --conf spark.executor.home=/opt/spark \
-  --conf spark.mesos.driver.labels=DCOS_SPACE:/dev/beakerx \
-  --conf spark.mesos.driverEnv.SPARK_MESOS_KRB5_CONF_BASE64=dmlzaG51Cg== \
-  --conf spark.executorEnv.SPARK_MESOS_KRB5_CONF_BASE64=dmlzaG51Cg== \
-  --conf spark.mesos.driver.secret.names=/dev/AWS_ACCESS_KEY_ID,/dev/AWS_SECRET_ACCESS_KEY \
-  --conf spark.mesos.driver.secret.envkeys=AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY \
-  --conf spark.eventLog.enabled=true \
-  --conf spark.eventLog.dir=s3a://vishnu-mohan/spark/history \
   --class org.apache.spark.examples.SparkPi \
   /opt/spark/examples/jars/spark-examples_2.11-2.2.1.jar 100
+```
+
+## Prepare MNIST Dataset with Yahoo's Tensorflow on Spark
+
+### Clone the Yahoo TensorFlowOnSpark Github Repo
+```bash
+git clone https://github.com/yahoo/TensorFlowOnSpark
+```
+
+### Retrieve and extract raw MNIST Dataset
+
+```bash
+cd $MESOS_SANDBOX
+curl -fsSL -O https://s3.amazonaws.com/vishnu-mohan/tensorflow/mnist/mnist.zip
+unzip mnist.zip
+```
+
+### Prepare MNIST Dataset in CSV format and store on S3
+
+#### Remove existing csv folder in S3 bucket (if present)
+```bash
+aws s3 rm --recursive s3://vishnu-mohan/tensorflow/mnist/csv 
+```
+
+#### Prepare MINST as CSV for S3
+```bash
+eval \
+  spark-submit \
+  ${SPARK_OPTS} \
+  --verbose \
+  $(pwd)/TensorFlowOnSpark/examples/mnist/mnist_data_setup.py \
+    --output s3a://vishnu-mohan/tensorflow/mnist/csv \
+    --format csv
+```
+
+#### List prepared CSV files on S3
+```bash
+aws s3 ls --recursive s3://vishnu-mohan/tensorflow/mnist/csv
+```
+
+### Prepare MNIST Dataset in CSV format and store on HDFS (under hdfs://user/${USER}/mnist/csv)
+
+#### Remove existing folder (if present)
+```bash
+hdfs dfs -rm -R -skipTrash mnist/csv
+```
+
+#### Prepare MNIST as CSV for HDFS
+```bash
+eval \
+  spark-submit \
+  ${SPARK_OPTS} \
+  --verbose \
+  $(pwd)/TensorFlowOnSpark/examples/mnist/mnist_data_setup.py \
+    --output mnist/csv \
+    --format csv
+```
+
+#### List prepared CSV files on HDFS
+```bash
+hdfs dfs -ls -R mnist/csv
+```
+
+### Prepare MNIST Dataset in Tensorflow Record format and store on S3
+
+#### Remove existing bucket (if present)
+```bash
+aws s3 rm --recursive s3://vishnu-mohan/tensorflow/mnist/tfr
+```
+
+#### Prepare MNIST as TFRecord for S3
+```bash
+eval \
+  spark-submit \
+  ${SPARK_OPTS} \
+  --verbose \
+  $(pwd)/TensorFlowOnSpark/examples/mnist/mnist_data_setup.py \
+    --output s3a://vishnu-mohan/tensorflow/mnist/tfr \
+    --format tfr
+```
+
+#### List prepared TFRecord files on S3
+```bash
+aws s3 ls --recursive s3://vishnu-mohan/tensorflow/mnist/tfr
+```
+
+### Prepare MNIST Dataset in Tensorflow Record format and store on HDFS (under hdfs://user/${USER}/mnist/tfr)
+
+#### Remove existing directory (if present)
+```
+hdfs dfs -rm -R -skipTrash mnist/tfr
+```
+
+#### Prepare MNIST as TFRecords for HDFS
+```bash
+eval \
+  spark-submit \
+  ${SPARK_OPTS} \
+  --verbose \
+  $(pwd)/TensorFlowOnSpark/examples/mnist/mnist_data_setup.py \
+    --output mnist/tfr \
+    --format tfr
+```
+
+#### List prepared TFRecord files on HDFS
+```bash
+hdfs dfs -ls -R mnist/tfr
+```
+
+## Train MNIST with Tensorflow on Spark
+
+### Train MNIST from S3 in CSV format and store model in S3 (DO NOT USE!)
+
+#### Remove existing CSV model folder in S3 bucket (if present)
+```bash
+aws s3 rm --recursive s3://vishnu-mohan/tensorflow/mnist/mnist_csv_model
+```
+
+#### Train
+```bash
+eval \
+  spark-submit \
+  ${SPARK_OPTS} \
+  --verbose \
+  --py-files $(pwd)/TensorFlowOnSpark/examples/mnist/spark/mnist_dist.py \
+  $(pwd)/TensorFlowOnSpark/examples/mnist/spark/mnist_spark.py \
+    --cluster_size 5 \
+    --images s3a://vishnu-mohan/tensorflow/mnist/csv/train/images \
+    --labels s3a://vishnu-mohan/tensorflow/mnist/csv/train/labels \
+    --format csv \
+    --mode train \
+    --model s3a://vishnu-mohan/tensorflow/mnist/mnist_csv_model
+```
+
+#### List Model files trained from CSV on S3
+```bash
+aws s3 ls --recursive s3://vishnu-mohan/tensorflow/mnist/mnist_csv_model
+```
+
+### Train MNIST from S3 in TFRecord format and store model in S3 (DO NOT USE!)
+
+#### Remove existing TFR model folder in S3 bucket (if present)
+```bash
+aws s3 rm --recursive s3://vishnu-mohan/tensorflow/mnist/mnist_tfr_model
+```
+
+#### Train MNIST
+```bash
+eval \
+  spark-submit \
+  ${SPARK_OPTS} \
+  --verbose \
+  --py-files $(pwd)/TensorFlowOnSpark/examples/mnist/spark/mnist_dist.py \
+  $(pwd)/TensorFlowOnSpark/examples/mnist/spark/mnist_spark.py \
+  --cluster_size 5 \
+  --images s3a://vishnu-mohan/tensorflow/mnist/tfr/train \
+  --format tfr \
+  --mode train \
+  --model s3a://vishnu-mohan/tensorflow/mnist/mnist_tfr_model
+```
+
+#### List Model files trained from TFRecords on S3
+```bash
+aws s3 ls --recursive s3://vishnu-mohan/tensorflow/mnist/mnist_tfr_model
+```
+
+### Train MNIST from CSV on HDFS and store the model on HDFS (under hdfs://user/${USER}/mnist/mnist_csv_model)
+
+#### Remove existing CSV model folder on HDFS (if present)
+```bash
+hdfs dfs -rm -R -skipTrash mnist/mnist_csv_model
+```
+
+#### Train MNIST
+```bash
+eval \
+  spark-submit \
+  ${SPARK_OPTS} \
+  --verbose \
+  --py-files $(pwd)/TensorFlowOnSpark/examples/mnist/spark/mnist_dist.py \
+  $(pwd)/TensorFlowOnSpark/examples/mnist/spark/mnist_spark.py \
+  --cluster_size 5 \
+  --images mnist/csv/train/images \
+  --labels mnist/csv/train/labels \
+  --format csv \
+  --mode train \
+  --model mnist/mnist_csv_model
+```
+
+#### List Model files trained from CSV on HDFS
+```bash
+hdfs dfs -ls -R mnist/mnist_csv_model
+```
+
+### Train MNIST from TFRecords on HDFS and store the model on HDFS (under hdfs://user/${USER}/mnist/mnist_tfr_model)
+
+#### Remove existing TFR model folder on HDFS (if present)
+```bash
+hdfs dfs -rm -R -skipTrash mnist/mnist_tfr_model
+```
+
+#### Train MNIST TFRecord for HDFS (under hdfs://user/${USER}/mnist/tfr)
+```bash
+eval \
+  spark-submit \
+  ${SPARK_OPTS} \
+  --verbose \
+  --py-files $(pwd)/TensorFlowOnSpark/examples/mnist/spark/mnist_dist.py \
+  $(pwd)/TensorFlowOnSpark/examples/mnist/spark/mnist_spark.py \
+  --cluster_size 5 \
+  --images mnist/tfr/train \
+  --format tfr \
+  --mode train \
+  --model mnist/mnist_tfr_model
+```
+
+#### List model files trained from TFRecords on HDFS
+```bash
+hdfs dfs -ls -R mnist/mnist_tfr_model
 ```
