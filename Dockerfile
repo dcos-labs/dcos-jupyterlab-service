@@ -130,6 +130,7 @@ RUN echo "deb ${REPO}/${DISTRO} ${CODENAME} main" \
        gnupg \
        info \
        jq \
+       kstart \
        less \
        lmodern \
        man \
