@@ -213,7 +213,7 @@ aws s3 ls --recursive s3://vishnu-mohan/tensorflow/mnist/mnist_tfr_model
 
 #### Remove existing CSV model folder on HDFS (if present)
 ```bash
-hdfs dfs -rm -R -skipTrash user/${USER}/mnist/mnist_csv_model
+hdfs dfs -rm -R -skipTrash mnist/mnist_csv_model
 ```
 
 #### Train MNIST
@@ -241,7 +241,7 @@ hdfs dfs -ls -R mnist/mnist_csv_model
 
 #### Remove existing TFR model folder on HDFS (if present)
 ```bash
-hdfs dfs -rm -R -skipTrash user/${USER}/mnist/mnist_tfr_model
+hdfs dfs -rm -R -skipTrash mnist/mnist_tfr_model
 ```
 
 #### Train MNIST TFRecord for HDFS (under hdfs://user/${USER}/mnist/tfr)
