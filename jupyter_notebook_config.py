@@ -72,7 +72,7 @@ if (os.getenv('MARATHON_APP_ID') or os.getenv('MESOS_SANDBOX')):
 
     # Copy ${MESOS_SANDBOX}/krb5.conf if it exists to /etc/krb5.conf
     if os.path.exists('krb5.conf'):
-        copyfile('krb5.conf' '/etc/krb5.conf')
+        copyfile('krb5.conf', '/etc/krb5.conf')
 
     # Build up ${SPARK_OPTS} for Apache Toree and to conveniently reuse with spark-submit:
     # eval spark-submit ${SPARK_OPTS} <...>
