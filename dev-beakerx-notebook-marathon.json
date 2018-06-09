@@ -8,8 +8,8 @@
   "container": {
     "type": "MESOS",
     "docker": {
-      "image": "vishnumohan/beakerx-dcos:0.17.1-1.11.2",
-      "forcePullImage": false
+      "image": "vishnumohan/beakerx-dcos",
+      "forcePullImage": true
     }
   },
   "fetch": [
@@ -98,7 +98,7 @@
     "HAPROXY_GROUP": "external",
     "HAPROXY_0_ENABLED": "true",
     "HAPROXY_0_REDIRECT_TO_HTTPS": "true",
-    "HAPROXY_0_VHOST": "vishnu-11-publicsl-hku49nlfi2ys-1403229029.us-east-1.elb.amazonaws.com",
+    "HAPROXY_0_VHOST": "vhost.example.com",
     "HAPROXY_0_PATH": "/service/dev/beakerx/notebook",
     "HAPROXY_2_ENABLED": "true",
     "HAPROXY_2_REDIRECT_TO_HTTPS": "true"
