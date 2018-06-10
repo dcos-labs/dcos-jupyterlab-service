@@ -72,7 +72,7 @@
     "SPARK_CONF_EXECUTOR_JAVA_OPTIONS": "spark.executor.extraJavaOptions='-XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/mnt/mesos/sandbox'",
     "SPARK_CONF_EVENTLOG_ENABLED": "spark.eventLog.enabled=true",
     "SPARK_CONF_EVENTLOG_DIR": "spark.eventLog.dir=s3a://vishnu-mohan/spark/history",
-    "SPARK_CONF_MESOS_EXECUTOR_DOCKER_IMAGE":"spark.mesos.executor.docker.image=vishnumohan/spark-dcos:tfos",
+    "SPARK_CONF_MESOS_EXECUTOR_DOCKER_IMAGE":"spark.mesos.executor.docker.image=vishnumohan/spark-dcos",
     "SPARK_CONF_MESOS_EXECUTOR_HOME": "spark.mesos.executor.home=/opt/spark",
     "SPARK_CONF_MESOS_CONTAINERIZER": "spark.mesos.containerizer=mesos",
     "SPARK_CONF_MESOS_PRINCIPAL": "spark.mesos.principal=dev_beakerx",

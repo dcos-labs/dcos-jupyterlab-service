@@ -21,12 +21,12 @@ tee dev-beakerx-quota.json <<- 'EOF'
    {
      "name": "cpus",
      "type": "SCALAR",
-     "scalar": { "value": 4.4 }
+     "scalar": { "value": 5.0 }
    },
    {
      "name": "mem",
      "type": "SCALAR",
-     "scalar": { "value": 9216.0 }
+     "scalar": { "value": 22525.0 }
    }
  ]
 }
