@@ -63,7 +63,7 @@ ARG TENSORFLOW_VARIANT="cpu"
 ARG TENSORFLOW_VERSION="1.8.0"
 ARG TINI_GPG_KEY="595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7"
 ARG TINI_URL="https://github.com/krallin/tini/releases/download"
-ARG TINI_VERSION="v0.17.0"
+ARG TINI_VERSION="v0.18.0"
 ARG VCS_REF
 ARG XGBOOST_JAVA_JAR_SHA256="4a6599ee3f1bd10d984e8b03747d5bc3cb637aeb791474178de2c285857bf69e"
 ARG XGBOOST_SPARK_JAR_SHA256="cd31fb96b26fee197e126215949bc4f5c9a3cafd7ff157ab0037a63777c2935e"
@@ -205,9 +205,12 @@ RUN cd /tmp \
     && tar xf "libtensorflow_jni-${TENSORFLOW_VARIANT}-linux-x86_64-${TENSORFLOW_VERSION}.tar.gz" "./libtensorflow_jni.so" \
     && mv "libtensorflow_jni.so" "/usr/lib" \
     && rm -rf /tmp/* \
+    && groupadd wheel -g 11 \
+    && echo "auth required pam_wheel.so use_uid" >> /etc/pam.d/su \
     && useradd -m -N -u "${NB_UID}" -g "${NB_GID}" -s /bin/bash "${NB_USER}" \
     && usermod -a -G 99,65534 "${NB_USER}" \
     && chown "${NB_UID}:${NB_GID}" "${CONDA_DIR}" \
+    && chmod g+w /etc/passwd \
     && fix-permissions "${CONDA_DIR}" \
     && fix-permissions "${HOME}"
 
@@ -241,7 +244,7 @@ RUN cd /tmp \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/geojson-extension \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/github \
     && ${CONDA_DIR}/bin/jupyter labextension install jupyterlab_bokeh \
-    && ${CONDA_DIR}/bin/jupyter labextension install beakerx-jupyterlab@0.17.1 \
+    && ${CONDA_DIR}/bin/jupyter labextension install beakerx-jupyterlab@0.19.0 \
     && ${CONDA_DIR}/bin/conda remove --force --json -yq openjdk \
     && ${CONDA_DIR}/bin/npm cache clean --force \
     && rm -rf "${CONDA_DIR}/share/jupyter/lab/staging" \
@@ -261,7 +264,7 @@ COPY --chown="1000:100" jupyter_notebook_config.py "${HOME}/.jupyter/"
 
 USER root
 EXPOSE 8888
-ENTRYPOINT ["tini", "--"]
+ENTRYPOINT ["tini", "-g", "--"]
 CMD ["start-notebook.sh"]
 
 COPY start.sh /usr/local/bin/
