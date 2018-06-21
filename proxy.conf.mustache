@@ -1,0 +1,67 @@
+server {
+    {{#PORT_NOTEBOOK}}
+    listen {{PORT_NOTEBOOK}};
+    {{/PORT_NOTEBOOK}}
+    {{^PORT_NOTEBOOK}}
+    listen 8080;
+    {{/PORT_NOTEBOOK}}
+    server_name default_server;
+    {{#MARATHON_APP_ID}}
+    port_in_redirect off;
+    {{/MARATHON_APP_ID}}
+    {{^MARATHON_APP_ID}}
+    port_in_redirect on;
+    {{/MARATHON_APP_ID}}
+
+    #error_log logs/error.log warn;
+    #error_log /dev/stderr warn;
+
+    #large_client_header_buffers 8 64k;
+    #client_header_buffer_size 64k;
+
+    #set_by_lua $session_secret 'return os.getenv("OIDC_SESSION_SECRET")';
+    #set_by_lua $session_check_ssi 'return os.getenv("OIDC_SESSION_CHECK_SSI")';
+    #set_by_lua $session_name 'return os.getenv("OIDC_SESSION_NAME")';
+
+    location = /favicon.ico {
+        return 404;
+    }
+
+    location = /healthz {
+        return 200;
+    }
+    
+    location {{MARATHON_APP_LABEL_HAPROXY_0_PATH}}/ {
+        access_by_lua_file lua/oidc_auth_proxy_pass.lua;
+        proxy_pass http://localhost:8888;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_http_version 1.1;
+        proxy_redirect off;
+        proxy_buffering off;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+        proxy_read_timeout 86400;
+    }
+
+    location ^~ {{MARATHON_APP_LABEL_HAPROXY_0_PATH}}/tensorboard/ {
+        rewrite ^{{MARATHON_APP_LABEL_HAPROXY_0_PATH}}/tensorboard/(.*)$ /$1 break;
+        access_by_lua_file lua/oidc_auth_proxy_pass.lua;
+        proxy_pass http://localhost:6006;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_http_version 1.1;
+        proxy_redirect off;
+        proxy_buffering off;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+        proxy_read_timeout 86400;
+    }
+
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   html;
+    }
+}

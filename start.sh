@@ -8,6 +8,59 @@ set -e
 if [ $# -eq 0 ]; then
     cmd=bash
 else
+    # bootstrap requires that ${LIBPROCESS_IP} or ${MESOS_CONTAINER_IP} be set
+    if [ -z ${LIBPROCESS_IP+x} ]; then
+        CONTAINER_IP=$(LIBPROCESS_IP="0.0.0.0" bootstrap -get-task-ip);
+        export LIBPROCESS_IP="${CONTAINER_IP}"
+    else
+        CONTAINER_IP=$(bootstrap -get-task-ip)
+    fi
+
+    export CONTAINER_IP
+    echo "CONTAINER_IP: ${CONTAINER_IP}"
+    echo "LIBPROCESS_IP: ${LIBPROCESS_IP}"
+
+    if [ -z ${MESOS_CONTAINER_IP+x} ]; then
+        export MESOS_CONTAINER_IP="${LIBPROCESS_IP}"
+    fi
+    echo "MESOS_CONTAINER_IP: ${MESOS_CONTAINER_IP}"
+
+    if [ -z ${MESOS_SANDBOX+x} ]; then
+        export MESOS_SANDBOX="${HOME}"
+    fi
+    echo "MESOS_SANDBOX: ${MESOS_SANDBOX}"
+
+    # Set environment variables for Spark Monitor: https://krishnan-r.github.io/sparkmonitor/install.html
+    export SPARKMONITOR_UI_HOST="${MESOS_CONTAINER_IP}"
+    if [ ${PORT_SPARKUI+x} ]; then
+        export SPARKMONITOR_UI_PORT="${PORT_SPARKUI}"
+    fi
+
+    # ${HOME} is set to ${MESOS_SANDBOX} on DC/OS and won't have a default IPython profile
+    if [ ! -f "${MESOS_SANDBOX}/.ipython/profile_default/ipython_kernel_config.py" ]; then
+        ipython profile create default
+        # Enable the SparkMonitor Jupyter Kernel Extension
+        echo "c.InteractiveShellApp.extensions.append('sparkmonitor.kernelextension')" \
+            >> "$(ipython profile locate default)/ipython_kernel_config.py"
+    fi
+
+    # Tensorboard
+    if [ ${TENSORBOARD_LOGDIR+x} ]; then
+        if [ ${PORT_TFDBG+x} ]; then
+            tensorboard --host localhost --port 6006 --debugger_port "${PORT_TFDBG}" --logdir "${TENSORBOARD_LOGDIR}" 2>&1 &
+        else
+            tensorboard --host localhost --port 6006 --logdir "${TENSORBOARD_LOGDIR}" 2>&1 &
+        fi
+    fi
+
+    # bootstrap needs ${MESOS_SANDBOX} set to obtain the relative path to the mustache template(s)
+    MESOS_SANDBOX="/" CONFIG_TEMPLATE_NGINX_CONF="/opt/mesosphere/nginx.conf.mustache,/usr/local/openresty/nginx/conf/nginx.conf" bootstrap -template -resolve=false --print-env=false -install-certs=false
+
+    MESOS_SANDBOX="/" CONFIG_TEMPLATE_NGINX_PROXY_CONF="/opt/mesosphere/proxy.conf.mustache,/usr/local/openresty/nginx/conf/sites/proxy.conf" bootstrap -template -resolve=false --print-env=false -install-certs=false
+
+    # Start Openresty for (Optional) OpenID Connect Authentication: https://github.com/zmartzone/lua-resty-openidc
+    openresty
+
     cmd=$*
 fi
 
