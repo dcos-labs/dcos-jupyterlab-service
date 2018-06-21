@@ -1,0 +1,88 @@
+env OIDC_REDIRECT_URI;
+env OIDC_DISCOVERY_URI;
+env OIDC_CLIENT_ID;
+env OIDC_CLIENT_SECRET;
+env OIDC_TLS_VERIFY;
+env OIDC_AUTH_METHOD;
+env OIDC_SCOPE;
+env OIDC_EMAIL;
+
+env OIDC_SESSION_SECRET;
+env OIDC_SESSION_CHECK_SSI;
+env OIDC_SESSION_NAME;
+
+#user  nobody;
+worker_processes  1;
+
+#error_log  logs/error.log;
+#error_log  logs/error.log  notice;
+#error_log  logs/error.log  info;
+{{#NGINX_LOG_LEVEL}}
+error_log  stderr {{NGINX_LOG_LEVEL}};
+{{/NGINX_LOG_LEVEL}}
+{{^NGINX_LOG_LEVEL}}
+error_log  stderr warn;
+{{/NGINX_LOG_LEVEL}}
+
+#pid        logs/nginx.pid;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    # top-level http config for websocket headers
+    # If Upgrade is defined, Connection = upgrade
+    # If Upgrade is empty, Connection = close
+    map $http_upgrade $connection_upgrade {
+        default upgrade;
+        ''      close;
+    }
+
+    lua_package_path '~/lua/?.lua;;';
+
+    {{#OIDC_USE_SPARTAN_RESOLVER}}
+    resolver 198.51.100.1 198.51.100.2 198.51.100.3;
+    {{/OIDC_USE_SPARTAN_RESOLVER}}
+    {{^OIDC_USE_SPARTAN_RESOLVER}}
+    resolver 208.67.220.220 208.67.222.222;
+    {{/OIDC_USE_SPARTAN_RESOLVER}}
+
+    {{#OIDC_TRUST_DCOS_CA}}
+    lua_ssl_trusted_certificate /mnt/mesos/sandbox/.ssl/ca-bundle.crt;
+    {{/OIDC_TRUST_DCOS_CA}}
+    {{^OIDC_TRUST_DCOS_CA}}
+    lua_ssl_trusted_certificate /etc/ssl/certs/ca-certificates.crt;
+    {{/OIDC_TRUST_DCOS_CA}}
+    lua_ssl_verify_depth 5;
+
+    # cache for discovery metadata documents
+    lua_shared_dict discovery 1m;
+    # cache for JWKs
+    lua_shared_dict jwks 1m;
+
+    # NB: if you have "lua_code_cache off;", use:
+    # set $session_secret xxxxxxxxxxxxxxxxxxx;
+    # see: https://github.com/bungle/lua-resty-session#notes-about-turning-lua-code-cache-off
+    
+    #lua_code_cache off;
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log  logs/access.log  main;
+    #access_log  /dev/stdout  main;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    #keepalive_timeout  0;
+    keepalive_timeout  65;
+
+    #gzip  on;
+
+    include sites/*;
+}

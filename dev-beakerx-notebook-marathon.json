@@ -4,7 +4,7 @@
   "cpus": 2,
   "mem": 8192,
   "user": "nobody",
-  "cmd": "export SPARK_CONF_SPARK_EXECUTORENV_CLASSPATH=\"spark.executorEnv.CLASSPATH=$(${HADOOP_HDFS_HOME}/bin/hadoop classpath --glob):${CLASSPATH}\" && export SPARK_CONF_SPARK_EXECUTORENV_LD_LIBRARY_PATH=\"spark.executorEnv.LD_LIBRARY_PATH=${LD_LIBRARY_PATH}\" && env | sort && /usr/local/bin/start.sh ${CONDA_DIR}/bin/jupyter lab --notebook-dir=\"/mnt/mesos/sandbox\"",
+  "cmd": "export SPARK_CONF_SPARK_EXECUTORENV_CLASSPATH=\"spark.executorEnv.CLASSPATH=$(${HADOOP_HDFS_HOME}/bin/hadoop classpath --glob):${CLASSPATH}\" && export SPARK_CONF_SPARK_EXECUTORENV_LD_LIBRARY_PATH=\"spark.executorEnv.LD_LIBRARY_PATH=${LD_LIBRARY_PATH}\" && /usr/local/bin/start.sh ${CONDA_DIR}/bin/jupyter lab --notebook-dir=\"/mnt/mesos/sandbox\"",
   "container": {
     "type": "MESOS",
     "docker": {
@@ -51,11 +51,19 @@
     "CONDA_ENVS_PATH": "/mnt/mesos/sandbox/conda/envs:/opt/conda/envs",
     "CONDA_PKGS_DIRS": "/mnt/mesos/sandbox/conda/pkgs:/opt/conda/pkgs",
     "DCOS_DIR": "/mnt/mesos/sandbox/.dcos",
+    "ENABLE_SPARK_MONITOR": "true",
     "HADOOP_CONF_DIR": "/mnt/mesos/sandbox",
     "HOME": "/mnt/mesos/sandbox",
     "JAVA_OPTS": "'-XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/mnt/mesos/sandbox'",
     "JUPYTER_CONFIG_DIR": "/mnt/mesos/sandbox/.jupyter",
     "JUPYTER_RUNTIME_DIR": "/mnt/mesos/sandbox/.local/share/jupyter/runtime",
+    "NGINX_LOG_LEVEL": "notice",
+    "OIDC_DISCOVERY_URI": "https://keycloak.example.com/auth/realms/Notebook/.well-known/openid-configuration",
+    "OIDC_REDIRECT_URI": "/service/dev/beakerx/notebook/redirect_uri",
+    "OIDC_CLIENT_ID": "Notebook",
+    "OIDC_CLIENT_SECRET": "0d3a850e-517f-415f-976f-8b92ac683dd1",
+    "OIDC_TLS_VERIFY": "no",
+    "OIDC_EMAIL": "vishnu2kmohan@yahoo.com",
     "USER": "nobody",
     "S3_ENDPOINT": "s3.us-east-1.amazonaws.com",
     "S3_USE_HTTPS": "1",
@@ -64,15 +72,13 @@
     "SPARK_USER": "nobody",
     "SPARK_DRIVER_CORES": "2",
     "SPARK_DRIVER_MEMORY": "4g",
-    "SPARK_DRIVER_JAVA_OPTIONS": "'-XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/mnt/mesos/sandbox'",
+    "SPARK_DRIVER_JAVA_OPTIONS": "'-XX:+UseG1GC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/mnt/mesos/sandbox'",
     "SPARK_CONF_SPARK_SCHEDULER_MINREGISTEREDRESOURCESRATIO": "spark.scheduler.minRegisteredResourcesRatio=1.0",
     "SPARK_CONF_CORES_MAX": "spark.cores.max=5",
     "SPARK_CONF_EXECUTOR_CORES": "spark.executor.cores=1",
     "SPARK_CONF_EXECUTOR_MEMORY": "spark.executor.memory=4g",
-    "SPARK_CONF_EXECUTOR_JAVA_OPTIONS": "spark.executor.extraJavaOptions='-XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/mnt/mesos/sandbox'",
-    "SPARK_CONF_EVENTLOG_ENABLED": "spark.eventLog.enabled=true",
-    "SPARK_CONF_EVENTLOG_DIR": "spark.eventLog.dir=s3a://vishnu-mohan/spark/history",
-    "SPARK_CONF_MESOS_EXECUTOR_DOCKER_IMAGE":"spark.mesos.executor.docker.image=vishnumohan/spark-dcos",
+    "SPARK_CONF_EXECUTOR_JAVA_OPTIONS": "spark.executor.extraJavaOptions='-XX:+UseG1GC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/mnt/mesos/sandbox'",
+    "SPARK_CONF_MESOS_EXECUTOR_DOCKER_IMAGE": "spark.mesos.executor.docker.image=vishnumohan/spark-dcos",
     "SPARK_CONF_MESOS_EXECUTOR_HOME": "spark.mesos.executor.home=/opt/spark",
     "SPARK_CONF_MESOS_CONTAINERIZER": "spark.mesos.containerizer=mesos",
     "SPARK_CONF_MESOS_PRINCIPAL": "spark.mesos.principal=dev_beakerx",
@@ -88,9 +94,10 @@
     "SPARK_CONF_SPARK_EXECUTORENV_KRB5_CONFIG": "spark.executorEnv.KRB5_CONFIG=/mnt/mesos/sandbox/krb5.conf",
     "SPARK_CONF_SPARK_EXECUTORENV_JAVA_HOME": "spark.executorEnv.JAVA_HOME=/opt/jdk",
     "SPARK_CONF_SPARK_EXECUTORENV_HADOOP_HDFS_HOME": "spark.executorEnv.HADOOP_HDFS_HOME=/opt/hadoop",
-    "SPARK_CONF_SPARK_EXECUTORENV_HADOOP_OPTS": "spark.executorEnv.HADOOP_OPTS='-Djava.library.path=/opt/hadoop/lib/native -Djava.security.krb5.conf=/mnt/mesos/sandbox/krb5.conf'",
     "SPARK_CONF_SPARK_MESOS_URIS": "spark.mesos.uris=http://api.devhdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/hdfs-site.xml,http://api.devhdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/core-site.xml",
+    "SPARK_CONF_SPARK_EXECUTORENV_HADOOP_OPTS": "spark.executorEnv.HADOOP_OPTS='-Djava.library.path=/opt/hadoop/lib/native -Djava.security.krb5.conf=/mnt/mesos/sandbox/krb5.conf'",
     "SPARK_MESOS_KRB5_CONF_BASE64": "W2xpYmRlZmF1bHRzXQoJZGVmYXVsdF9yZWFsbSA9IEFUSEVOQS5NSVQuRURVCgpbcmVhbG1zXQojIHVzZSAia2RjID0gLi4uIiBpZiByZWFsbSBhZG1pbnMgaGF2ZW4ndCBwdXQgU1JWIHJlY29yZHMgaW50byBETlMKCUFUSEVOQS5NSVQuRURVID0gewoJCWFkbWluX3NlcnZlciA9IGtlcmJlcm9zLm1pdC5lZHUKCX0KCUFORFJFVy5DTVUuRURVID0gewoJCWFkbWluX3NlcnZlciA9IGtkYy0wMS5hbmRyZXcuY211LmVkdQoJfQoKW2RvbWFpbl9yZWFsbV0KCW1pdC5lZHUgPSBBVEhFTkEuTUlULkVEVQoJY3NhaWwubWl0LmVkdSA9IENTQUlMLk1JVC5FRFUKCS51Y3NjLmVkdSA9IENBVFMuVUNTQy5FRFUKCltsb2dnaW5nXQojCWtkYyA9IENPTlNPTEUK",
+    "TENSORBOARD_LOGDIR": "/mnt/mesos/sandbox",
     "TERM": "xterm-256color"
   },
   "labels": {
@@ -99,9 +106,7 @@
     "HAPROXY_0_ENABLED": "true",
     "HAPROXY_0_REDIRECT_TO_HTTPS": "true",
     "HAPROXY_0_VHOST": "vhost.example.com",
-    "HAPROXY_0_PATH": "/service/dev/beakerx/notebook",
-    "HAPROXY_2_ENABLED": "true",
-    "HAPROXY_2_REDIRECT_TO_HTTPS": "true"
+    "HAPROXY_0_PATH": "/service/dev/beakerx/notebook"
   },
   "portDefinitions": [
     {
@@ -117,7 +122,7 @@
       "protocol": "tcp",
       "name": "sparkdriver",
       "labels": {
-        "VIP_1": "/dev/beakerx/sparkdriver:7077"
+        "VIP_1": "/dev/beakerx/notebook/sparkdriver:7077"
       }
     },
     {
@@ -125,20 +130,28 @@
       "protocol": "tcp",
       "name": "sparkui",
       "labels": {
-        "VIP_2": "/dev/beakerx/sparkui:4040"
+        "VIP_2": "/dev/beakerx/notebook/sparkui:4040"
       }
     },
     {
       "port": 0,
       "protocol": "tcp",
       "name": "sparkblockmanager"
+    },
+    {
+      "port": 0,
+      "protocol": "tcp",
+      "name": "tfdbg",
+      "labels": {
+        "VIP_3": "/dev/beakerx/notebook/tfdbg:6046"
+      }
     }
   ],
   "healthChecks": [
     {
       "portIndex": 0,
       "protocol": "MESOS_HTTP",
-      "path": "/service/dev/beakerx/notebook/api",
+      "path": "/healthz",
       "gracePeriodSeconds": 30,
       "intervalSeconds": 20,
       "timeoutSeconds": 10,

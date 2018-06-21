@@ -9,21 +9,16 @@ from shutil import copyfile
 from jupyter_core.paths import jupyter_data_dir
 from notebook.auth import passwd
 
-# Setup the Notebook to listen on all interfaces on port 8888 by default
-c.NotebookApp.ip = '*'  # noqa: F821
-c.NotebookApp.port = 8888
-c.NotebookApp.open_browser = False
+# Only (pre)set a password if we're *not* using OpenID Connect
+if not (os.getenv('OIDC_DISCOVERY_URI') and
+        os.getenv('OIDC_REDIRECT_URI') and
+        os.getenv('OIDC_CLIENT_ID') and
+        os.getenv('OIDC_CLIENT_SECRET')):
 
-# https://github.com/jupyter/notebook/issues/3130
-c.FileContentsManager.delete_to_trash = False
-
-# If running under Apache Mesos:
-if (os.getenv('MESOS_SANDBOX')):
-    if os.getenv('PORT_NOTEBOOK'):
-        c.NotebookApp.port = int(os.getenv('PORT_NOTEBOOK'))
-
-    # Set the Access-Control-Allow-Origin header
-    c.NotebookApp.allow_origin = '*'
+    # Set a password if JUPYTER_PASSWORD is set
+    if 'JUPYTER_PASSWORD' in os.environ:
+        c.NotebookApp.password = passwd(os.environ['JUPYTER_PASSWORD'])
+        del os.environ['JUPYTER_PASSWORD']
 
     # Set Jupyter Notebook Server password to 'jupyter-<Marathon-App-Prefix>'
     # e.g., Marathon App ID '/foo/bar/app' maps to password: 'jupyter-foo-bar'
@@ -31,24 +26,47 @@ if (os.getenv('MESOS_SANDBOX')):
         MARATHON_APP_PREFIX = \
             '-'.join(os.getenv('MARATHON_APP_ID').split('/')[:-1])
         c.NotebookApp.password = passwd('jupyter{}'.format(MARATHON_APP_PREFIX))
+else:
+    # Disable Notebook authentication since we're authenticating using OpenID Connect
+    c.NotebookApp.password = u''
+    c.NotebookApp.token = u''
 
-    # Allow CORS and TLS from behind Marathon-LB/HAProxy
-    # Trust X-Scheme/X-Forwarded-Proto and X-Real-Ip/X-Forwarded-For
-    # Necessary if the proxy handles SSL
-    if os.getenv('MARATHON_APP_LABEL_HAPROXY_GROUP'):
-        c.NotebookApp.trust_xheaders = True
+    # Don't leak OpenID Connect configuration to the end-user
+    try:
+        for env in ['OIDC_DISCOVERY_URI',
+                    'OIDC_REDIRECT_URI',
+                    'OIDC_CLIENT_ID',
+                    'OIDC_CLIENT_SECRET'
+                    'OIDC_EMAIL']:
+            del os.environ[env]
+    except KeyError:
+        pass
 
+# Setup the Notebook to listen on localhost:8888 by default
+c.NotebookApp.ip = '127.0.0.1'
+c.NotebookApp.port = 8888
+c.NotebookApp.open_browser = False
+
+# https://github.com/jupyter/notebook/issues/3130
+c.FileContentsManager.delete_to_trash = False
+
+# Allow CORS and TLS from behind Nginx/Marathon-LB/HAProxy
+# Trust X-Scheme/X-Forwarded-Proto and X-Real-Ip/X-Forwarded-For
+# Necessary if the proxy handles SSL
+c.NotebookApp.trust_xheaders = True
+
+# Set the Access-Control-Allow-Origin header
+c.NotebookApp.allow_origin = '*'
+
+# If running under Apache Mesos:
+if (os.getenv('MESOS_SANDBOX')):
     if os.getenv('MARATHON_APP_LABEL_HAPROXY_0_VHOST'):
         c.NotebookApp.allow_origin = \
-            'http://{}'.format(
-                os.getenv('MARATHON_APP_LABEL_HAPROXY_0_VHOST')
-            )
+            'http://{}'.format(os.getenv('MARATHON_APP_LABEL_HAPROXY_0_VHOST'))
 
     if os.getenv('MARATHON_APP_LABEL_HAPROXY_0_REDIRECT_TO_HTTPS'):
         c.NotebookApp.allow_origin = \
-            'https://{}'.format(
-                os.getenv('MARATHON_APP_LABEL_HAPROXY_0_VHOST')
-            )
+            'https://{}'.format(os.getenv('MARATHON_APP_LABEL_HAPROXY_0_VHOST'))
 
     # Set the Jupyter Notebook server base URL to the HAPROXY_PATH specified
     if os.getenv('MARATHON_APP_LABEL_HAPROXY_0_PATH'):
@@ -74,11 +92,6 @@ if (os.getenv('MESOS_SANDBOX')):
     # Copy ${MESOS_SANDBOX}/krb5.conf if it exists to /etc/krb5.conf
     if os.path.exists('krb5.conf'):
         copyfile('krb5.conf', '/etc/krb5.conf')
-
-# Set a password if JUPYTER_PASSWORD is set
-if 'JUPYTER_PASSWORD' in os.environ:
-    c.NotebookApp.password = passwd(os.environ['JUPYTER_PASSWORD'])
-    del os.environ['JUPYTER_PASSWORD']
 
 # Build up ${SPARK_OPTS} for Apache Toree and to conveniently reuse with spark-submit:
 # eval spark-submit ${SPARK_OPTS} <...>
@@ -177,7 +190,14 @@ for env in spark_conf_envs:
 
 os.environ['SPARK_OPTS'] = ' '.join(spark_opts)
 
-os.environ['PYSPARK_SUBMIT_ARGS'] = ' '.join(spark_opts + ['pyspark-shell'])
+if os.getenv('ENABLE_SPARK_MONITOR'):
+    os.environ['PYSPARK_SUBMIT_ARGS'] = ' '.join(spark_opts +
+        ['--conf spark.driver.extraClassPath=/opt/conda/lib/python3.6/site-packages/sparkmonitor/listener.jar',
+         '--conf spark.extraListeners=sparkmonitor.listener.JupyterSparkMonitorListener',
+         'pyspark-shell'])
+else:
+    os.environ['PYSPARK_SUBMIT_ARGS'] = ' '.join(spark_opts + ['pyspark-shell'])
+
 os.environ['SPARKR_SUBMIT_ARGS'] = ' '.join(spark_opts + ['sparkr-shell'])
 
 # Set a certificate if USE_HTTPS is set to any value

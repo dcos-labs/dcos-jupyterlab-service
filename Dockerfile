@@ -16,11 +16,12 @@ ARG CONDA_URL="https://repo.continuum.io/miniconda"
 ARG DCOS_CLI_URL="https://downloads.dcos.io/binaries/cli/linux/x86-64"
 ARG DCOS_CLI_VERSION="1.11"
 ARG DCOS_COMMONS_URL="https://downloads.mesosphere.com/dcos-commons"
-ARG DCOS_COMMONS_VERSION="0.42.1"
-ARG DISTRO="debian"
+ARG DCOS_COMMONS_VERSION="0.50.0"
 ARG DEBCONF_NONINTERACTIVE_SEEN="true"
 ARG DEBIAN_FRONTEND="noninteractive"
-ARG GPG_KEYSERVER="hkps://zimmermann.mayfirst.org"
+ARG DEBIAN_REPO="http://cdn-fastly.deb.debian.org"
+ARG DISTRO="debian"
+ARG GPG_KEYSERVER="hkps://hkps.pool.sks-keyservers.net"
 ARG HADOOP_AWS_JAR_SHA1="d997f4cf765ca360b69c8bbcaab8785e7c37a55d"
 ARG HADOOP_AWS_URL="https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws"
 ARG HADOOP_AWS_VERSION="2.7.6"
@@ -47,7 +48,7 @@ ARG MESOS_VERSION="1.5.0"
 ARG NB_GID="100"
 ARG NB_UID="1000"
 ARG NB_USER="beakerx"
-ARG REPO="http://cdn-fastly.deb.debian.org"
+ARG OPENRESTY_REPO="http://openresty.org/package"
 ARG SPARK_DIST_URL="https://downloads.mesosphere.com/spark"
 ARG SPARK_HOME="/opt/spark"
 ARG SPARK_VERSION="2.2.1-2"
@@ -106,35 +107,38 @@ ENV BOOTSTRAP="${MESOSPHERE_PREFIX}/bin/bootstrap" \
     SHELL="/bin/bash" \
     SPARK_HOME=${SPARK_HOME:-"/opt/spark"}
 
-RUN echo "deb ${REPO}/${DISTRO} ${CODENAME} main" \
-         >> /etc/apt/sources.list \
-    echo "deb ${REPO}/${DISTRO}-security ${CODENAME}/updates main" \
-         >> /etc/apt/sources.list \
+RUN echo "deb ${DEBIAN_REPO}/${DISTRO} ${CODENAME} main" >> /etc/apt/sources.list \
+    && echo "deb ${DEBIAN_REPO}/${DISTRO}-security ${CODENAME}/updates main" >> /etc/apt/sources.list \
+    && echo "deb ${OPENRESTY_REPO}/${DISTRO} ${CODENAME} openresty" > /etc/apt/sources.list.d/openresty.list \
     && apt-get update -yq --fix-missing \
-    && apt-get install -yq --no-install-recommends locales \
+    && apt-get install -yq --no-install-recommends apt-utils curl ca-certificates gnupg locales \
     && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
     && locale-gen \
-    && apt-get install -yq --no-install-recommends apt-utils \
+    && curl --retry 3 -fsSL https://openresty.org/package/pubkey.gpg -o /tmp/openresty-pubkey.gpg \
+    && apt-key add /tmp/openresty-pubkey.gpg \
+    && rm /tmp/openresty-pubkey.gpg \
+    && apt-get update -yq --fix-missing \
     && apt-get -yq dist-upgrade \
     && apt-get install -yq --no-install-recommends \
        bash-completion \
        bzip2 \
-       ca-certificates \
-       curl \
        dirmngr \
        dnsutils \
        ffmpeg \
        fonts-dejavu \
        fonts-liberation \
        git \
-       gnupg \
        info \
        jq \
        kstart \
        less \
        lmodern \
+       luarocks \
+       lua-socket \
        man \
        netcat \
+       openresty \
+       openresty-opm \
        openssh-client \
        procps \
        psmisc \
@@ -147,6 +151,9 @@ RUN echo "deb ${REPO}/${DISTRO} ${CODENAME} main" \
        wget \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
+    && opm get zmartzone/lua-resty-openidc \
+    && chmod ugo+rw /usr/local/openresty/nginx/logs \
+    && chmod ugo+rw /usr/local/openresty/nginx \
     && addgroup --gid 99 nobody \
     && usermod -u 99 -g 99 nobody \
     && echo "nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin" >> /etc/passwd \
@@ -244,7 +251,13 @@ RUN cd /tmp \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/geojson-extension \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/github \
     && ${CONDA_DIR}/bin/jupyter labextension install jupyterlab_bokeh \
-    && ${CONDA_DIR}/bin/jupyter labextension install beakerx-jupyterlab@0.19.0 \
+    && ${CONDA_DIR}/bin/jupyter labextension install beakerx-jupyterlab@0.20.0 \
+    && ${CONDA_DIR}/bin/jupyter nbextension install --py --sys-prefix --symlink sparkmonitor \
+    && ${CONDA_DIR}/bin/jupyter nbextension enable --py --sys-prefix sparkmonitor \
+    && ${CONDA_DIR}/bin/jupyter serverextension enable --py --sys-prefix sparkmonitor \
+    && ipython profile create \
+    && echo "c.InteractiveShellApp.extensions.append('sparkmonitor.kernelextension')" \
+       >> $(ipython profile locate default)/ipython_kernel_config.py \
     && ${CONDA_DIR}/bin/conda remove --force --json -yq openjdk \
     && ${CONDA_DIR}/bin/npm cache clean --force \
     && rm -rf "${CONDA_DIR}/share/jupyter/lab/staging" \
@@ -260,29 +273,40 @@ COPY --chown="1000:100" profile "${HOME}/.profile"
 COPY --chown="1000:100" bash_profile "${HOME}/.bash_profile"
 COPY --chown="1000:100" bashrc "${HOME}/.bashrc"
 COPY --chown="1000:100" dircolors "${HOME}/.dircolors"
-COPY --chown="1000:100" jupyter_notebook_config.py "${HOME}/.jupyter/"
 
 USER root
-EXPOSE 8888
+
+COPY start-notebook.sh /usr/local/bin/
+COPY start-singleuser.sh /usr/local/bin/
+
+RUN mv /usr/lib/x86_64-linux-gnu/libcurl.so.4.4.0 /usr/lib/x86_64-linux-gnu/libcurl.so.4.4.0.bak \
+    && cp "${MESOSPHERE_PREFIX}/libmesos-bundle/lib/libcurl.so.4" /usr/lib/x86_64-linux-gnu/libcurl.so.4.4.0
+
+ENV PYTHONPATH="${SPARK_HOME}/python:${SPARK_HOME}/python/lib/py4j-0.10.4-src.zip:${PYTHONPATH}" \
+    LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:${MESOSPHERE_PREFIX}/libmesos-bundle/lib:${JAVA_HOME}/jre/lib/amd64/server"
+
+WORKDIR "${HOME}"
+
+EXPOSE 8080
 ENTRYPOINT ["tini", "-g", "--"]
 CMD ["start-notebook.sh"]
 
-COPY start.sh /usr/local/bin/
-COPY start-notebook.sh /usr/local/bin/
-COPY start-singleuser.sh /usr/local/bin/
-COPY jupyter_notebook_config.py /etc/jupyter/
-COPY conf/ "${SPARK_HOME}/conf/"
 COPY krb5.conf.mustache /etc/
+COPY conf/ "${SPARK_HOME}/conf/"
+COPY start.sh /usr/local/bin/
+COPY jupyter_notebook_config.py /etc/jupyter/
+COPY nginx /usr/local/openresty/nginx/
 
 RUN mkdir -p /usr/local/bin/start-notebook.d \
     && fix-permissions /etc/jupyter/ \
     && chmod -R ugo+rw "${SPARK_HOME}/conf" \
     && cp "${CONDA_DIR}/share/examples/krb5/krb5.conf" /etc \
     && chmod ugo+rw /etc/krb5.conf \
-    && mv /usr/lib/x86_64-linux-gnu/libcurl.so.4.4.0 /usr/lib/x86_64-linux-gnu/libcurl.so.4.4.0.bak \
-    && cp "${MESOSPHERE_PREFIX}/libmesos-bundle/lib/libcurl.so.4" /usr/lib/x86_64-linux-gnu/libcurl.so.4.4.0
+    && chmod ugo+rw /usr/local/openresty/nginx/conf/nginx.conf \
+    && chmod ugo+rw /usr/local/openresty/nginx/conf/sites/proxy.conf
 
-ENV PYTHONPATH="${SPARK_HOME}/python:${SPARK_HOME}/python/lib/py4j-0.10.4-src.zip:${PYTHONPATH}" \
-    LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:${MESOSPHERE_PREFIX}/libmesos-bundle/lib:${JAVA_HOME}/jre/lib/amd64/server"
-WORKDIR "${HOME}"
+COPY nginx.conf.mustache /opt/mesosphere/
+COPY proxy.conf.mustache /opt/mesosphere/
+
 USER "${NB_UID}"
+COPY --chown="1000:100" jupyter_notebook_config.py "${HOME}/.jupyter/"
