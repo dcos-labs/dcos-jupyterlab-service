@@ -54,7 +54,7 @@ if next(proxy_opts) == nil then
    proxy_opts = nil
 end
 
--- OpenID Connect Options
+-- OpenID Connect Options - https://github.com/zmartzone/lua-resty-openidc
 local opts = {
     redirect_uri_path = os.getenv("OIDC_REDIRECT_URI") or "/redirect_uri",
     discovery = os.getenv("OIDC_DISCOVERY_URI"),
@@ -63,7 +63,8 @@ local opts = {
     ssl_verify = os.getenv("OIDC_TLS_VERIFY") or "yes",
     token_endpoint_auth_method = os.getenv("OIDC_AUTH_METHOD") or "client_secret_basic",
     scope = os.getenv("OIDC_SCOPE") or "openid profile email",
-    iat_slack = 600,
+    iat_slack = os.getenv("OIDC_IAT_SLACK") or 600,
+    logout_path = os.getenv("OIDC_LOGOUT_PATH") or "/logout",
     proxy_opts = proxy_opts
 }
 
@@ -72,29 +73,14 @@ ngx.log(ngx.DEBUG, "discovery: " .. tostring(opts.discovery))
 ngx.log(ngx.DEBUG, "client_id: " .. tostring(opts.client_id))
 -- ngx.log(ngx.DEBUG, tostring(opts.client_secret))
 
--- Don't trigger the OpenID Connect authentication flow if the minimal options aren't set
-if is_empty(opts.redirect_uri_path) or is_empty(opts.discovery) or is_empty(opts.client_id) or is_empty(opts.client_secret) then
-    return true
+if is_not_empty(os.getenv("OIDC_POST_LOGOUT_REDIRECT_URI")) then
+    opts["post_logout_redirect_uri"] = os.getenv("OIDC_POST_LOGOUT_REDIRECT_URI")
+    ngx.log(ngx.DEBUG, "post_logout_redirect_uri: " .. tostring(opts.post_logout_redirect_uri))
 end
 
--- Set a fixed and unique session secret for every domain to prevent an infinite redirect loop
---   https://github.com/pingidentity/lua-resty-openidc/issues/32#issuecomment-273900768
---   https://github.com/openresty/lua-nginx-module#set_by_lua
-ngx.log(ngx.DEBUG, "ngx.var.server_name: " .. tostring(ngx.var.server_name))
-local session_opts = {
-    secret = ngx.encode_base64(ngx.var.server_name):sub(0, 32)
-}
-ngx.log(ngx.DEBUG, "session_opts.secret: " .. tostring(session_opts.secret))
-
--- Change the redirect uri to the root uri to prevent a 500 error
-local request_uri_args = ngx.req.get_uri_args()
-if ngx.var.request_uri == opts.redirect_uri_path and (not request_uri_args.code or not request_uri_args.state) then
-    -- https://github.com/openresty/lua-nginx-module#ngxreqset_uri
-    -- Note: 1. 'jump=true' isn't allowed in 'access_by_lua' directive
-    --       2. 'ngx.req.set_uri' will not change the value of 'ngx.var.request_uri'
-    --ngx.req.set_uri("/", false)
-    ngx.log(ngx.DEBUG, "Changing redirect_uri to root uri...")
-    return ngx.redirect("/")
+-- Don't trigger the OpenID Connect authentication flow if the minimal options aren't set
+if is_empty(opts.discovery) or is_empty(opts.client_id) or is_empty(opts.client_secret) then
+    return true
 end
 
 local res, err, _target, session = require("resty.openidc").authenticate(opts)
@@ -129,9 +115,6 @@ if is_not_empty(os.getenv("OIDC_UPN")) then
 end
 
 ngx.log(ngx.DEBUG, "Authorization successful")
-
-ngx.log(ngx.DEBUG, "Setting Authorization Bearer Token Header...")
-ngx.req.set_header("Authorization", "Bearer " .. session.data.enc_id_token)
 
 -- Set Authentication headers for downstream SSO
 if res.id_token.username then
