@@ -5,13 +5,13 @@ FROM debian@sha256:316ebb92ca66bb8ddc79249fb29872bece4be384cb61b5344fac4e84ca4ed
 ARG AWS_JAVA_SDK_JAR_SHA1="650f07e69b071cbf41c32d4ea35fd6bbba8e6793"
 ARG AWS_JAVA_SDK_URL="https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk"
 ARG AWS_JAVA_SDK_VERSION="1.7.5"
-ARG BEAKERX_DCOS_VERSION="0.17.1-1.11.2"
+ARG BEAKERX_DCOS_VERSION="0.20.1-1.11.2"
 ARG BUILD_DATE
 ARG CODENAME="stretch"
 ARG CONDA_DIR="/opt/conda"
 ARG CONDA_ENV_YML="beakerx-root-conda-base-env.yml"
-ARG CONDA_INSTALLER="Miniconda3-4.5.1-Linux-x86_64.sh"
-ARG CONDA_MD5="0c28787e3126238df24c5d4858bd0744"
+ARG CONDA_INSTALLER="Miniconda3-4.5.4-Linux-x86_64.sh"
+ARG CONDA_MD5="a946ea1d0c4a642ddf0c3a26a18bb16d"
 ARG CONDA_URL="https://repo.continuum.io/miniconda"
 ARG DCOS_CLI_URL="https://downloads.dcos.io/binaries/cli/linux/x86-64"
 ARG DCOS_CLI_VERSION="1.11"
@@ -103,6 +103,7 @@ ENV BOOTSTRAP="${MESOSPHERE_PREFIX}/bin/bootstrap" \
     NB_GID=${NB_GID:-"100"} \
     NB_UID=${NB_UID:-"1000"} \
     NB_USER=${NB_USER:-"beakerx"} \
+    NODE_OPTIONS="--max-old-space-size=8192" \
     PATH="${JAVA_HOME}/bin:${SPARK_HOME}/bin:${HADOOP_HDFS_HOME}/bin:${CONDA_DIR}/bin:${MESOSPHERE_PREFIX}/bin:${PATH}" \
     SHELL="/bin/bash" \
     SPARK_HOME=${SPARK_HOME:-"/opt/spark"}
@@ -152,6 +153,7 @@ RUN echo "deb ${DEBIAN_REPO}/${DISTRO} ${CODENAME} main" >> /etc/apt/sources.lis
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
     && opm get zmartzone/lua-resty-openidc \
+    && rm -rf ~/.opm/cache \
     && chmod ugo+rw /usr/local/openresty/nginx/logs \
     && chmod ugo+rw /usr/local/openresty/nginx \
     && addgroup --gid 99 nobody \
@@ -247,20 +249,32 @@ RUN cd /tmp \
     && ${CONDA_DIR}/bin/conda env update --json -q -f "${CONDA_DIR}/${CONDA_ENV_YML}" \
     && ${CONDA_DIR}/bin/jupyter toree install --sys-prefix --interpreters=Scala,PySpark,SparkR,SQL \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyter-widgets/jupyterlab-manager \
-    && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/hub-extension \
+    && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/fasta-extension \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/geojson-extension \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/github \
+    && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/hub-extension \
+    && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/latex \
+    && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/plotly-extension \
+    && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/vega2-extension \
+    && ${CONDA_DIR}/bin/jupyter labextension install @jpmorganchase/perspective-jupyterlab \
+    && ${CONDA_DIR}/bin/jupyter labextension install beakerx-jupyterlab@0.20.1  \
+    && ${CONDA_DIR}/bin/jupyter labextension install bqplot \
     && ${CONDA_DIR}/bin/jupyter labextension install jupyterlab_bokeh \
-    && ${CONDA_DIR}/bin/jupyter labextension install beakerx-jupyterlab@0.20.0 \
+    && ${CONDA_DIR}/bin/jupyter labextension install jupyterlab_voyager \
+    && ${CONDA_DIR}/bin/jupyter labextension install jupyterlab-kernelspy \
+    && ${CONDA_DIR}/bin/jupyter labextension install jupyterlab-toc \
+    && ${CONDA_DIR}/bin/jupyter labextension install knowledgelab \
+    && ${CONDA_DIR}/bin/jupyter labextension install pylantern \
+    && ${CONDA_DIR}/bin/jupyter labextension install qgrid \
     && ${CONDA_DIR}/bin/jupyter nbextension install --py --sys-prefix --symlink sparkmonitor \
     && ${CONDA_DIR}/bin/jupyter nbextension enable --py --sys-prefix sparkmonitor \
     && ${CONDA_DIR}/bin/jupyter serverextension enable --py --sys-prefix sparkmonitor \
     && ipython profile create \
     && echo "c.InteractiveShellApp.extensions.append('sparkmonitor.kernelextension')" \
        >> $(ipython profile locate default)/ipython_kernel_config.py \
-    && ${CONDA_DIR}/bin/conda remove --force --json -yq openjdk \
+    && ${CONDA_DIR}/bin/conda remove --force --json -yq openjdk pyqt qt \
     && ${CONDA_DIR}/bin/npm cache clean --force \
-    && rm -rf "${CONDA_DIR}/share/jupyter/lab/staging" \
+    && rm -rf "${CONDA_DIR}/share/jupyter/lab/staging"  "${HOME}/.npm/_cacache" \
     && rm -rf "${HOME}/.cache/pip" "${HOME}/.cache/yarn" "${HOME}/.node-gyp" \
     && ${CONDA_DIR}/bin/conda clean --json -tipsy \
     && for dir in .conda/envs .jupyter .local/share/jupyter/runtime .sparkmagic bin work; \
@@ -293,7 +307,6 @@ CMD ["start-notebook.sh"]
 
 COPY krb5.conf.mustache /etc/
 COPY conf/ "${SPARK_HOME}/conf/"
-COPY start.sh /usr/local/bin/
 COPY jupyter_notebook_config.py /etc/jupyter/
 COPY nginx /usr/local/openresty/nginx/
 
@@ -305,8 +318,10 @@ RUN mkdir -p /usr/local/bin/start-notebook.d \
     && chmod ugo+rw /usr/local/openresty/nginx/conf/nginx.conf \
     && chmod ugo+rw /usr/local/openresty/nginx/conf/sites/proxy.conf
 
+COPY openidc.lua /usr/local/openresty/site/lualib/resty/
 COPY nginx.conf.mustache /opt/mesosphere/
 COPY proxy.conf.mustache /opt/mesosphere/
+COPY start.sh /usr/local/bin/
+COPY --chown="1000:100" jupyter_notebook_config.py "${HOME}/.jupyter/"
 
 USER "${NB_UID}"
-COPY --chown="1000:100" jupyter_notebook_config.py "${HOME}/.jupyter/"
