@@ -18,7 +18,7 @@ if not (os.getenv('OIDC_DISCOVERY_URI') and
     # Set a password if JUPYTER_PASSWORD is set
     if 'JUPYTER_PASSWORD' in os.environ:
         c.NotebookApp.password = passwd(os.environ['JUPYTER_PASSWORD'])
-        del os.environ['JUPYTER_PASSWORD']
+        del(os.environ['JUPYTER_PASSWORD'])
 
     # Set Jupyter Notebook Server password to 'jupyter-<Marathon-App-Prefix>'
     # e.g., Marathon App ID '/foo/bar/app' maps to password: 'jupyter-foo-bar'
@@ -31,14 +31,14 @@ else:
     c.NotebookApp.password = u''
     c.NotebookApp.token = u''
 
-    # Don't leak OpenID Connect configuration to the end-user
+# Don't leak OpenID Connect configuration to the end-user
+for env in ['OIDC_DISCOVERY_URI',
+            'OIDC_REDIRECT_URI',
+            'OIDC_CLIENT_ID',
+            'OIDC_CLIENT_SECRET',
+            'OIDC_EMAIL']:
     try:
-        for env in ['OIDC_DISCOVERY_URI',
-                    'OIDC_REDIRECT_URI',
-                    'OIDC_CLIENT_ID',
-                    'OIDC_CLIENT_SECRET'
-                    'OIDC_EMAIL']:
-            del os.environ[env]
+        del(os.environ[env])
     except KeyError:
         pass
 

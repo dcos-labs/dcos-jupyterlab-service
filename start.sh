@@ -44,6 +44,11 @@ else
             >> "$(ipython profile locate default)/ipython_kernel_config.py"
     fi
 
+    # Copy over .hadooprc so that hadoop fs s3a://<bucket>/ works
+    if [ ! -f "${MESOS_SANDBOX}/.hadooprc" ]; then
+        cp "/home/beakerx/.hadooprc" "${MESOS_SANDBOX}/.hadooprc"
+    fi
+
     # Tensorboard
     if [ ${TENSORBOARD_LOGDIR+x} ]; then
         if [ ${PORT_TFDBG+x} ]; then
