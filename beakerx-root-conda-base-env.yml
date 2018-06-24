@@ -3,6 +3,7 @@ channels:
 - conda-forge
 - defaults
 dependencies:
+- altair
 - awscli
 - bazel
 - beakerx=0.20.1

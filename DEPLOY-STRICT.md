@@ -154,7 +154,7 @@ hdfs dfs -ls -R mnist/tfr
 
 ## Train MNIST with Tensorflow on Spark
 
-### Train MNIST from S3 in CSV format and store model in S3 (DO NOT USE!)
+### Train MNIST from S3 in CSV format and store model in S3
 
 #### Remove existing CSV model folder in S3 bucket (if present)
 ```bash
@@ -174,7 +174,7 @@ eval \
     --labels s3a://vishnu-mohan/tensorflow/mnist/csv/train/labels \
     --format csv \
     --mode train \
-    --model s3a://vishnu-mohan/tensorflow/mnist/mnist_csv_model
+    --model s3://vishnu-mohan/tensorflow/mnist/mnist_csv_model
 ```
 
 #### List Model files trained from CSV on S3
@@ -182,7 +182,7 @@ eval \
 aws s3 ls --recursive s3://vishnu-mohan/tensorflow/mnist/mnist_csv_model
 ```
 
-### Train MNIST from S3 in TFRecord format and store model in S3 (DO NOT USE!)
+### Train MNIST from S3 in TFRecord format and store model in S3
 
 #### Remove existing TFR model folder in S3 bucket (if present)
 ```bash
@@ -201,7 +201,7 @@ eval \
   --images s3a://vishnu-mohan/tensorflow/mnist/tfr/train \
   --format tfr \
   --mode train \
-  --model s3a://vishnu-mohan/tensorflow/mnist/mnist_tfr_model
+  --model s3://vishnu-mohan/tensorflow/mnist/mnist_tfr_model
 ```
 
 #### List Model files trained from TFRecords on S3

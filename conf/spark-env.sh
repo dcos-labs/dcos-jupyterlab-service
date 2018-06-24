@@ -20,6 +20,10 @@
 # This file is sourced when running various Spark programs.
 # Copy it as spark-env.sh and edit that to configure Spark for your site.
 
+# Using Spark's "Hadoop Free" Build
+# https://spark.apache.org/docs/latest/hadoop-provided.html
+export SPARK_DIST_CLASSPATH=$(${HADOOP_HDFS_HOME}/bin/hadoop classpath):${HADOOP_HDFS_HOME}/share/hadoop/tools/lib/*
+
 if [ -d "${MESOS_SANDBOX}" ] ; then
     cd "${MESOS_SANDBOX}" || exit
     MESOSPHERE_PREFIX=${MESOSPHERE_PREFIX:-"/opt/mesosphere"}
