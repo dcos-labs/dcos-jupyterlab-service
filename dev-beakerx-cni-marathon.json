@@ -1,5 +1,5 @@
 {
-  "id": "/dev/beakerx/notebook",
+  "id": "/dev/beakerx/cni",
   "instances": 1,
   "cpus": 2,
   "mem": 8192,
@@ -10,8 +10,48 @@
     "docker": {
       "image": "vishnumohan/beakerx-dcos",
       "forcePullImage": true
-    }
+    },
+    "portMappings": [
+        {
+          "containerPort": 8080,
+          "protocol": "tcp",
+          "name": "notebook",
+          "labels": {
+            "VIP_0": "/dev/beakerx/cni:8888"
+          }
+        },
+        {
+          "containerPort": 7077,
+          "protocol": "tcp",
+          "name": "sparkdriver",
+          "labels": {
+            "VIP_1": "/dev/beakerx/cni/sparkdriver:7077"
+          }
+        },
+        {
+          "containerPort": 4040,
+          "protocol": "tcp",
+          "name": "sparkui",
+          "labels": {
+            "VIP_2": "/dev/beakerx/cni/sparkui:4040"
+          }
+        },
+        {
+          "containerPort": 6046,
+          "protocol": "tcp",
+          "name": "tfdbg",
+          "labels": {
+            "VIP_3": "/dev/beakerx/cni/tfdbg:6046"
+          }
+        }
+    ]
   },
+  "networks": [
+    {
+      "mode": "container",
+      "name": "dcos"
+    }
+  ],
   "fetch": [
     {
       "uri": "http://api.devhdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/core-site.xml",
@@ -47,13 +87,13 @@
     "JUPYTER_RUNTIME_DIR": "/mnt/mesos/sandbox/.local/share/jupyter/runtime",
     "NGINX_LOG_LEVEL": "warn",
     "OIDC_DISCOVERY_URI": "https://keycloak.example.com/auth/realms/Notebook/.well-known/openid-configuration",
-    "OIDC_REDIRECT_URI": "/service/dev/beakerx/notebook/redirect_uri",
+    "OIDC_REDIRECT_URI": "/service/dev/beakerx/cni/redirect_uri",
     "OIDC_CLIENT_ID": "Notebook",
-    "OIDC_CLIENT_SECRET": "0b50d1a5-e09a-4e69-bdd5-8cb6c191c441",
+    "OIDC_CLIENT_SECRET": "caa0cff3-d5f2-4c14-8988-3665bba4464c",
     "OIDC_TLS_VERIFY": "no",
     "OIDC_EMAIL": "vishnu2kmohan@yahoo.com",
-    "OIDC_LOGOUT_PATH": "/service/dev/beakerx/notebook/logmeout",
-    "OIDC_POST_LOGOUT_REDIRECT_URI": "https://vhost.example.com/service/dev/beakerx/notebook",
+    "OIDC_LOGOUT_PATH": "/service/dev/beakerx/cni/logmeout",
+    "OIDC_POST_LOGOUT_REDIRECT_URI": "https://vhost.example.com/service/dev/beakerx/cni",
     "USER": "nobody",
     "S3_ENDPOINT": "s3.us-east-1.amazonaws.com",
     "S3_USE_HTTPS": "1",
@@ -96,47 +136,8 @@
     "HAPROXY_0_ENABLED": "true",
     "HAPROXY_0_REDIRECT_TO_HTTPS": "true",
     "HAPROXY_0_VHOST": "vhost.example.com",
-    "HAPROXY_0_PATH": "/service/dev/beakerx/notebook"
+    "HAPROXY_0_PATH": "/service/dev/beakerx/cni"
   },
-  "portDefinitions": [
-    {
-      "port": 0,
-      "protocol": "tcp",
-      "name": "notebook",
-      "labels": {
-        "VIP_0": "/dev/beakerx/notebook:8888"
-      }
-    },
-    {
-      "port": 0,
-      "protocol": "tcp",
-      "name": "sparkdriver",
-      "labels": {
-        "VIP_1": "/dev/beakerx/notebook/sparkdriver:7077"
-      }
-    },
-    {
-      "port": 0,
-      "protocol": "tcp",
-      "name": "sparkui",
-      "labels": {
-        "VIP_2": "/dev/beakerx/notebook/sparkui:4040"
-      }
-    },
-    {
-      "port": 0,
-      "protocol": "tcp",
-      "name": "sparkblockmanager"
-    },
-    {
-      "port": 0,
-      "protocol": "tcp",
-      "name": "tfdbg",
-      "labels": {
-        "VIP_3": "/dev/beakerx/notebook/tfdbg:6046"
-      }
-    }
-  ],
   "healthChecks": [
     {
       "portIndex": 0,
