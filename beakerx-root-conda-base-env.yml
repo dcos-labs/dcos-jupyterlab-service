@@ -28,6 +28,8 @@ dependencies:
 - pillow
 - pyarrow
 - pyfolio
+- r-base
+- r-irkernel
 - s3fs
 - scikit-learn
 - scipy

@@ -27,6 +27,12 @@ else
 
     if [ -z ${MESOS_SANDBOX+x} ]; then
         export MESOS_SANDBOX="${HOME}"
+    else
+        # Copy over profile files for convenience
+        cp /home/beakerx/.bash_profile "${MESOS_SANDBOX}/"
+        cp /home/beakerx/.bashrc "${MESOS_SANDBOX}/"
+        cp /home/beakerx/.dircolors "${MESOS_SANDBOX}/"
+        cp /home/beakerx/.profile "${MESOS_SANDBOX}/"
     fi
     echo "MESOS_SANDBOX: ${MESOS_SANDBOX}"
 

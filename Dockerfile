@@ -2,7 +2,7 @@
 # https://github.com/docker-library/repo-info/blob/master/repos/debian/tag-details.md#debian94---linux-amd64
 FROM debian@sha256:316ebb92ca66bb8ddc79249fb29872bece4be384cb61b5344fac4e84ca4ed2b2
 
-ARG BEAKERX_DCOS_VERSION="0.20.1-1.11.2"
+ARG BEAKERX_DCOS_VERSION="0.20.1-1.11.3"
 ARG BUILD_DATE
 ARG CODENAME="stretch"
 ARG CONDA_DIR="/opt/conda"
@@ -46,10 +46,11 @@ ARG OPENRESTY_REPO="http://openresty.org/package"
 ARG SPARK_DIST_URL="https://s3.amazonaws.com/vishnu-mohan/spark"
 ARG SPARK_DIST_SHA256="52e29e83a65688e29da975d1ace7815c6a5b55e76c41d43a28e5e80de2b29843"
 ARG SPARK_HOME="/opt/spark"
+ARG SPARK_MAJOR_VERSION="2.2"
 ARG SPARK_VERSION="2.2.1"
 ARG TENSORFLOW_ECO_URL="https://s3.amazonaws.com/vishnu-mohan/tensorflow"
-ARG TENSORFLOW_HADOOP_JAR_SHA256="6a0399f315d79ed5f12546a3cced0968067486268af5c8b12389ebac5449118c"
-ARG TENSORFLOW_SPARK_JAR_SHA256="5b45a37b2b401528a51ef19247a304009d5c94cf210fb319c597bf331a798246"
+ARG TENSORFLOW_HADOOP_JAR_SHA256="cb77cc942a477fb0dbc6b7d17ee1cb0a0a73ba827f288db4c749d5fc0a0c5be3"
+ARG TENSORFLOW_SPARK_JAR_SHA256="303e8d5a8e2e9bad059435d4a86d03a71b3be00d661acba3c5b8f524f20b30fc"
 ARG TENSORFLOW_JAR_SHA256="4b6a9d76ea853db41532275a3608d2d1b5abc1c16609cf8b9ebfffef7c3036fc"
 ARG TENSORFLOW_JNI_SHA256="894d39d8e1d8d1329ea7153f8624657d27619c5db1d9535ab6b66296e3e6ee45"
 ARG TENSORFLOW_SERVING_APT_URL="http://storage.googleapis.com/tensorflow-serving-apt"
@@ -138,7 +139,6 @@ RUN echo "deb ${DEBIAN_REPO}/${DISTRO} ${CODENAME} main" >> /etc/apt/sources.lis
        procps \
        psmisc \
        rsync \
-       r-base \
        sudo \
        sssd \
        unzip \
@@ -196,9 +196,9 @@ RUN cd /tmp \
     && echo "${XGBOOST_SPARK_JAR_SHA256}" "xgboost4j-spark-${XGBOOST_VERSION}.jar" | sha256sum -c - \
     && curl --retry 3 -fsSL -O "${TENSORFLOW_URL}/libtensorflow/libtensorflow-${TENSORFLOW_VERSION}.jar" \
     && echo "${TENSORFLOW_JAR_SHA256}" "libtensorflow-${TENSORFLOW_VERSION}.jar" | sha256sum -c - \
-    && curl --retry 3 -fsSL -O "${TENSORFLOW_ECO_URL}/${TENSORFLOW_VERSION}/tensorflow-hadoop-${TENSORFLOW_VERSION}.jar" \
+    && curl --retry 3 -fsSL -O "${TENSORFLOW_ECO_URL}/${TENSORFLOW_VERSION}/hadoop-${HADOOP_MAJOR_VERSION}/tensorflow-hadoop-${TENSORFLOW_VERSION}.jar" \
     && echo "${TENSORFLOW_HADOOP_JAR_SHA256}" "tensorflow-hadoop-${TENSORFLOW_VERSION}.jar" | sha256sum -c - \
-    && curl --retry 3 -fsSL -O "${TENSORFLOW_ECO_URL}/${TENSORFLOW_VERSION}/spark-tensorflow-connector_2.11-${TENSORFLOW_VERSION}.jar" \
+    && curl --retry 3 -fsSL -O "${TENSORFLOW_ECO_URL}/${TENSORFLOW_VERSION}/spark-${SPARK_MAJOR_VERSION}/spark-tensorflow-connector_2.11-${TENSORFLOW_VERSION}.jar" \
     && echo "${TENSORFLOW_SPARK_JAR_SHA256}" "spark-tensorflow-connector_2.11-${TENSORFLOW_VERSION}.jar" | sha256sum -c - \
     && cd /tmp \
     && curl --retry 3 -fsSL -O "${TENSORFLOW_URL}/libtensorflow/libtensorflow_jni-${TENSORFLOW_VARIANT}-linux-x86_64-${TENSORFLOW_VERSION}.tar.gz" \
@@ -256,9 +256,8 @@ RUN cd /tmp \
     && ${CONDA_DIR}/bin/jupyter labextension install jupyterlab-kernelspy \
     && ${CONDA_DIR}/bin/jupyter labextension install jupyterlab-toc \
     && ${CONDA_DIR}/bin/jupyter labextension install knowledgelab \
-    && ${CONDA_DIR}/bin/jupyter labextension install pylantern \
     && ${CONDA_DIR}/bin/jupyter labextension install qgrid \
-    && ${CONDA_DIR}/bin/jupyter nbextension install --py --sys-prefix --symlink sparkmonitor \
+    && ${CONDA_DIR}/bin/jupyter nbextension install --py --sys-prefix sparkmonitor \
     && ${CONDA_DIR}/bin/jupyter nbextension enable --py --sys-prefix sparkmonitor \
     && ${CONDA_DIR}/bin/jupyter serverextension enable --py --sys-prefix sparkmonitor \
     && ipython profile create \
