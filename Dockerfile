@@ -319,6 +319,7 @@ COPY nginx.conf.mustache /opt/mesosphere/
 COPY proxy.conf.mustache /opt/mesosphere/
 COPY start.sh /usr/local/bin/
 COPY --chown="1000:100" jupyter_notebook_config.py "${HOME}/.jupyter/"
+COPY --chown="1000:100" beakerx.json "${HOME}/.jupyter/"
 
 USER "${NB_UID}"
 

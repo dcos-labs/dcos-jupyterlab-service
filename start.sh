@@ -21,7 +21,7 @@ else
     echo "LIBPROCESS_IP: ${LIBPROCESS_IP}"
 
     if [ -z ${MESOS_CONTAINER_IP+x} ]; then
-        export MESOS_CONTAINER_IP="${LIBPROCESS_IP}"
+        export MESOS_CONTAINER_IP="${CONTAINER_IP}"
     fi
     echo "MESOS_CONTAINER_IP: ${MESOS_CONTAINER_IP}"
 
@@ -42,6 +42,12 @@ else
         # Enable the SparkMonitor Jupyter Kernel Extension
         echo "c.InteractiveShellApp.extensions.append('sparkmonitor.kernelextension')" \
             >> "$(ipython profile locate default)/ipython_kernel_config.py"
+    fi
+
+    # Copy over beakerx.json so that we have a sane set of defaults
+    if [ ! -f "${MESOS_SANDBOX}/.jupyter/beakerx.json" ]; then
+        mkdir -p "${MESOS_SANDBOX}/.jupyter"
+        cp "/home/beakerx/.jupyter/beakerx.json" "${MESOS_SANDBOX}/.jupyter/"
     fi
 
     # Copy over .hadooprc so that hadoop fs s3a://<bucket>/ works
