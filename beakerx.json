@@ -1,0 +1,84 @@
+{
+  "beakerx": {
+    "jvm_options": {
+      "heap_GB": null,
+      "other": [],
+      "properties": {}
+    },
+    "spark_options": {
+      "profiles": [
+        {
+          "spark.app.name": "BeakerX",
+          "spark.master": "mesos://zk://zk-1.zk:2181,zk-2.zk:2181,zk-3.zk:2181,zk-4.zk:2181,zk-5.zk:2181/mesos",
+          "spark.executor.cores": "1",
+          "spark.executor.memory": "4g",
+          "name": "",
+          "properties": [
+            {
+              "name": "spark.scheduler.minRegisteredResourcesRatio",
+              "value": "1.0"
+            },
+            {
+              "name": "spark.cores.max",
+              "value": "5"
+            },
+            {
+              "name": "spark.executor.extraJavaOptions",
+              "value": "''-XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/mnt/mesos/sandbox''"
+            },
+            {
+              "name": "spark.mesos.executor.docker.image",
+              "value": "vishnumohan/spark-dcos"
+            },
+            {
+              "name": "spark.mesos.executor.home",
+              "value": "/opt/spark"
+            },
+            {
+              "name": "spark.mesos.principal",
+              "value": "dev_beakerx"
+            },
+            {
+              "name": "spark.mesos.role",
+              "value": "dev-beakerx"
+            },
+            {
+              "name": "spark.mesos.driver.labels",
+              "value": "DCOS_SPACE:/dev/beakerx"
+            },
+            {
+              "name": "spark.mesos.task.labels",
+              "value": "DCOS_SPACE:/dev/beakerx"
+            },
+            {
+              "name": "spark.executorEnv.KRB5_CONFIG",
+              "value": "/mnt/mesos/sandbox/krb5.conf"
+            },
+            {
+              "name": "spark.executorEnv.JAVA_HOME",
+              "value": "/opt/jdk"
+            },
+            {
+              "name": "spark.executorEnv.HADOOP_HDFS_HOME",
+              "value": "/opt/hadoop"
+            },
+            {
+              "name": "spark.executorEnv.HADOOP_OPTS",
+              "value": "''-Djava.library.path=/opt/hadoop/lib/native -Djava.security.krb5.conf=/mnt/mesos/sandbox/krb5.conf''"
+            }
+          ]
+        }
+      ]
+    },
+    "ui_options": {
+      "auto_close": true,
+      "auto_save": true,
+      "improve_fonts": true,
+      "show_catalog": true,
+      "show_publication": true,
+      "use_data_grid": true,
+      "wide_cells": true
+    },
+    "version": 2
+  }
+}
