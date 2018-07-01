@@ -4,30 +4,49 @@ channels:
 - defaults
 dependencies:
 - altair
+- atomicwrites
+- attrs
 - awscli
 - bazel
 - beakerx=0.20.1
 - beautifulsoup4
 - bokeh
+- click
 - cython
 - dask
+- dask-ml
+- dask-tensorflow
+- dask-xgboost
 - distributed
+- flake8
+- funcsigs
+- future
 - grpcio
 - h5py
 - ipywidgets
 - jupyter_contrib_nbextensions
+- jupyterhub
+- jupyterlab
 - keras
 - libhdfs3
 - lxml
 - matplotlib
-- nodejs=8.11.*
-- jupyterhub
-- jupyterlab
+- more-itertools
+- mpi[openmpi]
+- mpi4py
 - nbconvert
+- nodejs=8.11.*
 - pandas
+- pep8
 - pillow
+- pluggy
+- psutil
+- py
 - pyarrow
 - pyfolio
+- pyglet
+- pytest
+- python-snappy
 - r-base
 - r-irkernel
 - s3fs
@@ -36,9 +55,17 @@ dependencies:
 - wrapt
 - xgboost
 - xlrd
+- yapf
 - pip:
+  - flatbuffers
+  - gym[atari]
+  - horovod
   - https://dist.apache.org/repos/dist/dev/incubator/toree/0.2.0-incubating-rc5/toree-pip/toree-0.2.0.tar.gz
   - knowledgelab
+  - opencv-python
+  - PyOpenGL
+  - ray[rllib]
+  - redis
   - sparkmonitor
   - tensorflow==1.8.0
   - tensorflow-hub

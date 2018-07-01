@@ -36,13 +36,13 @@ else
     fi
     echo "MESOS_SANDBOX: ${MESOS_SANDBOX}"
 
-    # Set environment variables for Spark Monitor: https://krishnan-r.github.io/sparkmonitor/install.html
+    # Set environment variables for Spark Monitor
+    # https://krishnan-r.github.io/sparkmonitor/install.html
     export SPARKMONITOR_UI_HOST="${MESOS_CONTAINER_IP}"
-    if [ ${PORT_SPARKUI+x} ]; then
-        export SPARKMONITOR_UI_PORT="${PORT_SPARKUI}"
-    fi
+    export SPARKMONITOR_UI_PORT=${PORT_SPARKUI:-"4040"}
 
     # ${HOME} is set to ${MESOS_SANDBOX} on DC/OS and won't have a default IPython profile
+    # We have to manually check since `ipython profile locate default` *creates* the config
     if [ ! -f "${MESOS_SANDBOX}/.ipython/profile_default/ipython_kernel_config.py" ]; then
         ipython profile create default
         # Enable the SparkMonitor Jupyter Kernel Extension
@@ -50,30 +50,80 @@ else
             >> "$(ipython profile locate default)/ipython_kernel_config.py"
     fi
 
-    # Copy over beakerx.json so that we have a sane set of defaults
+    # Copy over beakerx.json so that we have a sane set of defaults for Mesosphere DC/OS
     if [ ! -f "${MESOS_SANDBOX}/.jupyter/beakerx.json" ]; then
         mkdir -p "${MESOS_SANDBOX}/.jupyter"
         cp "/home/beakerx/.jupyter/beakerx.json" "${MESOS_SANDBOX}/.jupyter/"
     fi
 
-    # Copy over .hadooprc so that hadoop fs s3a://<bucket>/ works
+    # Copy over .hadooprc so that `hadoop fs s3a://<bucket>/` works OOTB, if providing Hadoop 3.x
     if [ ! -f "${MESOS_SANDBOX}/.hadooprc" ]; then
         cp "/home/beakerx/.hadooprc" "${MESOS_SANDBOX}/.hadooprc"
     fi
 
-    # Tensorboard
+    # Start Tensorboard if ${TENSORBOARD_LOGDIR} is defined
     if [ ${TENSORBOARD_LOGDIR+x} ]; then
         if [ ${PORT_TFDBG+x} ]; then
-            tensorboard --host localhost --port 6006 --debugger_port "${PORT_TFDBG}" --logdir "${TENSORBOARD_LOGDIR}" 2>&1 &
-        else
-            tensorboard --host localhost --port 6006 --logdir "${TENSORBOARD_LOGDIR}" 2>&1 &
+            TENSORBOARD_ARGS="${TENSORBOARD_ARGS} --debugger_port ${PORT_TFDBG}"
         fi
+        tensorboard \
+            --host localhost \
+            --port 6006 \
+            --logdir "${TENSORBOARD_LOGDIR}" \
+            "${TENSORBOARD_ARGS}" 2>&1 &
+    fi
+
+    # Start Dask Distributed Scheduler?
+    if [ ${START_DASK_DISTRIBUTED+x} ]; then
+        PORT_DASKSCHEDULER=${PORT_DASKSCHEDULER:-"8786"}
+        PORT_DASKBOARD=${PORT_DASKBOARD:-"8787"}
+        dask-scheduler \
+            --port "${PORT_DASKSCHEDULER}" \
+            --bokeh-port "${PORT_DASKBOARD}" \
+            --bokeh-prefix "${MARATHON_APP_LABEL_HAPROXY_0_PATH}/daskboard" 2>&1 &
+    fi
+
+    # Start Ray Head Node?
+    if [ ${START_RAY_HEAD_NODE+x} ]; then
+        PORT_RAYREDIS=${PORT_RAYREDIS:-"6379"}
+        PORT_RAYOBJECTMANAGER=${PORT_RAYOBJECTMANAGER:-"8076"}
+        if [ ${MARATHON_APP_RESOURCE_CPUS+x} ]; then
+            RAY_CPUS=$(python -c "import os; print(int(
+                                  float(os.getenv('MARATHON_APP_RESOURCE_CPUS'))))"
+            )
+            RAY_ARGS="${RAY_ARGS} --num-cpus=${RAY_CPUS}"
+        fi
+        if [ ${MARATHON_APP_RESOURCE_GPUS+x} ]; then
+            RAY_GPUS=$(python -c "import os; print(int(
+                                  float(os.getenv('MARATHON_APP_RESOURCE_GPUS'))))"
+            )
+            RAY_ARGS="${RAY_ARGS} --num-gpus=${RAY_GPUS}"
+        fi
+        if [ ${MARATHON_APP_RESOURCE_MEM+x} ]; then
+            PLASMA_MEMORY_BYTES=$(python -c \
+                 "import os; print(str(int(
+                 float(os.environ['MARATHON_APP_RESOURCE_MEM'])
+                 * float(os.getenv('PLASMA_MEMORY_FRACTION', '0.4'))
+                 * 1024 * 1024)))"
+            )
+            RAY_ARGS="${RAY_ARGS} --object-store-memory=${PLASMA_MEMORY_BYTES}"
+        fi
+        echo "RAY_ARGS: ${RAY_ARGS}"
+        ray start ${RAY_ARGS} \
+            --redis-port="${PORT_RAYREDIS}" \
+            --object-manager-port="${PORT_RAYOBJECTMANAGER}" \
+            --head \
+            --no-ui
     fi
 
     # bootstrap needs ${MESOS_SANDBOX} set to obtain the relative path to the mustache template(s)
-    MESOS_SANDBOX="/" CONFIG_TEMPLATE_NGINX_CONF="/opt/mesosphere/nginx.conf.mustache,/usr/local/openresty/nginx/conf/nginx.conf" bootstrap -template -resolve=false --print-env=false -install-certs=false
+    MESOS_SANDBOX="/" \
+        CONFIG_TEMPLATE_NGINX_CONF="/opt/mesosphere/nginx.conf.mustache,/usr/local/openresty/nginx/conf/nginx.conf" \
+        bootstrap -template -resolve=false --print-env=false -install-certs=false
 
-    MESOS_SANDBOX="/" CONFIG_TEMPLATE_NGINX_PROXY_CONF="/opt/mesosphere/proxy.conf.mustache,/usr/local/openresty/nginx/conf/sites/proxy.conf" bootstrap -template -resolve=false --print-env=false -install-certs=false
+    MESOS_SANDBOX="/" \
+        CONFIG_TEMPLATE_NGINX_PROXY_CONF="/opt/mesosphere/proxy.conf.mustache,/usr/local/openresty/nginx/conf/sites/proxy.conf" \
+        bootstrap -template -resolve=false --print-env=false -install-certs=false
 
     # Start Openresty for (Optional) OpenID Connect Authentication: https://github.com/zmartzone/lua-resty-openidc
     openresty

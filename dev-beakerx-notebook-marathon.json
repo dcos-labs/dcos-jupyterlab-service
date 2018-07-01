@@ -49,12 +49,15 @@
     "OIDC_DISCOVERY_URI": "https://keycloak.example.com/auth/realms/Notebook/.well-known/openid-configuration",
     "OIDC_REDIRECT_URI": "/service/dev/beakerx/notebook/redirect_uri",
     "OIDC_CLIENT_ID": "Notebook",
-    "OIDC_CLIENT_SECRET": "0b50d1a5-e09a-4e69-bdd5-8cb6c191c441",
+    "OIDC_CLIENT_SECRET": "496f6b73-dcd7-4c89-94f5-bb6338edeecd",
     "OIDC_TLS_VERIFY": "no",
     "OIDC_EMAIL": "vishnu2kmohan@yahoo.com",
     "OIDC_LOGOUT_PATH": "/service/dev/beakerx/notebook/logmeout",
     "OIDC_POST_LOGOUT_REDIRECT_URI": "https://vhost.example.com/service/dev/beakerx/notebook",
+    "OIDC_USE_SPARTAN_RESOLVER": "true",
     "USER": "nobody",
+    "START_DASK_DISTRIBUTED": "true",
+    "START_RAY_HEAD_NODE": "true",
     "S3_ENDPOINT": "s3.us-east-1.amazonaws.com",
     "S3_USE_HTTPS": "1",
     "S3_VERIFY_SSL": "1",
@@ -134,6 +137,38 @@
       "name": "tfdbg",
       "labels": {
         "VIP_3": "/dev/beakerx/notebook/tfdbg:6046"
+      }
+    },
+    {
+      "port": 0,
+      "protocol": "tcp",
+      "name": "daskscheduler",
+      "labels": {
+        "VIP_4": "/dev/beakerx/notebook/daskscheduler:8786"
+      }
+    },
+    {
+      "port": 0,
+      "protocol": "tcp",
+      "name": "daskboard",
+      "labels": {
+        "VIP_5": "/dev/beakerx/notebook/daskboard:8787"
+      }
+    },
+    {
+      "port": 0,
+      "protocol": "tcp",
+      "name": "rayredis",
+      "labels": {
+        "VIP_6": "/dev/beakerx/notebook/rayredis:6379"
+      }
+    },
+    {
+      "port": 0,
+      "protocol": "tcp",
+      "name": "rayobjectmanager",
+      "labels": {
+        "VIP_7": "/dev/beakerx/notebook/rayobjectmanager:8076"
       }
     }
   ],

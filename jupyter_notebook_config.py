@@ -189,16 +189,30 @@ for env in spark_conf_envs:
     spark_opts.append('--conf {}'.format(os.getenv(env)))
 
 os.environ['SPARK_OPTS'] = ' '.join(spark_opts)
+os.environ['PYSPARK_SUBMIT_ARGS'] = ' '.join(spark_opts + ['pyspark-shell'])
+os.environ['SPARKR_SUBMIT_ARGS'] = ' '.join(spark_opts + ['sparkr-shell'])
 
 if os.getenv('ENABLE_SPARK_MONITOR'):
-    os.environ['PYSPARK_SUBMIT_ARGS'] = ' '.join(spark_opts +
-        ['--conf spark.driver.extraClassPath=/opt/conda/lib/python3.6/site-packages/sparkmonitor/listener.jar',
-         '--conf spark.extraListeners=sparkmonitor.listener.JupyterSparkMonitorListener',
-         'pyspark-shell'])
-else:
-    os.environ['PYSPARK_SUBMIT_ARGS'] = ' '.join(spark_opts + ['pyspark-shell'])
+    from conda.cli.main_info import get_info_dict
+    conda_site_packages = os.path.dirname(get_info_dict()['conda_location'])
+    spark_monitor_conf = [
+        '--conf spark.driver.extraClassPath={}/sparkmonitor/listener.jar'.format(conda_site_packages),
+        '--conf spark.extraListeners=sparkmonitor.listener.JupyterSparkMonitorListener'
+    ]
+    os.environ['PYSPARK_SUBMIT_ARGS'] = ' '.join(
+        spark_opts + spark_monitor_conf + ['pyspark-shell']
+    )
 
-os.environ['SPARKR_SUBMIT_ARGS'] = ' '.join(spark_opts + ['sparkr-shell'])
+if os.getenv('MARATHON_APP_ID'):
+    MARATHON_VIP_SUFFIX = '.marathon.l4lb.thisdcos.directory'
+    vip_prefix = ''.join(os.environ['MARATHON_APP_ID'].split('/'))
+    ray_redis_address = ''.join([vip_prefix, 'rayredis{}:6379'.format(MARATHON_VIP_SUFFIX)])
+    dask_scheduler_address = ''.join([vip_prefix, 'daskscheduler{}:8786'.format(MARATHON_VIP_SUFFIX)])
+    os.environ['RAY_REDIS_ADDRESS'] = ray_redis_address
+    os.environ['DASK_SCHEDULER_ADDRESS'] = dask_scheduler_address
+else:
+    os.environ['RAY_REDIS_ADDRESS'] = '{}:6379'.format(os.getenv('MESOS_CONTAINER_IP'))
+    os.environ['DASK_SCHEDULER_ADDRESS'] = '{}:8786'.format(os.getenv('MESOS_CONTAINER_IP'))
 
 # Set a certificate if USE_HTTPS is set to any value
 PEM_FILE = os.path.join(jupyter_data_dir(), 'notebook.pem')

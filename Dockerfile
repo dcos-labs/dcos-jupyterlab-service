@@ -42,7 +42,7 @@ ARG MESOS_VERSION="1.5.0"
 ARG NB_GID="100"
 ARG NB_UID="1000"
 ARG NB_USER="beakerx"
-ARG OPENRESTY_REPO="http://openresty.org/package"
+ARG OPENRESTY_REPO="https://openresty.org/package"
 ARG SPARK_DIST_URL="https://s3.amazonaws.com/vishnu-mohan/spark"
 ARG SPARK_DIST_SHA256="52e29e83a65688e29da975d1ace7815c6a5b55e76c41d43a28e5e80de2b29843"
 ARG SPARK_HOME="/opt/spark"
@@ -106,23 +106,26 @@ ENV BOOTSTRAP="${MESOSPHERE_PREFIX}/bin/bootstrap" \
 
 RUN echo "deb ${DEBIAN_REPO}/${DISTRO} ${CODENAME} main" >> /etc/apt/sources.list \
     && echo "deb ${DEBIAN_REPO}/${DISTRO}-security ${CODENAME}/updates main" >> /etc/apt/sources.list \
-    && echo "deb ${OPENRESTY_REPO}/${DISTRO} ${CODENAME} openresty" > /etc/apt/sources.list.d/openresty.list \
     && apt-get update -yq --fix-missing \
-    && apt-get install -yq --no-install-recommends apt-utils ca-certificates curl dirmngr gnupg locales \
+    && apt-get install -yq --no-install-recommends apt-transport-https apt-utils ca-certificates curl dirmngr gnupg locales \
     && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
     && locale-gen \
     && curl --retry 3 -fsSL https://openresty.org/package/pubkey.gpg -o /tmp/openresty-pubkey.gpg \
     && apt-key add /tmp/openresty-pubkey.gpg \
     && rm /tmp/openresty-pubkey.gpg \
+    && echo "deb ${OPENRESTY_REPO}/${DISTRO} ${CODENAME} openresty" > /etc/apt/sources.list.d/openresty.list \
     && apt-get update -yq --fix-missing \
     && apt-get -yq dist-upgrade \
     && apt-get install -yq --no-install-recommends \
        bash-completion \
        bzip2 \
+       cmake \
        dnsutils \
        ffmpeg \
        fonts-dejavu \
        fonts-liberation \
+       g++ \
+       gcc \
        git \
        info \
        jq \
@@ -131,6 +134,7 @@ RUN echo "deb ${DEBIAN_REPO}/${DISTRO} ${CODENAME} main" >> /etc/apt/sources.lis
        lmodern \
        luarocks \
        lua-socket \
+       make \
        man \
        netcat \
        openresty \
@@ -144,6 +148,7 @@ RUN echo "deb ${DEBIAN_REPO}/${DISTRO} ${CODENAME} main" >> /etc/apt/sources.lis
        unzip \
        vim \
        wget \
+       zlib1g-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
     && opm get zmartzone/lua-resty-openidc \
@@ -234,11 +239,12 @@ RUN cd /tmp \
     && echo "${CONDA_MD5}  ${CONDA_INSTALLER}" | md5sum -c - \
     && bash "./${CONDA_INSTALLER}" -u -b -p "${CONDA_DIR}" \
     && ${CONDA_DIR}/bin/conda config --system --prepend channels conda-forge \
+    && ${CONDA_DIR}/bin/conda update --json --all -yq \
     && ${CONDA_DIR}/bin/conda config --system --set auto_update_conda false \
     && ${CONDA_DIR}/bin/conda config --system --set show_channel_urls true \
-    && ${CONDA_DIR}/bin/conda update --json --all -yq \
     && ${CONDA_DIR}/bin/pip install --upgrade pip \
     && ${CONDA_DIR}/bin/conda env update --json -q -f "${CONDA_DIR}/${CONDA_ENV_YML}" \
+    && ${CONDA_DIR}/bin/pip install --upgrade pip \
     && ${CONDA_DIR}/bin/jupyter toree install --sys-prefix --interpreters=Scala,PySpark,SparkR,SQL \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyter-widgets/jupyterlab-manager \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/fasta-extension \
