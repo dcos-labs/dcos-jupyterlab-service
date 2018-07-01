@@ -1,6 +1,0 @@
-name: root
-channels:
-- conda-forge
-- defaults
-dependencies:
-- sparkmagic
