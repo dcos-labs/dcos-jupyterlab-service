@@ -204,10 +204,21 @@ if os.getenv('ENABLE_SPARK_MONITOR'):
     )
 
 if os.getenv('MARATHON_APP_ID'):
-    MARATHON_VIP_SUFFIX = '.marathon.l4lb.thisdcos.directory'
-    vip_prefix = ''.join(os.environ['MARATHON_APP_ID'].split('/'))
-    ray_redis_address = ''.join([vip_prefix, 'rayredis{}:6379'.format(MARATHON_VIP_SUFFIX)])
-    dask_scheduler_address = ''.join([vip_prefix, 'daskscheduler{}:8786'.format(MARATHON_VIP_SUFFIX)])
+    ray_redis_address = ''
+    dask_scheduler_address = ''
+    if os.getenv('LIBPROCESS_IP') == '0.0.0.0':
+        # Use the Spartan autoip address because the container is assigned an IP via CNI
+        AUTOIP_SUFFIX = '.marathon.autoip.dcos.thisdcos.directory'
+        autoip_prefix = '-'.join(os.getenv('MARATHON_APP_ID').split('/')[::-1][:-1])
+        ray_redis_address = ''.join([autoip_prefix, '{}:6379'.format(AUTOIP_SUFFIX)])
+        dask_scheduler_address = ''.join([autoip_prefix, '{}:8786'.format(AUTOIP_SUFFIX)])
+    else:
+        # Use the L4LB address because the container is bound to the agent IP
+        L4LB_SUFFIX = '.marathon.l4lb.thisdcos.directory'
+        l4lb_prefix = ''.join(os.environ['MARATHON_APP_ID'].split('/')[::1])
+        ray_redis_address = ''.join([l4lb_prefix, 'rayredis{}:6379'.format(L4LB_SUFFIX)])
+        dask_scheduler_address = ''.join([l4lb_prefix, 'daskscheduler{}:8786'.format(L4LB_SUFFIX)])
+
     os.environ['RAY_REDIS_ADDRESS'] = ray_redis_address
     os.environ['DASK_SCHEDULER_ADDRESS'] = dask_scheduler_address
 else:
