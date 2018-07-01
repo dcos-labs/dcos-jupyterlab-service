@@ -1,5 +1,5 @@
 {
-  "id": "/dev/beakerx/cni",
+  "id": "/dev/jupyter/notebook",
   "instances": 1,
   "cpus": 2,
   "mem": 8192,
@@ -8,50 +8,10 @@
   "container": {
     "type": "MESOS",
     "docker": {
-      "image": "vishnumohan/beakerx-dcos",
+      "image": "dcoslabs/dcos-jupyter:latest",
       "forcePullImage": true
-    },
-    "portMappings": [
-        {
-          "containerPort": 8080,
-          "protocol": "tcp",
-          "name": "notebook",
-          "labels": {
-            "VIP_0": "/dev/beakerx/cni:8888"
-          }
-        },
-        {
-          "containerPort": 7077,
-          "protocol": "tcp",
-          "name": "sparkdriver",
-          "labels": {
-            "VIP_1": "/dev/beakerx/cni/sparkdriver:7077"
-          }
-        },
-        {
-          "containerPort": 4040,
-          "protocol": "tcp",
-          "name": "sparkui",
-          "labels": {
-            "VIP_2": "/dev/beakerx/cni/sparkui:4040"
-          }
-        },
-        {
-          "containerPort": 6046,
-          "protocol": "tcp",
-          "name": "tfdbg",
-          "labels": {
-            "VIP_3": "/dev/beakerx/cni/tfdbg:6046"
-          }
-        }
-    ]
-  },
-  "networks": [
-    {
-      "mode": "container",
-      "name": "dcos"
     }
-  ],
+  },
   "fetch": [
     {
       "uri": "http://api.devhdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/core-site.xml",
@@ -68,7 +28,7 @@
   ],
   "secrets": {
     "serviceCredential": {
-      "source": "dev/beakerx/serviceCredential"
+      "source": "dev/jupyter/serviceCredential"
     }
   },
   "env": {
@@ -87,14 +47,17 @@
     "JUPYTER_RUNTIME_DIR": "/mnt/mesos/sandbox/.local/share/jupyter/runtime",
     "NGINX_LOG_LEVEL": "warn",
     "OIDC_DISCOVERY_URI": "https://keycloak.example.com/auth/realms/Notebook/.well-known/openid-configuration",
-    "OIDC_REDIRECT_URI": "/service/dev/beakerx/cni/redirect_uri",
+    "OIDC_REDIRECT_URI": "/service/dev/jupyter/notebook/redirect_uri",
     "OIDC_CLIENT_ID": "Notebook",
-    "OIDC_CLIENT_SECRET": "caa0cff3-d5f2-4c14-8988-3665bba4464c",
+    "OIDC_CLIENT_SECRET": "496f6b73-dcd7-4c89-94f5-bb6338edeecd",
     "OIDC_TLS_VERIFY": "no",
     "OIDC_EMAIL": "vishnu2kmohan@yahoo.com",
-    "OIDC_LOGOUT_PATH": "/service/dev/beakerx/cni/logmeout",
-    "OIDC_POST_LOGOUT_REDIRECT_URI": "https://vhost.example.com/service/dev/beakerx/cni",
+    "OIDC_LOGOUT_PATH": "/service/dev/jupyter/notebook/logmeout",
+    "OIDC_POST_LOGOUT_REDIRECT_URI": "https://vhost.example.com/service/dev/jupyter/notebook",
+    "OIDC_USE_SPARTAN_RESOLVER": "true",
     "USER": "nobody",
+    "START_DASK_DISTRIBUTED": "true",
+    "START_RAY_HEAD_NODE": "true",
     "S3_ENDPOINT": "s3.us-east-1.amazonaws.com",
     "S3_USE_HTTPS": "1",
     "S3_VERIFY_SSL": "1",
@@ -115,10 +78,10 @@
     "SPARK_CONF_SPARK_MESOS_EXECUTOR_DOCKER_FORCEPULLIMAGE": "spark.mesos.executor.docker.forcePullImage=true",
     "SPARK_CONF_MESOS_EXECUTOR_HOME": "spark.mesos.executor.home=/opt/spark",
     "SPARK_CONF_MESOS_CONTAINERIZER": "spark.mesos.containerizer=mesos",
-    "SPARK_CONF_MESOS_PRINCIPAL": "spark.mesos.principal=dev_beakerx",
-    "SPARK_CONF_MESOS_ROLE": "spark.mesos.role=dev-beakerx",
-    "SPARK_CONF_MESOS_DRIVER_LABELS": "spark.mesos.driver.labels=DCOS_SPACE:/dev/beakerx",
-    "SPARK_CONF_MESOS_TASK_LABELS": "spark.mesos.task.labels=DCOS_SPACE:/dev/beakerx",
+    "SPARK_CONF_MESOS_PRINCIPAL": "spark.mesos.principal=dev_jupyter",
+    "SPARK_CONF_MESOS_ROLE": "spark.mesos.role=dev-jupyter",
+    "SPARK_CONF_MESOS_DRIVER_LABELS": "spark.mesos.driver.labels=DCOS_SPACE:/dev/jupyter",
+    "SPARK_CONF_MESOS_TASK_LABELS": "spark.mesos.task.labels=DCOS_SPACE:/dev/jupyter",
     "SPARK_CONF_SPARK_MESOS_DRIVERENV_SPARK_MESOS_KRB5_CONF_BASE64": "spark.mesos.driverEnv.SPARK_MESOS_KRB5_CONF_BASE64=W2xpYmRlZmF1bHRzXQoJZGVmYXVsdF9yZWFsbSA9IEFUSEVOQS5NSVQuRURVCgpbcmVhbG1zXQojIHVzZSAia2RjID0gLi4uIiBpZiByZWFsbSBhZG1pbnMgaGF2ZW4ndCBwdXQgU1JWIHJlY29yZHMgaW50byBETlMKCUFUSEVOQS5NSVQuRURVID0gewoJCWFkbWluX3NlcnZlciA9IGtlcmJlcm9zLm1pdC5lZHUKCX0KCUFORFJFVy5DTVUuRURVID0gewoJCWFkbWluX3NlcnZlciA9IGtkYy0wMS5hbmRyZXcuY211LmVkdQoJfQoKW2RvbWFpbl9yZWFsbV0KCW1pdC5lZHUgPSBBVEhFTkEuTUlULkVEVQoJY3NhaWwubWl0LmVkdSA9IENTQUlMLk1JVC5FRFUKCS51Y3NjLmVkdSA9IENBVFMuVUNTQy5FRFUKCltsb2dnaW5nXQojCWtkYyA9IENPTlNPTEUK",
     "SPARK_CONF_SPARK_EXECUTORENV_SPARK_MESOS_KRB5_CONF_BASE64": "spark.executorEnv.SPARK_MESOS_KRB5_CONF_BASE64=W2xpYmRlZmF1bHRzXQoJZGVmYXVsdF9yZWFsbSA9IEFUSEVOQS5NSVQuRURVCgpbcmVhbG1zXQojIHVzZSAia2RjID0gLi4uIiBpZiByZWFsbSBhZG1pbnMgaGF2ZW4ndCBwdXQgU1JWIHJlY29yZHMgaW50byBETlMKCUFUSEVOQS5NSVQuRURVID0gewoJCWFkbWluX3NlcnZlciA9IGtlcmJlcm9zLm1pdC5lZHUKCX0KCUFORFJFVy5DTVUuRURVID0gewoJCWFkbWluX3NlcnZlciA9IGtkYy0wMS5hbmRyZXcuY211LmVkdQoJfQoKW2RvbWFpbl9yZWFsbV0KCW1pdC5lZHUgPSBBVEhFTkEuTUlULkVEVQoJY3NhaWwubWl0LmVkdSA9IENTQUlMLk1JVC5FRFUKCS51Y3NjLmVkdSA9IENBVFMuVUNTQy5FRFUKCltsb2dnaW5nXQojCWtkYyA9IENPTlNPTEUK",
     "SPARK_CONF_SPARK_EXECUTORENV_KRB5_CONFIG": "spark.executorEnv.KRB5_CONFIG=/mnt/mesos/sandbox/krb5.conf",
@@ -136,8 +99,79 @@
     "HAPROXY_0_ENABLED": "true",
     "HAPROXY_0_REDIRECT_TO_HTTPS": "true",
     "HAPROXY_0_VHOST": "vhost.example.com",
-    "HAPROXY_0_PATH": "/service/dev/beakerx/cni"
+    "HAPROXY_0_PATH": "/service/dev/jupyter/notebook"
   },
+  "portDefinitions": [
+    {
+      "port": 0,
+      "protocol": "tcp",
+      "name": "notebook",
+      "labels": {
+        "VIP_0": "/dev/jupyter/notebook:8888"
+      }
+    },
+    {
+      "port": 0,
+      "protocol": "tcp",
+      "name": "sparkdriver",
+      "labels": {
+        "VIP_1": "/dev/jupyter/notebook/sparkdriver:7077"
+      }
+    },
+    {
+      "port": 0,
+      "protocol": "tcp",
+      "name": "sparkui",
+      "labels": {
+        "VIP_2": "/dev/jupyter/notebook/sparkui:4040"
+      }
+    },
+    {
+      "port": 0,
+      "protocol": "tcp",
+      "name": "sparkblockmanager"
+    },
+    {
+      "port": 0,
+      "protocol": "tcp",
+      "name": "tfdbg",
+      "labels": {
+        "VIP_3": "/dev/jupyter/notebook/tfdbg:6046"
+      }
+    },
+    {
+      "port": 0,
+      "protocol": "tcp",
+      "name": "daskscheduler",
+      "labels": {
+        "VIP_4": "/dev/jupyter/notebook/daskscheduler:8786"
+      }
+    },
+    {
+      "port": 0,
+      "protocol": "tcp",
+      "name": "daskboard",
+      "labels": {
+        "VIP_5": "/dev/jupyter/notebook/daskboard:8787"
+      }
+    },
+    {
+      "port": 0,
+      "protocol": "tcp",
+      "name": "rayredis",
+      "labels": {
+        "VIP_6": "/dev/jupyter/notebook/rayredis:6379"
+      }
+    },
+    {
+      "port": 0,
+      "protocol": "tcp",
+      "name": "rayobjectmanager",
+      "labels": {
+        "VIP_7": "/dev/jupyter/notebook/rayobjectmanager:8076"
+      }
+    }
+  ],
   "healthChecks": [
     {
       "portIndex": 0,

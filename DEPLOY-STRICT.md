@@ -1,22 +1,22 @@
 # Jupyter Notebooks with the BeakerX JVM Kernels on Mesosphere DC/OS
 
-## Setup Service Account for BeakerX
+## Setup Service Account for Jupyter
 
 ```bash
-dcos security org service-accounts keypair beakerx-private-key.pem beakerx-public-key.pem
+dcos security org service-accounts keypair jupyter-private-key.pem jupyter-public-key.pem
 
-dcos security org service-accounts create -p beakerx-public-key.pem -d "Dev BeakerX Service Account" dev_beakerx
-dcos security secrets create-sa-secret --strict beakerx-private-key.pem dev_beakerx dev/beakerx/serviceCredential
-dcos security org users grant dev_beakerx dcos:mesos:master:task:user:nobody create --description "Allow dev_beakerx to launch tasks under the Linux user: nobody"
-dcos security org users grant dev_beakerx dcos:mesos:master:framework:role:dev-beakerx create --description "Allow dev_beakerx to register with Mesos and consume resources from the dev-beakerx role"
-dcos security org users grant dev_beakerx dcos:mesos:master:task:app_id:/dev/beakerx create --description "Allow dev_beakerx to create tasks under the /dev/beakerx namespace"
+dcos security org service-accounts create -p jupyter-public-key.pem -d "Dev Jupyter Service Account" dev_jupyter
+dcos security secrets create-sa-secret --strict jupyter-private-key.pem dev_jupyter dev/jupyter/serviceCredential
+dcos security org users grant dev_jupyter dcos:mesos:master:task:user:nobody create --description "Allow dev_jupyter to launch tasks under the Linux user: nobody"
+dcos security org users grant dev_jupyter dcos:mesos:master:framework:role:dev-jupyter create --description "Allow dev_jupyter to register with Mesos and consume resources from the dev-jupyter role"
+dcos security org users grant dev_jupyter dcos:mesos:master:task:app_id:/dev/jupyter create --description "Allow dev_jupyter to create tasks under the /dev/jupyter namespace"
 ```
 
-## (Optional) Setup Quota for BeakerX
+## (Optional) Setup Quota for Jupyter
 ```bash
-tee dev-beakerx-quota.json <<- 'EOF'
+tee dev-jupyter-quota.json <<- 'EOF'
 {
- "role": "dev-beakerx",
+ "role": "dev-jupyter",
  "guarantee": [
    {
      "name": "cpus",
@@ -32,7 +32,7 @@ tee dev-beakerx-quota.json <<- 'EOF'
 }
 EOF
 
-curl --cacert dcos-ca.crt -fsSL -X POST -H "Authorization: token=$(dcos config show core.dcos_acs_token)" -H "Content-Type: application/json" $(dcos config show core.dcos_url)/mesos/quota -d @dev-beakerx-quota.json
+curl --cacert dcos-ca.crt -fsSL -X POST -H "Authorization: token=$(dcos config show core.dcos_acs_token)" -H "Content-Type: application/json" $(dcos config show core.dcos_url)/mesos/quota -d @dev-jupyter-quota.json
 ```
 
 ## Submit a test SparkPi Job
