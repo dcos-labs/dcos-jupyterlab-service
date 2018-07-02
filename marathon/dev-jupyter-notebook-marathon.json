@@ -49,7 +49,7 @@
     "OIDC_DISCOVERY_URI": "https://keycloak.example.com/auth/realms/Notebook/.well-known/openid-configuration",
     "OIDC_REDIRECT_URI": "/service/dev/jupyter/notebook/redirect_uri",
     "OIDC_CLIENT_ID": "Notebook",
-    "OIDC_CLIENT_SECRET": "496f6b73-dcd7-4c89-94f5-bb6338edeecd",
+    "OIDC_CLIENT_SECRET": "b874f6e9-8f3f-41a6-a206-53e928d24fb1",
     "OIDC_TLS_VERIFY": "no",
     "OIDC_EMAIL": "vishnu2kmohan@yahoo.com",
     "OIDC_LOGOUT_PATH": "/service/dev/jupyter/notebook/logmeout",
@@ -115,7 +115,7 @@
       "protocol": "tcp",
       "name": "sparkdriver",
       "labels": {
-        "VIP_1": "/dev/jupyter/notebook/sparkdriver:7077"
+        "VIP_1": "/dev/jupyter/notebook:7077"
       }
     },
     {
@@ -123,7 +123,7 @@
       "protocol": "tcp",
       "name": "sparkui",
       "labels": {
-        "VIP_2": "/dev/jupyter/notebook/sparkui:4040"
+        "VIP_2": "/dev/jupyter/notebook:4040"
       }
     },
     {
@@ -136,7 +136,7 @@
       "protocol": "tcp",
       "name": "tfdbg",
       "labels": {
-        "VIP_3": "/dev/jupyter/notebook/tfdbg:6046"
+        "VIP_3": "/dev/jupyter/notebook:6046"
       }
     },
     {
@@ -144,7 +144,7 @@
       "protocol": "tcp",
       "name": "daskscheduler",
       "labels": {
-        "VIP_4": "/dev/jupyter/notebook/daskscheduler:8786"
+        "VIP_4": "/dev/jupyter/notebook:8786"
       }
     },
     {
@@ -152,7 +152,7 @@
       "protocol": "tcp",
       "name": "daskboard",
       "labels": {
-        "VIP_5": "/dev/jupyter/notebook/daskboard:8787"
+        "VIP_5": "/dev/jupyter/notebook:8787"
       }
     },
     {
@@ -160,7 +160,7 @@
       "protocol": "tcp",
       "name": "rayredis",
       "labels": {
-        "VIP_6": "/dev/jupyter/notebook/rayredis:6379"
+        "VIP_6": "/dev/jupyter/notebook:6379"
       }
     },
     {
@@ -168,7 +168,7 @@
       "protocol": "tcp",
       "name": "rayobjectmanager",
       "labels": {
-        "VIP_7": "/dev/jupyter/notebook/rayobjectmanager:8076"
+        "VIP_7": "/dev/jupyter/notebook:8076"
       }
     }
   ],
