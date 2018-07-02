@@ -102,9 +102,9 @@ else
         if [ ${MARATHON_APP_RESOURCE_MEM+x} ]; then
             PLASMA_MEMORY_BYTES=$(python -c \
                  "import os; print(str(int(
-                 float(os.environ['MARATHON_APP_RESOURCE_MEM'])
-                 * float(os.getenv('PLASMA_MEMORY_FRACTION', '0.4'))
-                 * 1024 * 1024)))"
+                  float(os.getenv('MARATHON_APP_RESOURCE_MEM'))
+                  * float(os.getenv('PLASMA_MEMORY_FRACTION', '0.4'))
+                  * 1024 * 1024)))"
             )
             RAY_ARGS="${RAY_ARGS} --object-store-memory=${PLASMA_MEMORY_BYTES}"
         fi
