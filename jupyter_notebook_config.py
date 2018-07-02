@@ -16,8 +16,8 @@ if not (os.getenv('OIDC_DISCOVERY_URI') and
         os.getenv('OIDC_CLIENT_SECRET')):
 
     # Set a password if JUPYTER_PASSWORD is set
-    if 'JUPYTER_PASSWORD' in os.environ:
-        c.NotebookApp.password = passwd(os.environ['JUPYTER_PASSWORD'])
+    if os.getenv('JUPYTER_PASSWORD'):
+        c.NotebookApp.password = passwd(os.getenv('JUPYTER_PASSWORD'))
         del(os.environ['JUPYTER_PASSWORD'])
 
     # Set Jupyter Notebook Server password to 'jupyter-<Marathon-App-Prefix>'
@@ -195,8 +195,9 @@ os.environ['SPARKR_SUBMIT_ARGS'] = ' '.join(spark_opts + ['sparkr-shell'])
 if os.getenv('ENABLE_SPARK_MONITOR'):
     from conda.cli.main_info import get_info_dict
     conda_site_packages = os.path.dirname(get_info_dict()['conda_location'])
+    spark_driver_extraclasspath = os.path.join(conda_site_packages, 'sparkmonitor/listener.jar')
     spark_monitor_conf = [
-        '--conf spark.driver.extraClassPath={}/sparkmonitor/listener.jar'.format(conda_site_packages),
+        '--conf spark.driver.extraClassPath={}'.format(spark_driver_extraclasspath),
         '--conf spark.extraListeners=sparkmonitor.listener.JupyterSparkMonitorListener'
     ]
     os.environ['PYSPARK_SUBMIT_ARGS'] = ' '.join(
@@ -208,16 +209,16 @@ if os.getenv('MARATHON_APP_ID'):
     dask_scheduler_address = ''
     if os.getenv('LIBPROCESS_IP') == '0.0.0.0':
         # Use the Spartan autoip address because the container is assigned an IP via CNI
-        AUTOIP_SUFFIX = '.marathon.autoip.dcos.thisdcos.directory'
+        AUTOIP_SUFFIX = 'marathon.autoip.dcos.thisdcos.directory'
         autoip_prefix = '-'.join(os.getenv('MARATHON_APP_ID').split('/')[::-1][:-1])
-        ray_redis_address = ''.join([autoip_prefix, '{}:6379'.format(AUTOIP_SUFFIX)])
-        dask_scheduler_address = ''.join([autoip_prefix, '{}:8786'.format(AUTOIP_SUFFIX)])
+        ray_redis_address = '{}.{}:6379'.format(autoip_prefix, AUTOIP_SUFFIX)
+        dask_scheduler_address = '{}.{}:8786'.format(autoip_prefix, AUTOIP_SUFFIX)
     else:
         # Use the L4LB address because the container is bound to the agent IP
-        L4LB_SUFFIX = '.marathon.l4lb.thisdcos.directory'
-        l4lb_prefix = ''.join(os.environ['MARATHON_APP_ID'].split('/')[::1])
-        ray_redis_address = ''.join([l4lb_prefix, 'rayredis{}:6379'.format(L4LB_SUFFIX)])
-        dask_scheduler_address = ''.join([l4lb_prefix, 'daskscheduler{}:8786'.format(L4LB_SUFFIX)])
+        L4LB_SUFFIX = 'marathon.l4lb.thisdcos.directory'
+        l4lb_prefix = ''.join(os.getenv('MARATHON_APP_ID').split('/')[::1])
+        ray_redis_address = '{}.{}:6379'.format(l4lb_prefix, L4LB_SUFFIX)
+        dask_scheduler_address = '{}.{}:8786'.format(l4lb_prefix, L4LB_SUFFIX)
 
     os.environ['RAY_REDIS_ADDRESS'] = ray_redis_address
     os.environ['DASK_SCHEDULER_ADDRESS'] = dask_scheduler_address
@@ -227,7 +228,7 @@ else:
 
 # Set a certificate if USE_HTTPS is set to any value
 PEM_FILE = os.path.join(jupyter_data_dir(), 'notebook.pem')
-if 'USE_HTTPS' in os.environ:
+if os.getenv('USE_HTTPS'):
     if not os.path.isfile(PEM_FILE):
         # Ensure PEM_FILE directory exists
         DIR_NAME = os.path.dirname(PEM_FILE)
