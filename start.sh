@@ -110,7 +110,7 @@ else
         fi
         echo "RAY_ARGS: ${RAY_ARGS}"
         ray start ${RAY_ARGS} \
-            --node-ip-address=${MESOS_CONTAINER_IP} \
+            --node-ip-address="${MESOS_CONTAINER_IP}" \
             --redis-port="${PORT_RAYREDIS}" \
             --object-manager-port="${PORT_RAYOBJECTMANAGER}" \
             --head \

@@ -44,8 +44,8 @@ dependencies:
 - py
 - pyarrow
 - pyfolio
-- pyglet
 - pytest
+- python=3.6.*
 - python-snappy
 - r-base
 - r-irkernel
@@ -63,6 +63,7 @@ dependencies:
   - https://dist.apache.org/repos/dist/dev/incubator/toree/0.2.0-incubating-rc5/toree-pip/toree-0.2.0.tar.gz
   - knowledgelab
   - opencv-python
+  - pyglet
   - PyOpenGL
   - ray[rllib]
   - redis
