@@ -22,6 +22,12 @@
         }
     ]
   },
+  "networks": [
+    {
+      "mode": "container",
+      "name": "dcos"
+    }
+  ],
   "fetch": [
     {
       "uri": "http://api.devhdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/core-site.xml",
