@@ -1,0 +1,69 @@
+{
+  "id": "/dev/jupyter/cni-ray-workers",
+  "instances": 4,
+  "cpus": 2,
+  "mem": 8192,
+  "user": "nobody",
+  "cmd": "/usr/local/bin/start-ray-worker.sh",
+  "container": {
+    "type": "MESOS",
+    "docker": {
+      "image": "dcoslabs/dcos-ml-worker:latest",
+      "forcePullImage": true
+    },
+    "portMappings": [
+        {
+          "containerPort": 8076,
+          "protocol": "tcp",
+          "name": "rayobjectmanager",
+          "labels": {
+            "VIP_7": "/dev/jupyter/cni-ray-workers:8076"
+          }
+        }
+    ]
+  },
+  "fetch": [
+    {
+      "uri": "http://api.devhdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/core-site.xml",
+      "executable": false,
+      "extract": false,
+      "cache": false
+    },
+    {
+      "uri": "http://api.devhdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/hdfs-site.xml",
+      "executable": false,
+      "extract": false,
+      "cache": false
+    }
+  ],
+  "secrets": {
+    "serviceCredential": {
+      "source": "dev/jupyter/serviceCredential"
+    }
+  },
+  "env": {
+    "DCOS_SERVICE_ACCOUNT_CREDENTIAL": {
+      "secret": "serviceCredential"
+    },
+    "CONDA_ENVS_PATH": "/mnt/mesos/sandbox/conda/envs:/opt/conda/envs",
+    "CONDA_PKGS_DIRS": "/mnt/mesos/sandbox/conda/pkgs:/opt/conda/pkgs",
+    "DCOS_DIR": "/mnt/mesos/sandbox/.dcos",
+    "HADOOP_CONF_DIR": "/mnt/mesos/sandbox",
+    "HOME": "/mnt/mesos/sandbox",
+    "JAVA_OPTS": "'-XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/mnt/mesos/sandbox'",
+    "JUPYTER_CONFIG_DIR": "/mnt/mesos/sandbox/.jupyter",
+    "JUPYTER_RUNTIME_DIR": "/mnt/mesos/sandbox/.local/share/jupyter/runtime",
+    "USER": "nobody",
+    "START_RAY_WORKER": "true",
+    "RAY_REDIS_APP": "cni-notebook",
+    "TERM": "xterm-256color"
+  },
+  "upgradeStrategy": {
+    "minimumHealthCapacity": 1.0,
+    "maximumOverCapacity": 1.0
+  },
+  "unreachableStrategy": {
+    "expungeAfterSeconds": 0,
+    "inactiveAfterSeconds": 0
+  }
+}
