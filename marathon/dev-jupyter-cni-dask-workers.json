@@ -1,17 +1,49 @@
 {
-  "id": "/dev/jupyter/ray-workers",
+  "id": "/dev/jupyter/cni-dask-workers",
   "instances": 2,
   "cpus": 2,
   "mem": 4096,
   "user": "nobody",
-  "cmd": "/usr/local/bin/start-ray-worker.sh",
+  "cmd": "/usr/local/bin/start-dask-worker.sh",
   "container": {
     "type": "MESOS",
     "docker": {
       "image": "dcoslabs/dcos-ml-worker:latest",
       "forcePullImage": true
-    }
+    },
+    "portMappings": [
+        {
+          "containerPort": 8786,
+          "protocol": "tcp",
+          "name": "worker",
+          "labels": {
+            "VIP_0": "/dev/jupyter/cni-dask-workers:8786"
+          }
+        },
+        {
+          "containerPort": 8787,
+          "protocol": "tcp",
+          "name": "bokeh",
+          "labels": {
+            "VIP_1": "/dev/jupyter/cni-dask-workers:8787"
+          }
+        },
+        {
+          "containerPort": 8767,
+          "protocol": "tcp",
+          "name": "nanny",
+          "labels": {
+            "VIP_2": "/dev/jupyter/cni-dask-workers:8788"
+          }
+        }
+    ]
   },
+  "networks": [
+    {
+      "mode": "container",
+      "name": "dcos"
+    }
+  ],
   "fetch": [
     {
       "uri": "http://api.devhdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/core-site.xml",
@@ -45,18 +77,9 @@
     "JUPYTER_RUNTIME_DIR": "/mnt/mesos/sandbox/.local/share/jupyter/runtime",
     "USER": "nobody",
     "START_RAY_WORKER": "true",
+    "DASK_SCHEDULER_APP": "cni-notebook",
     "TERM": "xterm-256color"
   },
-  "portDefinitions": [
-    {
-      "port": 0,
-      "protocol": "tcp",
-      "name": "rayobjectmanager",
-      "labels": {
-        "VIP_0": "/dev/jupyter/ray-worker:8076"
-      }
-    }
-  ],
   "upgradeStrategy": {
     "minimumHealthCapacity": 0.5,
     "maximumOverCapacity": 0.5

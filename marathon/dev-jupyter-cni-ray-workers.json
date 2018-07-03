@@ -1,8 +1,8 @@
 {
   "id": "/dev/jupyter/cni-ray-workers",
-  "instances": 4,
+  "instances": 2,
   "cpus": 2,
-  "mem": 8192,
+  "mem": 4096,
   "user": "nobody",
   "cmd": "/usr/local/bin/start-ray-worker.sh",
   "container": {
@@ -65,8 +65,8 @@
     "TERM": "xterm-256color"
   },
   "upgradeStrategy": {
-    "minimumHealthCapacity": 1.0,
-    "maximumOverCapacity": 1.0
+    "minimumHealthCapacity": 0.5,
+    "maximumOverCapacity": 0.5
   },
   "unreachableStrategy": {
     "expungeAfterSeconds": 0,

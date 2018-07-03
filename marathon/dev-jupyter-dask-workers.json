@@ -1,10 +1,10 @@
 {
-  "id": "/dev/jupyter/ray-workers",
+  "id": "/dev/jupyter/dask-workers",
   "instances": 2,
   "cpus": 2,
   "mem": 4096,
   "user": "nobody",
-  "cmd": "/usr/local/bin/start-ray-worker.sh",
+  "cmd": "/usr/local/bin/start-dask-worker.sh",
   "container": {
     "type": "MESOS",
     "docker": {
@@ -51,9 +51,25 @@
     {
       "port": 0,
       "protocol": "tcp",
-      "name": "rayobjectmanager",
+      "name": "worker",
       "labels": {
-        "VIP_0": "/dev/jupyter/ray-worker:8076"
+        "VIP_0": "/dev/jupyter/ray-worker:8786"
+      }
+    },
+    {
+      "port": 0,
+      "protocol": "tcp",
+      "name": "bokeh",
+      "labels": {
+        "VIP_0": "/dev/jupyter/ray-worker:8787"
+      }
+    },
+    {
+      "port": 0,
+      "protocol": "tcp",
+      "name": "nanny",
+      "labels": {
+        "VIP_0": "/dev/jupyter/ray-worker:8788"
       }
     }
   ],
