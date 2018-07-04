@@ -11,14 +11,7 @@ from notebook.auth import passwd
 
 # Only (pre)set a password if we're *not* using OpenID Connect
 if not (os.getenv('OIDC_DISCOVERY_URI') and
-        os.getenv('OIDC_REDIRECT_URI') and
-        os.getenv('OIDC_CLIENT_ID') and
-        os.getenv('OIDC_CLIENT_SECRET')):
-
-    # Set a password if JUPYTER_PASSWORD is set
-    if os.getenv('JUPYTER_PASSWORD'):
-        c.NotebookApp.password = passwd(os.getenv('JUPYTER_PASSWORD'))
-        del(os.environ['JUPYTER_PASSWORD'])
+        os.getenv('OIDC_CLIENT_ID')):
 
     # Set Jupyter Notebook Server password to 'jupyter-<Marathon-App-Prefix>'
     # e.g., Marathon App ID '/foo/bar/app' maps to password: 'jupyter-foo-bar'
@@ -26,6 +19,11 @@ if not (os.getenv('OIDC_DISCOVERY_URI') and
         MARATHON_APP_PREFIX = \
             '-'.join(os.getenv('MARATHON_APP_ID').split('/')[:-1])
         c.NotebookApp.password = passwd('jupyter{}'.format(MARATHON_APP_PREFIX))
+
+    # Set a password if JUPYTER_PASSWORD (override) is set
+    if os.getenv('JUPYTER_PASSWORD'):
+        c.NotebookApp.password = passwd(os.getenv('JUPYTER_PASSWORD'))
+        del(os.environ['JUPYTER_PASSWORD'])
 else:
     # Disable Notebook authentication since we're authenticating using OpenID Connect
     c.NotebookApp.password = u''
