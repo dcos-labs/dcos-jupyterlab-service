@@ -290,8 +290,7 @@ USER root
 COPY start-notebook.sh /usr/local/bin/
 COPY start-singleuser.sh /usr/local/bin/
 
-RUN mv /usr/lib/x86_64-linux-gnu/libcurl.so.4.4.0 /usr/lib/x86_64-linux-gnu/libcurl.so.4.4.0.bak \
-    && cp "${MESOSPHERE_PREFIX}/libmesos-bundle/lib/libcurl.so.4" /usr/lib/x86_64-linux-gnu/libcurl.so.4.4.0
+RUN cp "${MESOSPHERE_PREFIX}/libmesos-bundle/lib/libcurl.so.4" /usr/lib/x86_64-linux-gnu/libcurl.so.4.4.0
 
 ENV SPARK_DIST_CLASSPATH="${HADOOP_HDFS_HOME}/etc/hadoop:${HADOOP_HDFS_HOME}/share/hadoop/common/lib/*:${HADOOP_HDFS_HOME}/share/hadoop/common/*:${HADOOP_HDFS_HOME}/share/hadoop/hdfs:${HADOOP_HDFS_HOME}/share/hadoop/hdfs/lib/*:${HADOOP_HDFS_HOME}/share/hadoop/hdfs/*:${HADOOP_HDFS_HOME}/share/hadoop/yarn:${HADOOP_HDFS_HOME}/share/hadoop/yarn/lib/*:${HADOOP_HDFS_HOME}/share/hadoop/yarn/*:${HADOOP_HDFS_HOME}/share/hadoop/mapreduce/lib/*:${HADOOP_HDFS_HOME}/share/hadoop/mapreduce/*:${HADOOP_HDFS_HOME}/share/hadoop/tools/lib/*" \
     HADOOP_CLASSPATH="${HADOOP_CLASSPATH}:${HADOOP_HDFS_HOME}/share/hadoop/tools/lib/*" \
