@@ -79,7 +79,7 @@ if is_not_empty(os.getenv("OIDC_POST_LOGOUT_REDIRECT_URI")) then
 end
 
 -- Don't trigger the OpenID Connect authentication flow if the minimal options aren't set
-if is_empty(opts.discovery) or is_empty(opts.client_id) or is_empty(opts.client_secret) then
+if is_empty(opts.discovery) or is_empty(opts.client_id) then
     return true
 end
 
