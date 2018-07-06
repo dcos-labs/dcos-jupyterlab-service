@@ -202,27 +202,15 @@ if os.getenv('ENABLE_SPARK_MONITOR'):
         spark_opts + spark_monitor_conf + ['pyspark-shell']
     )
 
-if os.getenv('MARATHON_APP_ID'):
-    ray_redis_address = ''
-    dask_scheduler_address = ''
-    if os.getenv('LIBPROCESS_IP') == '0.0.0.0':
-        # Use the Spartan autoip address because the container is assigned an IP via CNI
-        AUTOIP_SUFFIX = 'marathon.autoip.dcos.thisdcos.directory'
-        autoip_prefix = '-'.join(os.getenv('MARATHON_APP_ID').split('/')[::-1][:-1])
-        ray_redis_address = '{}.{}:6379'.format(autoip_prefix, AUTOIP_SUFFIX)
-        dask_scheduler_address = '{}.{}:8786'.format(autoip_prefix, AUTOIP_SUFFIX)
-    else:
-        # Use the L4LB address because the container is bound to the agent IP
-        L4LB_SUFFIX = 'marathon.l4lb.thisdcos.directory'
-        l4lb_prefix = ''.join(os.getenv('MARATHON_APP_ID').split('/')[::1])
-        ray_redis_address = '{}.{}:6379'.format(l4lb_prefix, L4LB_SUFFIX)
-        dask_scheduler_address = '{}.{}:8786'.format(l4lb_prefix, L4LB_SUFFIX)
+# Ray Redis (Head Node) Address
+os.environ['RAY_REDIS_ADDRESS'] = '{}:{}'.format(
+    os.getenv('MESOS_CONTAINER_IP'),
+    os.getenv('PORT_RAYREDIS', '6379'))
 
-    os.environ['RAY_REDIS_ADDRESS'] = ray_redis_address
-    os.environ['DASK_SCHEDULER_ADDRESS'] = dask_scheduler_address
-else:
-    os.environ['RAY_REDIS_ADDRESS'] = '{}:6379'.format(os.getenv('MESOS_CONTAINER_IP'))
-    os.environ['DASK_SCHEDULER_ADDRESS'] = '{}:8786'.format(os.getenv('MESOS_CONTAINER_IP'))
+# Dask Scheduler Address
+os.environ['DASK_SCHEDULER_ADDRESS'] = '{}:{}'.format(
+    os.getenv('MESOS_CONTAINER_IP'),
+    os.getenv('PORT_DASKSCHEDULER', '8786'))
 
 # Set a certificate if USE_HTTPS is set to any value
 PEM_FILE = os.path.join(jupyter_data_dir(), 'notebook.pem')
