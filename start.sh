@@ -41,6 +41,10 @@ else
     export SPARKMONITOR_UI_HOST="${MESOS_CONTAINER_IP}"
     export SPARKMONITOR_UI_PORT=${PORT_SPARKUI:-"4040"}
 
+    # Set Spark Executor Environment Variables for TensorFlowOnSpark
+    export SPARK_CONF_SPARK_EXECUTORENV_CLASSPATH="spark.executorEnv.CLASSPATH=$(${HADOOP_HDFS_HOME}/bin/hadoop classpath --glob):${CLASSPATH}"
+    export SPARK_CONF_SPARK_EXECUTORENV_LD_LIBRARY_PATH="spark.executorEnv.LD_LIBRARY_PATH=${LD_LIBRARY_PATH}"
+
     # ${HOME} is set to ${MESOS_SANDBOX} on DC/OS and won't have a default IPython profile
     # We have to manually check since `ipython profile locate default` *creates* the config
     if [ ! -f "${MESOS_SANDBOX}/.ipython/profile_default/ipython_kernel_config.py" ]; then
@@ -88,14 +92,16 @@ else
         PORT_RAYREDIS=${PORT_RAYREDIS:-"6379"}
         PORT_RAYOBJECTMANAGER=${PORT_RAYOBJECTMANAGER:-"8076"}
         if [ ${MARATHON_APP_RESOURCE_CPUS+x} ]; then
-            RAY_CPUS=$(python -c "import os; print(int(
-                                  float(os.getenv('MARATHON_APP_RESOURCE_CPUS'))))"
+            RAY_CPUS=$(python -c \
+                "import os; print(int(
+                 float(os.getenv('MARATHON_APP_RESOURCE_CPUS'))))"
             )
             RAY_ARGS="${RAY_ARGS} --num-cpus=${RAY_CPUS}"
         fi
         if [ ${MARATHON_APP_RESOURCE_GPUS+x} ]; then
-            RAY_GPUS=$(python -c "import os; print(int(
-                                  float(os.getenv('MARATHON_APP_RESOURCE_GPUS'))))"
+            RAY_GPUS=$(python -c \
+                "import os; print(int(
+                 float(os.getenv('MARATHON_APP_RESOURCE_GPUS'))))"
             )
             RAY_ARGS="${RAY_ARGS} --num-gpus=${RAY_GPUS}"
         fi
