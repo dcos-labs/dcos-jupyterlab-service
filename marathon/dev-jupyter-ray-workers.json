@@ -2,7 +2,7 @@
   "id": "/dev/jupyter/ray-workers",
   "instances": 2,
   "cpus": 2,
-  "mem": 4096,
+  "mem": 6144,
   "user": "nobody",
   "cmd": "/usr/local/bin/start-ray-worker.sh",
   "container": {
@@ -37,14 +37,12 @@
     },
     "CONDA_ENVS_PATH": "/mnt/mesos/sandbox/conda/envs:/opt/conda/envs",
     "CONDA_PKGS_DIRS": "/mnt/mesos/sandbox/conda/pkgs:/opt/conda/pkgs",
-    "DCOS_DIR": "/mnt/mesos/sandbox/.dcos",
     "HADOOP_CONF_DIR": "/mnt/mesos/sandbox",
     "HOME": "/mnt/mesos/sandbox",
-    "JAVA_OPTS": "'-XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/mnt/mesos/sandbox'",
+    "JAVA_OPTS": "'-server -XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/mnt/mesos/sandbox'",
     "JUPYTER_CONFIG_DIR": "/mnt/mesos/sandbox/.jupyter",
     "JUPYTER_RUNTIME_DIR": "/mnt/mesos/sandbox/.local/share/jupyter/runtime",
     "USER": "nobody",
-    "START_RAY_WORKER": "true",
     "TERM": "xterm-256color"
   },
   "portDefinitions": [
@@ -53,7 +51,7 @@
       "protocol": "tcp",
       "name": "rayobjectmanager",
       "labels": {
-        "VIP_0": "/dev/jupyter/ray-worker:8076"
+        "VIP_0": "/dev/jupyter/ray-workers:8076"
       }
     }
   ],

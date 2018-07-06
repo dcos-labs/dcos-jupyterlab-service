@@ -2,7 +2,7 @@
   "id": "/dev/jupyter/cni-dask-workers",
   "instances": 2,
   "cpus": 2,
-  "mem": 4096,
+  "mem": 6144,
   "user": "nobody",
   "cmd": "/usr/local/bin/start-dask-worker.sh",
   "container": {
@@ -29,7 +29,7 @@
           }
         },
         {
-          "containerPort": 8767,
+          "containerPort": 8788,
           "protocol": "tcp",
           "name": "nanny",
           "labels": {
@@ -69,14 +69,12 @@
     },
     "CONDA_ENVS_PATH": "/mnt/mesos/sandbox/conda/envs:/opt/conda/envs",
     "CONDA_PKGS_DIRS": "/mnt/mesos/sandbox/conda/pkgs:/opt/conda/pkgs",
-    "DCOS_DIR": "/mnt/mesos/sandbox/.dcos",
     "HADOOP_CONF_DIR": "/mnt/mesos/sandbox",
     "HOME": "/mnt/mesos/sandbox",
-    "JAVA_OPTS": "'-XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/mnt/mesos/sandbox'",
+    "JAVA_OPTS": "'-server -XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/mnt/mesos/sandbox'",
     "JUPYTER_CONFIG_DIR": "/mnt/mesos/sandbox/.jupyter",
     "JUPYTER_RUNTIME_DIR": "/mnt/mesos/sandbox/.local/share/jupyter/runtime",
     "USER": "nobody",
-    "START_RAY_WORKER": "true",
     "DASK_SCHEDULER_APP": "cni-notebook",
     "TERM": "xterm-256color"
   },
