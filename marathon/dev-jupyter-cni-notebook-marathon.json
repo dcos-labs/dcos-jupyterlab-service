@@ -12,70 +12,70 @@
       "forcePullImage": true
     },
     "portMappings": [
-        {
-          "containerPort": 8080,
-          "protocol": "tcp",
-          "name": "notebook",
-          "labels": {
-            "VIP_0": "/dev/jupyter/cni-notebook:8888"
-          }
-        },
-        {
-          "containerPort": 7077,
-          "protocol": "tcp",
-          "name": "sparkdriver",
-          "labels": {
-            "VIP_1": "/dev/jupyter/cni-notebook:7077"
-          }
-        },
-        {
-          "containerPort": 4040,
-          "protocol": "tcp",
-          "name": "sparkui",
-          "labels": {
-            "VIP_2": "/dev/jupyter/cni-notebook:4040"
-          }
-        },
-        {
-          "containerPort": 6046,
-          "protocol": "tcp",
-          "name": "tfdbg",
-          "labels": {
-            "VIP_3": "/dev/jupyter/cni-notebook:6046"
-          }
-        },
-        {
-          "containerPort": 8786,
-          "protocol": "tcp",
-          "name": "daskscheduler",
-          "labels": {
-            "VIP_4": "/dev/jupyter/cni-notebook:8786"
-          }
-        },
-        {
-          "containerPort": 8787,
-          "protocol": "tcp",
-          "name": "daskboard",
-          "labels": {
-            "VIP_5": "/dev/jupyter/cni-notebook:8787"
-          }
-        },
-        {
-          "containerPort": 6379,
-          "protocol": "tcp",
-          "name": "rayredis",
-          "labels": {
-            "VIP_6": "/dev/jupyter/cni-notebook:6379"
-          }
-        },
-        {
-          "containerPort": 8076,
-          "protocol": "tcp",
-          "name": "rayobjectmanager",
-          "labels": {
-            "VIP_7": "/dev/jupyter/cni-notebook:8076"
-          }
+      {
+        "containerPort": 8080,
+        "protocol": "tcp",
+        "name": "notebook",
+        "labels": {
+          "VIP_0": "/dev/jupyter/cni-notebook:8888"
         }
+      },
+      {
+        "containerPort": 7077,
+        "protocol": "tcp",
+        "name": "sparkdriver",
+        "labels": {
+          "VIP_1": "/dev/jupyter/cni-notebook:7077"
+        }
+      },
+      {
+        "containerPort": 4040,
+        "protocol": "tcp",
+        "name": "sparkui",
+        "labels": {
+          "VIP_2": "/dev/jupyter/cni-notebook:4040"
+        }
+      },
+      {
+        "containerPort": 6046,
+        "protocol": "tcp",
+        "name": "tfdbg",
+        "labels": {
+          "VIP_3": "/dev/jupyter/cni-notebook:6046"
+        }
+      },
+      {
+        "containerPort": 8786,
+        "protocol": "tcp",
+        "name": "daskscheduler",
+        "labels": {
+          "VIP_4": "/dev/jupyter/cni-notebook:8786"
+        }
+      },
+      {
+        "containerPort": 8787,
+        "protocol": "tcp",
+        "name": "daskboard",
+        "labels": {
+          "VIP_5": "/dev/jupyter/cni-notebook:8787"
+        }
+      },
+      {
+        "containerPort": 6379,
+        "protocol": "tcp",
+        "name": "rayredis",
+        "labels": {
+          "VIP_6": "/dev/jupyter/cni-notebook:6379"
+        }
+      },
+      {
+        "containerPort": 8076,
+        "protocol": "tcp",
+        "name": "rayobjectmanager",
+        "labels": {
+          "VIP_7": "/dev/jupyter/cni-notebook:8076"
+        }
+      }
     ]
   },
   "networks": [

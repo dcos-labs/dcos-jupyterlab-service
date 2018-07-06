@@ -39,7 +39,6 @@
     "CONDA_PKGS_DIRS": "/mnt/mesos/sandbox/conda/pkgs:/opt/conda/pkgs",
     "HADOOP_CONF_DIR": "/mnt/mesos/sandbox",
     "HOME": "/mnt/mesos/sandbox",
-    "JAVA_OPTS": "'-server -XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/mnt/mesos/sandbox'",
     "JUPYTER_CONFIG_DIR": "/mnt/mesos/sandbox/.jupyter",
     "JUPYTER_RUNTIME_DIR": "/mnt/mesos/sandbox/.local/share/jupyter/runtime",
     "USER": "nobody",
@@ -53,6 +52,18 @@
       "labels": {
         "VIP_0": "/dev/jupyter/ray-workers:8076"
       }
+    }
+  ],
+  "healthChecks": [
+    {
+      "protocol": "COMMAND",
+      "command": {
+        "value": "/usr/local/bin/ray-worker-health-check.sh"
+      },
+      "gracePeriodSeconds": 60,
+      "intervalSeconds": 20,
+      "timeoutSeconds": 10,
+      "maxConsecutiveFailures": 3
     }
   ],
   "upgradeStrategy": {

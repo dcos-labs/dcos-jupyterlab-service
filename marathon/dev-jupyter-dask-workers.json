@@ -39,7 +39,6 @@
     "CONDA_PKGS_DIRS": "/mnt/mesos/sandbox/conda/pkgs:/opt/conda/pkgs",
     "HADOOP_CONF_DIR": "/mnt/mesos/sandbox",
     "HOME": "/mnt/mesos/sandbox",
-    "JAVA_OPTS": "'-server -XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/mnt/mesos/sandbox'",
     "JUPYTER_CONFIG_DIR": "/mnt/mesos/sandbox/.jupyter",
     "JUPYTER_RUNTIME_DIR": "/mnt/mesos/sandbox/.local/share/jupyter/runtime",
     "USER": "nobody",
@@ -49,7 +48,7 @@
     {
       "port": 0,
       "protocol": "tcp",
-      "name": "worker",
+      "name": "daskworker",
       "labels": {
         "VIP_0": "/dev/jupyter/dask-workers:8786"
       }
@@ -57,7 +56,7 @@
     {
       "port": 0,
       "protocol": "tcp",
-      "name": "bokeh",
+      "name": "daskbokeh",
       "labels": {
         "VIP_0": "/dev/jupyter/dask-workers:8787"
       }
@@ -65,10 +64,22 @@
     {
       "port": 0,
       "protocol": "tcp",
-      "name": "nanny",
+      "name": "dasknanny",
       "labels": {
         "VIP_0": "/dev/jupyter/dask-workers:8788"
       }
+    }
+  ],
+  "healthChecks": [
+    {
+      "protocol": "COMMAND",
+      "command": {
+        "value": "/opt/conda/bin/curl -fsSL -X GET \"http://$(hostname -i):${PORT_DASKBOKEH}\" > /dev/null 2>&1"
+      },
+      "gracePeriodSeconds": 60,
+      "intervalSeconds": 20,
+      "timeoutSeconds": 10,
+      "maxConsecutiveFailures": 3
     }
   ],
   "upgradeStrategy": {

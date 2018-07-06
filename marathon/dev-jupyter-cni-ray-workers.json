@@ -12,14 +12,14 @@
       "forcePullImage": true
     },
     "portMappings": [
-        {
-          "containerPort": 8076,
-          "protocol": "tcp",
-          "name": "rayobjectmanager",
-          "labels": {
-            "VIP_7": "/dev/jupyter/cni-ray-workers:8076"
-          }
+      {
+        "containerPort": 8076,
+        "protocol": "tcp",
+        "name": "rayobjectmanager",
+        "labels": {
+          "VIP_7": "/dev/jupyter/cni-ray-workers:8076"
         }
+      }
     ]
   },
   "networks": [
@@ -55,13 +55,24 @@
     "CONDA_PKGS_DIRS": "/mnt/mesos/sandbox/conda/pkgs:/opt/conda/pkgs",
     "HADOOP_CONF_DIR": "/mnt/mesos/sandbox",
     "HOME": "/mnt/mesos/sandbox",
-    "JAVA_OPTS": "'-server -XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/mnt/mesos/sandbox'",
     "JUPYTER_CONFIG_DIR": "/mnt/mesos/sandbox/.jupyter",
     "JUPYTER_RUNTIME_DIR": "/mnt/mesos/sandbox/.local/share/jupyter/runtime",
     "USER": "nobody",
     "RAY_REDIS_APP": "cni-notebook",
     "TERM": "xterm-256color"
   },
+  "healthChecks": [
+    {
+      "protocol": "COMMAND",
+      "command": {
+        "value": "/usr/local/bin/ray-worker-health-check.sh"
+      },
+      "gracePeriodSeconds": 60,
+      "intervalSeconds": 20,
+      "timeoutSeconds": 10,
+      "maxConsecutiveFailures": 3
+    }
+  ],
   "upgradeStrategy": {
     "minimumHealthCapacity": 0.5,
     "maximumOverCapacity": 0.5
