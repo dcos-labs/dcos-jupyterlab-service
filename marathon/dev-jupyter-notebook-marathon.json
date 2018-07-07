@@ -38,6 +38,7 @@
     "AWS_REGION": "us-east-1",
     "CONDA_ENVS_PATH": "/mnt/mesos/sandbox/conda/envs:/opt/conda/envs",
     "CONDA_PKGS_DIRS": "/mnt/mesos/sandbox/conda/pkgs:/opt/conda/pkgs",
+    "DCOS_DIRECTORY": "/mnt/mesos/sandbox/.dcos",
     "ENABLE_SPARK_MONITOR": "true",
     "HADOOP_CONF_DIR": "/mnt/mesos/sandbox",
     "HOME": "/mnt/mesos/sandbox",
