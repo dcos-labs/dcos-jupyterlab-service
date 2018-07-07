@@ -2,7 +2,7 @@
 # https://github.com/docker-library/repo-info/blob/master/repos/debian/tag-details.md#debian94---linux-amd64
 FROM debian@sha256:316ebb92ca66bb8ddc79249fb29872bece4be384cb61b5344fac4e84ca4ed2b2
 
-ARG BEAKERX_DCOS_VERSION="0.20.1-1.11.3"
+ARG DCOS_JUPYTER_VERSION="1.11.3-0.32.1"
 ARG BUILD_DATE
 ARG CODENAME="stretch"
 ARG CONDA_DIR="/opt/conda"
@@ -69,12 +69,12 @@ ARG XGBOOST_VERSION="0.71"
 
 LABEL maintainer="Vishnu Mohan <vishnu@mesosphere.com>" \
       org.label-schema.build-date="${BUILD_DATE}" \
-      org.label-schema.name="BeakerX" \
-      org.label-schema.description="BeakerX is a collection of kernels and extensions to the Jupyter interactive computing environment. It provides JVM support, interactive plots, tables, forms, publishing, and more." \
-      org.label-schema.url="http://beakerx.com" \
+      org.label-schema.name="Jupyter" \
+      org.label-schema.description="Project Jupyter exists to develop open-source software, open-standards, and services for interactive computing across dozens of programming languages." \
+      org.label-schema.url="http://jupyter.org" \
       org.label-schema.vcs-ref="${VCS_REF}" \
-      org.label-schema.vcs-url="https://github.com/vishnu2kmohan/beakerx-dcos-docker" \
-      org.label-schema.version="${BEAKERX_DCOS_VERSION}" \
+      org.label-schema.vcs-url="https://github.com/dcos-labs/dcos-jupyter-service" \
+      org.label-schema.version="${DCOS_JUPYTER_VERSION}" \
       org.label-schema.schema-version="1.0"
 
 ENV BOOTSTRAP="${MESOSPHERE_PREFIX}/bin/bootstrap" \
@@ -244,9 +244,8 @@ RUN cd /tmp \
     && ${CONDA_DIR}/bin/conda config --system --set show_channel_urls true \
     && ${CONDA_DIR}/bin/pip install --upgrade pip \
     && ${CONDA_DIR}/bin/conda env update --json -q -f "${CONDA_DIR}/${CONDA_ENV_YML}" \
-    && ${CONDA_DIR}/bin/pip install --upgrade pip \
     && ${CONDA_DIR}/bin/jupyter toree install --sys-prefix --interpreters=Scala,PySpark,SparkR,SQL \
-    && ${CONDA_DIR}/bin/jupyter labextension install @jupyter-widgets/jupyterlab-manager \
+    && ${CONDA_DIR}/bin/jupyter labextension install @jupyter-widgets/jupyterlab-manager@0.35.0 \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/fasta-extension \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/geojson-extension \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/github \
@@ -254,8 +253,7 @@ RUN cd /tmp \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/latex \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/plotly-extension \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/vega2-extension \
-    && ${CONDA_DIR}/bin/jupyter labextension install @jpmorganchase/perspective-jupyterlab \
-    && ${CONDA_DIR}/bin/jupyter labextension install beakerx-jupyterlab@0.20.1  \
+    && ${CONDA_DIR}/bin/jupyter labextension install beakerx-jupyterlab@1.0.0 \
     && ${CONDA_DIR}/bin/jupyter labextension install bqplot \
     && ${CONDA_DIR}/bin/jupyter labextension install jupyterlab_bokeh \
     && ${CONDA_DIR}/bin/jupyter labextension install jupyterlab_voyager \
@@ -265,6 +263,7 @@ RUN cd /tmp \
     && ${CONDA_DIR}/bin/jupyter labextension install qgrid \
     && ${CONDA_DIR}/bin/jupyter nbextension install --py --sys-prefix sparkmonitor \
     && ${CONDA_DIR}/bin/jupyter nbextension enable --py --sys-prefix sparkmonitor \
+    && ${CONDA_DIR}/bin/jupyter serverextension enable --sys-prefix jupyterlab_github \
     && ${CONDA_DIR}/bin/jupyter serverextension enable --py --sys-prefix sparkmonitor \
     && ipython profile create \
     && echo "c.InteractiveShellApp.extensions.append('sparkmonitor.kernelextension')" \

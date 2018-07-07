@@ -8,7 +8,7 @@ dependencies:
 - attrs
 - awscli
 - bazel
-- beakerx=0.20.1
+- beakerx=1.0.0
 - beautifulsoup4
 - bokeh
 - click
@@ -24,9 +24,10 @@ dependencies:
 - grpcio
 - h5py
 - ipywidgets
+- invoke
 - jupyter_contrib_nbextensions
 - jupyterhub
-- jupyterlab
+- jupyterlab=0.32.1
 - keras
 - libhdfs3
 - lxml
@@ -61,11 +62,12 @@ dependencies:
   - gym[atari]
   - horovod
   - https://dist.apache.org/repos/dist/dev/incubator/toree/0.2.0-incubating-rc5/toree-pip/toree-0.2.0.tar.gz
+  - jupyterlab_github
   - knowledgelab
   - opencv-python
   - pyglet
   - PyOpenGL
-  - ray[rllib]
+  - ray[rllib]==0.5.0
   - redis
   - sparkmonitor
   - tensorflow==1.8.0
