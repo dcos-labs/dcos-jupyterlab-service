@@ -109,7 +109,7 @@ end
 -- Only authorize a valid user, based on their User Principal Name (UPN), if specified
 if is_not_empty(os.getenv("OIDC_UPN")) then
     ngx.log(ngx.DEBUG, "Authorizing UPN: " .. os.getenv("OIDC_UPN") .. " against " .. tostring(res.user.upn))
-    if res.user.email ~= os.getenv("OIDC_UPN") then
+    if res.user.upn ~= os.getenv("OIDC_UPN") then
         ngx.exit(ngx.HTTP_FORBIDDEN)
     end
 end
