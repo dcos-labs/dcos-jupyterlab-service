@@ -36,14 +36,32 @@ else
     fi
     echo "MESOS_SANDBOX: ${MESOS_SANDBOX}"
 
+    # Kerberos Credentials Cache
+    KRB5CCNAME=${KRB5CCNAME:-"/tmp/krb5cc_$(id -u)"}
+    export KRB5CCNAME
+
+    # Add Hadoop Jars to CLASSPATH
+    CLASSPATH="$(${HADOOP_HDFS_HOME}/bin/hadoop classpath --glob):${CLASSPATH}"
+    export CLASSPATH
+
     # Set environment variables for Spark Monitor
     # https://krishnan-r.github.io/sparkmonitor/install.html
     export SPARKMONITOR_UI_HOST="${MESOS_CONTAINER_IP}"
     export SPARKMONITOR_UI_PORT=${PORT_SPARKUI:-"4040"}
 
     # Set Spark Executor Environment Variables for TensorFlowOnSpark
-    export SPARK_CONF_SPARK_EXECUTORENV_CLASSPATH="spark.executorEnv.CLASSPATH=$(${HADOOP_HDFS_HOME}/bin/hadoop classpath --glob):${CLASSPATH}"
-    export SPARK_CONF_SPARK_EXECUTORENV_LD_LIBRARY_PATH="spark.executorEnv.LD_LIBRARY_PATH=${LD_LIBRARY_PATH}"
+    SPARK_CONF_SPARK_EXECUTORENV_CLASSPATH="spark.executorEnv.CLASSPATH=$(${HADOOP_HDFS_HOME}/bin/hadoop classpath --glob):${CLASSPATH}"
+    SPARK_CONF_SPARK_EXECUTORENV_LD_LIBRARY_PATH="spark.executorEnv.LD_LIBRARY_PATH=${LD_LIBRARY_PATH}"
+    export SPARK_CONF_SPARK_EXECUTORENV_CLASSPATH
+    export SPARK_CONF_SPARK_EXECUTORENV_LD_LIBRARY_PATH
+
+    # Forward Kerberos Credentials Cache onto Spark Executors (for TensorFlowOnSpark)?
+    if [ ${ENABLE_SPARK_KERBEROS_TICKET_FORWARDING+x} ]; then
+        SPARK_FILES="${KRB5CCNAME},${SPARK_FILES}"
+        SPARK_CONF_SPARK_EXECUTORENV_KRB5CCNAME="spark.executorEnv.KRB5CCNAME=/mnt/mesos/sandbox/krb5cc_$(id -u)"
+        export SPARK_FILES
+        export SPARK_CONF_SPARK_EXECUTORENV_KRB5CCNAME
+    fi
 
     # ${HOME} is set to ${MESOS_SANDBOX} on DC/OS and won't have a default IPython profile
     # We have to manually check since `ipython profile locate default` *creates* the config
