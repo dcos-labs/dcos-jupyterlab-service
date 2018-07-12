@@ -42,6 +42,8 @@ http {
         ''      close;
     }
 
+    large_client_header_buffers 4 16k;
+
     lua_package_path '~/lua/?.lua;;';
 
     {{#OIDC_USE_SPARTAN_RESOLVER}}
