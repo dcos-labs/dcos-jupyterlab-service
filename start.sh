@@ -41,7 +41,7 @@ else
     export KRB5CCNAME
 
     # Add Hadoop Jars to CLASSPATH
-    CLASSPATH="$("${HADOOP_HDFS_HOME}/bin/hadoop" classpath --glob):${CLASSPATH}"
+    CLASSPATH=$("${HADOOP_HDFS_HOME}/bin/hadoop" classpath --glob):"${CLASSPATH}"
     export CLASSPATH
 
     # Set environment variables for Spark Monitor
