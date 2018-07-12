@@ -41,7 +41,7 @@ else
     export KRB5CCNAME
 
     # Add Hadoop Jars to CLASSPATH
-    CLASSPATH="$(${HADOOP_HDFS_HOME}/bin/hadoop classpath --glob):${CLASSPATH}"
+    CLASSPATH="$("${HADOOP_HDFS_HOME}/bin/hadoop" classpath --glob):${CLASSPATH}"
     export CLASSPATH
 
     # Set environment variables for Spark Monitor
@@ -50,7 +50,7 @@ else
     export SPARKMONITOR_UI_PORT=${PORT_SPARKUI:-"4040"}
 
     # Set Spark Executor Environment Variables for TensorFlowOnSpark
-    SPARK_CONF_SPARK_EXECUTORENV_CLASSPATH="spark.executorEnv.CLASSPATH=$(${HADOOP_HDFS_HOME}/bin/hadoop classpath --glob):${CLASSPATH}"
+    SPARK_CONF_SPARK_EXECUTORENV_CLASSPATH="spark.executorEnv.CLASSPATH=${CLASSPATH}"
     SPARK_CONF_SPARK_EXECUTORENV_LD_LIBRARY_PATH="spark.executorEnv.LD_LIBRARY_PATH=${LD_LIBRARY_PATH}"
     export SPARK_CONF_SPARK_EXECUTORENV_CLASSPATH
     export SPARK_CONF_SPARK_EXECUTORENV_LD_LIBRARY_PATH
