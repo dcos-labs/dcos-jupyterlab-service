@@ -55,12 +55,10 @@ else
     export SPARK_CONF_SPARK_EXECUTORENV_CLASSPATH
     export SPARK_CONF_SPARK_EXECUTORENV_LD_LIBRARY_PATH
 
-    # Forward Kerberos Credentials Cache onto Spark Executors (for TensorFlowOnSpark)?
+    # Forward Kerberos Credentials Cache (File) onto Spark Executors (for TensorFlowOnSpark)?
     if [ ${ENABLE_SPARK_KERBEROS_TICKET_FORWARDING+x} ]; then
         SPARK_FILES="${KRB5CCNAME},${SPARK_FILES}"
-        SPARK_CONF_SPARK_EXECUTORENV_KRB5CCNAME="spark.executorEnv.KRB5CCNAME=/mnt/mesos/sandbox/krb5cc_$(id -u)"
         export SPARK_FILES
-        export SPARK_CONF_SPARK_EXECUTORENV_KRB5CCNAME
     fi
 
     # ${HOME} is set to ${MESOS_SANDBOX} on DC/OS and won't have a default IPython profile

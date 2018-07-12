@@ -22,7 +22,8 @@
 
 # Using Spark's "Hadoop Free" Build
 # https://spark.apache.org/docs/latest/hadoop-provided.html
-export SPARK_DIST_CLASSPATH=$(${HADOOP_HDFS_HOME}/bin/hadoop classpath):${HADOOP_HDFS_HOME}/share/hadoop/tools/lib/*
+SPARK_DIST_CLASSPATH=$("${HADOOP_HDFS_HOME}/bin/hadoop" classpath):"${HADOOP_HDFS_HOME}/share/hadoop/tools/lib/*"
+export SPARK_DIST_CLASSPATH
 
 if [ -d "${MESOS_SANDBOX}" ] ; then
     cd "${MESOS_SANDBOX}" || exit
@@ -105,6 +106,15 @@ if [ -d "${MESOS_SANDBOX}" ] ; then
         echo "spark-env: /etc/krb5.conf" >&2
         cat /etc/krb5.conf >&2
     fi
+
+    if [ -f "${MESOS_SANDBOX}/krb5cc_$(id -u)" ]; then
+        echo "spark-env: Found Kerberos Credentials Cache: krb5cc_$(id -u) in ${MESOS_SANDBOX}. Moving to /tmp" >&2
+        mv "${MESOS_SANDBOX}/krb5cc_$(id -u)" /tmp
+        echo "spark-env: Exporting KRB5CCNAME=/tmp/krb5cc_$(id -u) if not already set" >&2
+        KRB5CCNAME=${KRB5CCNAME:-"/tmp/krb5cc_$(id -u)"}
+        export KRB5CCNAME
+    fi
+
 fi
 
 # Options read when launching programs locally with
