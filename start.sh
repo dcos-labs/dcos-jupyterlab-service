@@ -81,6 +81,17 @@ else
         cp "/home/beakerx/.hadooprc" "${MESOS_SANDBOX}/.hadooprc"
     fi
 
+    # Start Spark History Server if ${SPARK_HISTORY_FS_LOGDIRECTORY} is defined
+    if [ ${SPARK_HISTORY_FS_LOGDIRECTORY+x} ]; then
+        SPARK_LOG_DIR=${SPARK_LOG_DIR:-"${MESOS_SANDBOX}"} \
+        PORT_SPARKHISTORY=${PORT_SPARKHISTORY:-"18080"} \
+        SPARK_HISTORY_OPTS="-Dspark.history.ui.port=${PORT_SPARKHISTORY} \
+            -Dspark.history.fs.logDirectory=${SPARK_HISTORY_FS_LOGDIRECTORY} \
+            ${SPARK_HISTORY_OPTS}" \
+        APPLICATION_WEB_PROXY_BASE="${MARATHON_APP_LABEL_HAPROXY_0_PATH}/sparkhistory" \
+        /opt/spark/sbin/start-history-server.sh
+    fi
+
     # Start Tensorboard if ${TENSORBOARD_LOGDIR} is defined
     if [ ${TENSORBOARD_LOGDIR+x} ]; then
         if [ ${PORT_TFDBG+x} ]; then

@@ -47,13 +47,13 @@
     "JUPYTER_RUNTIME_DIR": "/mnt/mesos/sandbox/.local/share/jupyter/runtime",
     "NGINX_LOG_LEVEL": "warn",
     "OIDC_DISCOVERY_URI": "https://keycloak.example.com/auth/realms/notebook/.well-known/openid-configuration",
-    "OIDC_REDIRECT_URI": "/service/dev/jupyter/notebook/redirect_uri",
+    "OIDC_REDIRECT_URI": "/dev/jupyter/notebook/redirect_uri",
     "OIDC_CLIENT_ID": "notebook",
-    "OIDC_CLIENT_SECRET": "2fec3ec1-5209-4d27-bc54-1e3f4f8f5fec",
+    "OIDC_CLIENT_SECRET": "6a774856-7ea7-4194-8ad8-d6229710998f",
     "OIDC_TLS_VERIFY": "no",
     "OIDC_EMAIL": "vishnu2kmohan@yahoo.com",
-    "OIDC_LOGOUT_PATH": "/service/dev/jupyter/notebook/logmeout",
-    "OIDC_POST_LOGOUT_REDIRECT_URI": "https://vhost.example.com/service/dev/jupyter/notebook",
+    "OIDC_LOGOUT_PATH": "/dev/jupyter/notebook/logmeout",
+    "OIDC_POST_LOGOUT_REDIRECT_URI": "https://vhost.example.com/dev/jupyter/notebook",
     "OIDC_USE_SPARTAN_RESOLVER": "true",
     "USER": "nobody",
     "START_DASK_DISTRIBUTED": "true",
@@ -66,6 +66,7 @@
     "SPARK_DRIVER_CORES": "2",
     "SPARK_DRIVER_MEMORY": "4g",
     "SPARK_DRIVER_JAVA_OPTIONS": "'-server -XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/mnt/mesos/sandbox'",
+    "SPARK_HISTORY_FS_LOGDIRECTORY": "hdfs://hdfs/history",
     "SPARK_CONF_SPARK_SCHEDULER_MINREGISTEREDRESOURCESRATIO": "spark.scheduler.minRegisteredResourcesRatio=1.0",
     "SPARK_CONF_SPARK_SCHEDULER_MAXREGISTEREDRESOURCESWAITINGTIME": "spark.scheduler.maxRegisteredResourcesWaitingTime=300s",
     "SPARK_CONF_CORES_MAX": "spark.cores.max=5",
@@ -73,7 +74,7 @@
     "SPARK_CONF_EXECUTOR_MEMORY": "spark.executor.memory=6g",
     "SPARK_CONF_EXECUTOR_JAVA_OPTIONS": "spark.executor.extraJavaOptions='-server -XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/mnt/mesos/sandbox'",
     "SPARK_CONF_EVENTLOG_ENABLED": "spark.eventLog.enabled=true",
-    "SPARK_CONF_EVENTLOG_DIR": "spark.eventLog.dir=s3a://vishnu-mohan/spark/history",
+    "SPARK_CONF_EVENTLOG_DIR": "spark.eventLog.dir=hdfs://hdfs/history",
     "SPARK_CONF_HADOOP_FS_S3A_AWS_CREDENTIALS_PROVIDER": "spark.hadoop.fs.s3a.aws.credentials.provider=com.amazonaws.auth.InstanceProfileCredentialsProvider",
     "SPARK_CONF_MESOS_EXECUTOR_DOCKER_IMAGE": "spark.mesos.executor.docker.image=dcoslabs/dcos-spark:latest",
     "SPARK_CONF_SPARK_MESOS_EXECUTOR_DOCKER_FORCEPULLIMAGE": "spark.mesos.executor.docker.forcePullImage=true",
@@ -91,7 +92,7 @@
     "SPARK_CONF_SPARK_MESOS_URIS": "spark.mesos.uris=http://api.devhdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/hdfs-site.xml,http://api.devhdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/core-site.xml",
     "SPARK_CONF_SPARK_EXECUTORENV_HADOOP_OPTS": "spark.executorEnv.HADOOP_OPTS='-Djava.library.path=/opt/hadoop/lib/native -Djava.security.krb5.conf=/mnt/mesos/sandbox/krb5.conf'",
     "SPARK_MESOS_KRB5_CONF_BASE64": "W2xpYmRlZmF1bHRzXQoJZGVmYXVsdF9yZWFsbSA9IEFUSEVOQS5NSVQuRURVCgpbcmVhbG1zXQojIHVzZSAia2RjID0gLi4uIiBpZiByZWFsbSBhZG1pbnMgaGF2ZW4ndCBwdXQgU1JWIHJlY29yZHMgaW50byBETlMKCUFUSEVOQS5NSVQuRURVID0gewoJCWFkbWluX3NlcnZlciA9IGtlcmJlcm9zLm1pdC5lZHUKCX0KCUFORFJFVy5DTVUuRURVID0gewoJCWFkbWluX3NlcnZlciA9IGtkYy0wMS5hbmRyZXcuY211LmVkdQoJfQoKW2RvbWFpbl9yZWFsbV0KCW1pdC5lZHUgPSBBVEhFTkEuTUlULkVEVQoJY3NhaWwubWl0LmVkdSA9IENTQUlMLk1JVC5FRFUKCS51Y3NjLmVkdSA9IENBVFMuVUNTQy5FRFUKCltsb2dnaW5nXQojCWtkYyA9IENPTlNPTEUK",
-    "TENSORBOARD_LOGDIR": "/mnt/mesos/sandbox",
+    "TENSORBOARD_LOGDIR": "hdfs://hdfs/",
     "TERM": "xterm-256color"
   },
   "labels": {
@@ -100,7 +101,7 @@
     "HAPROXY_0_ENABLED": "true",
     "HAPROXY_0_REDIRECT_TO_HTTPS": "true",
     "HAPROXY_0_VHOST": "vhost.example.com",
-    "HAPROXY_0_PATH": "/service/dev/jupyter/notebook"
+    "HAPROXY_0_PATH": "/dev/jupyter/notebook"
   },
   "portDefinitions": [
     {
@@ -170,6 +171,14 @@
       "name": "rayobjectmanager",
       "labels": {
         "VIP_7": "/dev/jupyter/notebook:8076"
+      }
+    },
+    {
+      "port": 0,
+      "protocol": "tcp",
+      "name": "sparkhistory",
+      "labels": {
+        "VIP_8": "/dev/jupyter/notebook:18080"
       }
     }
   ],
