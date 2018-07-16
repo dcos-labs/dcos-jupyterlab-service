@@ -5,8 +5,7 @@
 
 Primarily, these functions help with:
 
-* starting the TensorFlow ``tf.train.Server`` for the node
-* (allocating GPUs as desired, and determining the node's role in the cluster).
+* starting the TensorFlow ``tf.train.Server`` for the node (allocating GPUs as desired, and determining the node's role in the cluster).
 * managing input/output data for *InputMode.SPARK*.
 """
 
@@ -33,30 +32,26 @@ def hdfs_path(ctx, path):
   Returns:
     An absolute path prefixed with the correct filesystem scheme.
   """
-  if (path.startswith("adl://")
-      or path.startswith("file://")
-      or path.startswith("hdfs://")
-      or path.startswith("oss://")
-      or path.startswith("s3://")
-      or path.startswith("s3a://")
-      or path.startswith("swift://")
-      or path.startswith("viewfs://")
-      or path.startswith("wasb://")):
-    #  absolute path w/ scheme, just return as-is
+  #  All Hadoop-Compatible File System Schemes (as of Hadoop 3.0.x):
+  HADOOP_SCHEMES = ['adl://',
+                    'hdfs://',
+                    'oss://',
+                    's3://',
+                    's3a://',
+                    's3n://',
+                    'swift://',
+                    'viewfs://',
+                    'wasb://']
+  if (any(path.startswith(scheme) for scheme in HADOOP_SCHEMES)
+      or path.startswith('file://')):
+    # absolute path w/ scheme, just return as-is
     return path
   elif path.startswith("/"):
     # absolute path w/o scheme, just prepend w/ defaultFS
     return ctx.defaultFS + path
   else:
     # relative path, prepend defaultFS + standard working dir
-    if (ctx.defaultFS.startswith("adl://")
-        or ctx.defaultFS.startswith("file://")
-        or ctx.defaultFS.startswith("hdfs://")
-        or ctx.defaultFS.startswith("oss://")
-        or ctx.defaultFS.startswith("s3://")
-        or ctx.defaultFS.startswith("s3a://")
-        or ctx.defaultFS.startswith("viewfs://")
-        or ctx.defaultFS.startswith("wasb://")):
+    if ctx.defaultFS.startswith("hdfs://") or ctx.defaultFS.startswith("viewfs://"):
       return "{0}/user/{1}/{2}".format(ctx.defaultFS, getpass.getuser(), path)
     elif ctx.defaultFS.startswith("file://"):
       return "{0}/{1}/{2}".format(ctx.defaultFS, ctx.working_dir[1:], path)
