@@ -2,18 +2,18 @@
 # https://github.com/docker-library/repo-info/blob/master/repos/debian/tag-details.md#debian94---linux-amd64
 FROM debian@sha256:316ebb92ca66bb8ddc79249fb29872bece4be384cb61b5344fac4e84ca4ed2b2
 
-ARG DCOS_JUPYTER_VERSION="1.11.3-0.32.1"
+ARG JUPYTER_DCOS_VERSION="0.32.1-1.1.0"
 ARG BUILD_DATE
 ARG CODENAME="stretch"
 ARG CONDA_DIR="/opt/conda"
-ARG CONDA_ENV_YML="beakerx-root-conda-base-env.yml"
+ARG CONDA_ENV_YML="jupyter-root-conda-base-env.yml"
 ARG CONDA_INSTALLER="Miniconda3-4.5.4-Linux-x86_64.sh"
 ARG CONDA_MD5="a946ea1d0c4a642ddf0c3a26a18bb16d"
 ARG CONDA_URL="https://repo.continuum.io/miniconda"
 ARG DCOS_CLI_URL="https://downloads.dcos.io/binaries/cli/linux/x86-64"
 ARG DCOS_CLI_VERSION="1.11"
 ARG DCOS_COMMONS_URL="https://downloads.mesosphere.com/dcos-commons"
-ARG DCOS_COMMONS_VERSION="0.50.0"
+ARG DCOS_COMMONS_VERSION="0.51.0"
 ARG DEBCONF_NONINTERACTIVE_SEEN="true"
 ARG DEBIAN_FRONTEND="noninteractive"
 ARG DEBIAN_REPO="http://cdn-fastly.deb.debian.org"
@@ -49,15 +49,15 @@ ARG SPARK_HOME="/opt/spark"
 ARG SPARK_MAJOR_VERSION="2.2"
 ARG SPARK_VERSION="2.2.1"
 ARG TENSORFLOW_ECO_URL="https://s3.amazonaws.com/vishnu-mohan/tensorflow"
-ARG TENSORFLOW_HADOOP_JAR_SHA256="cb77cc942a477fb0dbc6b7d17ee1cb0a0a73ba827f288db4c749d5fc0a0c5be3"
-ARG TENSORFLOW_SPARK_JAR_SHA256="303e8d5a8e2e9bad059435d4a86d03a71b3be00d661acba3c5b8f524f20b30fc"
-ARG TENSORFLOW_JAR_SHA256="4b6a9d76ea853db41532275a3608d2d1b5abc1c16609cf8b9ebfffef7c3036fc"
-ARG TENSORFLOW_JNI_SHA256="894d39d8e1d8d1329ea7153f8624657d27619c5db1d9535ab6b66296e3e6ee45"
+ARG TENSORFLOW_HADOOP_JAR_SHA256="23d8791de849a0567602436772de5cd7f1b72ae41931f4265f53a80db7e068b2"
+ARG TENSORFLOW_SPARK_JAR_SHA256="65a310a589b14e729ca5358de38341c73d4c599d014fdc4195874f0f4038d9cf"
+ARG TENSORFLOW_JAR_SHA256="140fe736c5d320c2d4cfd1542ad340b29793f2c993703052f010b80f931c24b9"
+ARG TENSORFLOW_JNI_SHA256="2a0e2c3d0846c8d7a05b78a7660a741f6b614ae530baa7a22ada9428381633c4"
 ARG TENSORFLOW_SERVING_APT_URL="http://storage.googleapis.com/tensorflow-serving-apt"
-ARG TENSORFLOW_SERVING_VERSION="1.5.0"
+ARG TENSORFLOW_SERVING_VERSION="1.9.0"
 ARG TENSORFLOW_URL="https://storage.googleapis.com/tensorflow"
 ARG TENSORFLOW_VARIANT="cpu"
-ARG TENSORFLOW_VERSION="1.8.0"
+ARG TENSORFLOW_VERSION="1.9.0"
 ARG TINI_GPG_KEY="595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7"
 ARG TINI_URL="https://github.com/krallin/tini/releases/download"
 ARG TINI_VERSION="v0.18.0"
@@ -74,7 +74,7 @@ LABEL maintainer="Vishnu Mohan <vishnu@mesosphere.com>" \
       org.label-schema.url="http://jupyter.org" \
       org.label-schema.vcs-ref="${VCS_REF}" \
       org.label-schema.vcs-url="https://github.com/dcos-labs/dcos-jupyter-service" \
-      org.label-schema.version="${DCOS_JUPYTER_VERSION}" \
+      org.label-schema.version="${JUPYTER_DCOS_VERSION}" \
       org.label-schema.schema-version="1.0"
 
 ENV BOOTSTRAP="${MESOSPHERE_PREFIX}/bin/bootstrap" \
