@@ -65,7 +65,7 @@ local supported_token_auth_methods = {
 }
 
 local openidc = {
-  _VERSION = "1.6.0"
+  _VERSION = "1.6.1"
 }
 openidc.__index = openidc
 
@@ -472,7 +472,7 @@ local function openidc_load_jwt_none_alg(enc_hdr, enc_payload)
 end
 
 -- get the Discovery metadata from the specified URL
-local function openidc_discover(url, ssl_verify, timeout, proxy_opts)
+local function openidc_discover(url, ssl_verify, timeout, exptime, proxy_opts)
   ngx.log(ngx.DEBUG, "openidc_discover: URL is: "..url)
 
   local json, err
@@ -495,7 +495,7 @@ local function openidc_discover(url, ssl_verify, timeout, proxy_opts)
       json, err = openidc_parse_json_response(res)
       if json then
         if string.sub(url, 1, string.len(json['issuer'])) == json['issuer'] then
-          openidc_cache_set("discovery", url, cjson.encode(json), 24 * 60 * 60)
+          openidc_cache_set("discovery", url, cjson.encode(json), exptime or 24 * 60 * 60)
         else
           err = "issuer field in Discovery data does not match URL"
           ngx.log(ngx.ERR, err)
@@ -518,7 +518,7 @@ end
 local function openidc_ensure_discovered_data(opts)
   local err
   if type(opts.discovery) == "string" then
-    opts.discovery, err = openidc_discover(opts.discovery, opts.ssl_verify, opts.timeout, opts.proxy_opts)
+    opts.discovery, err = openidc_discover(opts.discovery, opts.ssl_verify, opts.timeout, opts.jwk_expires_in, opts.proxy_opts)
   end
   return err
 end
@@ -533,7 +533,7 @@ function openidc.get_discovery_doc(opts)
     return opts.discovery, err
 end
 
-local function openidc_jwks(url, force, ssl_verify, timeout, proxy_opts)
+local function openidc_jwks(url, force, ssl_verify, timeout, exptime, proxy_opts)
   ngx.log(ngx.DEBUG, "openidc_jwks: URL is: "..url.. " (force=" .. force .. ")")
 
   local json, err, v
@@ -559,7 +559,7 @@ local function openidc_jwks(url, force, ssl_verify, timeout, proxy_opts)
       ngx.log(ngx.DEBUG, "response data: "..res.body)
       json, err = openidc_parse_json_response(res)
       if json then
-        openidc_cache_set("jwks", url, cjson.encode(json), 24 * 60 * 60)
+        openidc_cache_set("jwks", url, cjson.encode(json), exptime or 24 * 60 * 60)
       end
     end
 
@@ -608,16 +608,10 @@ local wrap = ('.'):rep(64)
 
 local envelope = "-----BEGIN %s-----\n%s\n-----END %s-----\n"
 
-local function der2pem(data, header, typ)
+local function der2pem(data, typ)
   typ = typ:upper() or "CERTIFICATE"
-  if header == nil then
-    data = b64(data)
-    return string.format(envelope, typ, data:gsub(wrap, '%0\n', (#data-1)/64), typ)
-  else
-    -- ADDING b64 RSA HEADER WITH OID
-    data = header .. b64(data)
-    return string.format(envelope, typ,  data:gsub(wrap, '%0\n', (#data-1)/64), typ)
-  end
+  data = b64(data)
+  return string.format(envelope, typ, data:gsub(wrap, '%0\n', (#data-1)/64), typ)
 end
 
 
@@ -660,6 +654,11 @@ local function encode_sequence_of_integer(array)
   return encode_sequence(array,encode_binary_integer)
 end
 
+local function encode_bit_string(array)
+  local s = "\0" .. array -- first octet holds the number of unused bits
+  return "\3" .. encode_length(#s) .. s
+end
+
 local function openidc_pem_from_x5c(x5c)
   -- TODO check x5c length
   ngx.log(ngx.DEBUG, "Found x5c, getting PEM public key from x5c entry of json public key")
@@ -678,9 +677,13 @@ local function openidc_pem_from_rsa_n_and_e(n, e)
     openidc_base64_url_decode(n), openidc_base64_url_decode(e)
   }
   local encoded_key = encode_sequence_of_integer(der_key)
-
-  --PEM KEY FROM PUBLIC KEYS, PASSING 64 BIT ENCODED RSA HEADER STRING WHICH IS SAME FOR ALL KEYS
-  local pem = der2pem(encoded_key,"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8A","PUBLIC KEY")
+  local pem = der2pem(encode_sequence({
+    encode_sequence({
+        "\6\9\42\134\72\134\247\13\1\1\1" -- OID :rsaEncryption
+        .. "\5\0" -- ASN.1 NULL of length 0
+    }),
+    encode_bit_string(encoded_key)
+  }), "PUBLIC KEY")
   ngx.log(ngx.DEBUG, "Generated pem key from n and e: ", pem)
   return pem
 end
@@ -705,7 +708,7 @@ local function openidc_pem_from_jwk(opts, kid)
   local jwk, jwks
 
   for force=0, 1 do
-    jwks, err = openidc_jwks(opts.discovery.jwks_uri, force, opts.ssl_verify, opts.timeout, opts.proxy_opts)
+    jwks, err = openidc_jwks(opts.discovery.jwks_uri, force, opts.ssl_verify, opts.timeout, opts.jwk_expires_in, opts.proxy_opts)
     if err then
       return nil, err
     end
@@ -731,7 +734,7 @@ local function openidc_pem_from_jwk(opts, kid)
     return nil, "don't know how to create RSA key/cert for " .. cjson.encode(jwt)
   end
 
-  openidc_cache_set("jwks", cache_id, pem, 24 * 60 * 60)
+  openidc_cache_set("jwks", cache_id, pem, opts.jwk_expires_in or 24 * 60 * 60)
   return pem
 end
 
