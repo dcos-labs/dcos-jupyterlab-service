@@ -137,6 +137,8 @@
     "OIDC_USE_SPARTAN_RESOLVER": "true",
     "USER": "nobody",
     "START_DASK_DISTRIBUTED": "true",
+    "START_SPARK_HISTORY": "true",
+    "START_TENSORBOARD": "true",
     "START_RAY_HEAD_NODE": "true",
     "S3_ENDPOINT": "s3.us-east-1.amazonaws.com",
     "S3_USE_HTTPS": "1",

@@ -321,10 +321,16 @@ COPY openidc.lua /usr/local/openresty/site/lualib/resty/
 COPY nginx.conf.mustache /opt/mesosphere/
 COPY proxy.conf.mustache /opt/mesosphere/
 COPY start.sh /usr/local/bin/
+COPY start-spark-history.sh /usr/local/bin/
+COPY start-tensorboard.sh /usr/local/bin/
 COPY --chown="1000:100" jupyter_notebook_config.py "${HOME}/.jupyter/"
 COPY --chown="1000:100" beakerx.json "${HOME}/.jupyter/"
 
 USER "${NB_UID}"
+
+RUN pip install https://github.com/vishnu2kmohan/jupyter-spark-history-dcos/archive/master.zip \
+    && jupyter serverextension enable jupyter_spark_history_dcos \
+    && rm -rf "${HOME}/.cache/pip"
 
 # Patch TensorFlowOnSpark to handle all Hadoop 3.x supported Filesystem URIs
 COPY --chown="1000:100" TFNode.py "${CONDA_DIR}/lib/python3.6/site-packages/tensorflowonspark/"

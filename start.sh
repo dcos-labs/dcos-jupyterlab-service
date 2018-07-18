@@ -81,19 +81,20 @@ else
         cp "/home/beakerx/.hadooprc" "${MESOS_SANDBOX}/.hadooprc"
     fi
 
-    # Start Spark History Server if ${SPARK_HISTORY_FS_LOGDIRECTORY} is defined
-    if [ ${SPARK_HISTORY_FS_LOGDIRECTORY+x} ]; then
+    # Start Spark History Server?
+    if [ ${START_SPARK_HISTORY+x} ]; then
+        SPARK_HISTORY_FS_LOGDIRECTORY=${SPARK_HISTORY_FS_LOGDIRECTORY:-"${MESOS_SANDBOX}"} \
         SPARK_LOG_DIR=${SPARK_LOG_DIR:-"${MESOS_SANDBOX}"} \
         PORT_SPARKHISTORY=${PORT_SPARKHISTORY:-"18080"} \
         SPARK_HISTORY_OPTS="-Dspark.history.ui.port=${PORT_SPARKHISTORY} \
             -Dspark.history.fs.logDirectory=${SPARK_HISTORY_FS_LOGDIRECTORY} \
             ${SPARK_HISTORY_OPTS}" \
-        APPLICATION_WEB_PROXY_BASE="${MARATHON_APP_LABEL_HAPROXY_0_PATH}/sparkhistory" \
         /opt/spark/sbin/start-history-server.sh
     fi
 
-    # Start Tensorboard if ${TENSORBOARD_LOGDIR} is defined
-    if [ ${TENSORBOARD_LOGDIR+x} ]; then
+    # Start Tensorboard?
+    if [ ${START_TENSORBOARD+x} ]; then
+        TENSORBOARD_LOGDIR=${TENSORBOARD_LOGDIR:-"${MESOS_SANDBOX}"}
         if [ ${PORT_TFDBG+x} ]; then
             TENSORBOARD_ARGS="${TENSORBOARD_ARGS} --debugger_port ${PORT_TFDBG}"
         fi
@@ -232,10 +233,11 @@ if [ "$(id -u)" == '0' ] ; then
         usermod -u "${NB_UID}" "${NB_USER}"
     fi
 
-    # Change GID of NB_USER to NB_GID if it does not match
+    # Add NB_USER to NB_GID if it's not the default group
     if [ "${NB_GID}" != "$(id -g ${NB_USER})" ] ; then
-        echo "Set ${NB_USER} GID to: ${NB_GID}"
-        groupmod -g "${NB_GID}" -o "$(id -g -n ${NB_USER})"
+        echo "Add $NB_USER to group: $NB_GID"
+        groupadd -g $NB_GID -o $NB_USER
+        usermod -a -G $NB_GID $NB_USER
     fi
 
     # Enable sudo if requested
