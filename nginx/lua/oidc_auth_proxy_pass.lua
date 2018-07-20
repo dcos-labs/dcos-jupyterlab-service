@@ -9,32 +9,6 @@ local function is_not_empty(s)
   return (s ~= nil) and (s ~= '')
 end
 
-local resolver = require "resty.dns.resolver"
-
--- Use Spartan (https://github.com/dcos/spartan) when running on DC/OS
-if is_not_empty(os.getenv("OIDC_USE_SPARTAN_RESOLVER")) then
-    r, err = resolver:new{
-        nameservers = {{"198.51.100.1", 53},
-                       {"198.51.100.2", 53},
-                       {"198.51.100.3", 53}},
-        retrans = 3,  -- retransmissions on receive timeout
-        timeout = 2000,  -- msec
-    }
-else
--- Use the OpenDNS resolvers
-    r, err = resolver:new{
-        nameservers = {{"208.67.220.220", 53},
-                       {"208.67.222.222", 53}},
-        retrans = 3,  -- retransmissions on receive timeout
-        timeout = 2000,  -- msec
-    }
-end
-
-if not r then
-    ngx.log(ngx.ERR, "Failed to instantiate the resolver: " .. err)
-    return nil
-end
-
 local proxy_opts = {}
 
 if is_not_empty(os.getenv("HTTP_PROXY")) then
@@ -108,8 +82,8 @@ end
 
 -- Only authorize a valid user, based on their User Principal Name (UPN), if specified
 if is_not_empty(os.getenv("OIDC_UPN")) then
-    ngx.log(ngx.DEBUG, "Authorizing UPN: " .. os.getenv("OIDC_UPN") .. " against " .. tostring(res.user.upn))
-    if res.user.upn ~= os.getenv("OIDC_UPN") then
+    ngx.log(ngx.DEBUG, "Authorizing UPN: " .. os.getenv("OIDC_UPN") .. " against " .. tostring(res.id_token.upn))
+    if res.id_token.upn ~= os.getenv("OIDC_UPN") then
         ngx.exit(ngx.HTTP_FORBIDDEN)
     end
 end
