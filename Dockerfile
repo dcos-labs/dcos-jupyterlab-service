@@ -329,7 +329,7 @@ COPY --chown="1000:100" beakerx.json "${HOME}/.jupyter/"
 USER "${NB_UID}"
 
 RUN pip install https://github.com/vishnu2kmohan/jupyter-spark-history-dcos/archive/master.zip \
-    && jupyter serverextension enable jupyter_spark_history_dcos \
+    && jupyter serverextension enable --sys-prefix jupyter_spark_history_dcos \
     && rm -rf "${HOME}/.cache/pip"
 
 # Patch TensorFlowOnSpark to handle all Hadoop 3.x supported Filesystem URIs

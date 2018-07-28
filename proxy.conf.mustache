@@ -13,6 +13,8 @@ server {
     port_in_redirect on;
     {{/MARATHON_APP_ID}}
 
+    rewrite_log on;
+
     #error_log logs/error.log warn;
     #error_log /dev/stderr warn;
 
