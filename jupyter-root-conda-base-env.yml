@@ -27,7 +27,7 @@ dependencies:
 - invoke
 - jupyter_contrib_nbextensions
 - jupyterhub
-- jupyterlab=0.32.1
+- jupyterlab=0.33.4
 - keras
 - libhdfs3
 - lxml
@@ -36,7 +36,8 @@ dependencies:
 - mpi[openmpi]
 - mpi4py
 - nbconvert
-- nodejs=8.11.*
+- nodejs
+- numpy
 - pandas
 - pep8
 - pillow
@@ -62,13 +63,19 @@ dependencies:
   - gym[atari]
   - horovod
   - https://dist.apache.org/repos/dist/dev/incubator/toree/0.2.0-incubating-rc5/toree-pip/toree-0.2.0.tar.gz
+  - https://github.com/vishnu2kmohan/jupyter-spark-history-dcos/archive/0.1.0.zip
   - jupyterlab_github
   - knowledgelab
+  - mlflow
   - opencv-python
+  - pixiedust
+  - pixiedust_node
+  - pixiegateway
   - pyglet
   - PyOpenGL
   - ray[rllib]==0.5.0
   - redis
+  - rise
   - sparkmonitor
   - tensorflow==1.9.0
   - tensorflow-hub

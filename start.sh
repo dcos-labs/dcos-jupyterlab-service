@@ -31,7 +31,6 @@ else
         # Copy over profile files for convenience
         cp /home/beakerx/.bash_profile "${MESOS_SANDBOX}/"
         cp /home/beakerx/.bashrc "${MESOS_SANDBOX}/"
-        cp /home/beakerx/.dircolors "${MESOS_SANDBOX}/"
         cp /home/beakerx/.profile "${MESOS_SANDBOX}/"
     fi
     echo "MESOS_SANDBOX: ${MESOS_SANDBOX}"
@@ -48,18 +47,6 @@ else
     # https://krishnan-r.github.io/sparkmonitor/install.html
     export SPARKMONITOR_UI_HOST="${MESOS_CONTAINER_IP}"
     export SPARKMONITOR_UI_PORT=${PORT_SPARKUI:-"4040"}
-
-    # Set Spark Executor Environment Variables for TensorFlowOnSpark
-    SPARK_CONF_SPARK_EXECUTORENV_CLASSPATH="spark.executorEnv.CLASSPATH=${CLASSPATH}"
-    SPARK_CONF_SPARK_EXECUTORENV_LD_LIBRARY_PATH="spark.executorEnv.LD_LIBRARY_PATH=${LD_LIBRARY_PATH}"
-    export SPARK_CONF_SPARK_EXECUTORENV_CLASSPATH
-    export SPARK_CONF_SPARK_EXECUTORENV_LD_LIBRARY_PATH
-
-    # Forward Kerberos Credentials Cache (File) onto Spark Executors (for TensorFlowOnSpark)?
-    if [ ${ENABLE_SPARK_KERBEROS_TICKET_FORWARDING+x} ]; then
-        SPARK_FILES="${KRB5CCNAME},${SPARK_FILES}"
-        export SPARK_FILES
-    fi
 
     # ${HOME} is set to ${MESOS_SANDBOX} on DC/OS and won't have a default IPython profile
     # We have to manually check since `ipython profile locate default` *creates* the config

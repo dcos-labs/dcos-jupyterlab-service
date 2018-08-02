@@ -1,6 +1,7 @@
 import errno
 import os
 import re
+import requests
 import stat
 import subprocess
 
@@ -87,6 +88,26 @@ if (os.getenv('MESOS_SANDBOX')):
     # Set the current working directory to ${MESOS_SANDBOX}
     os.chdir(mesos_sandbox)
 
+    # Download configuration files
+    JUPYTER_CONF_FILES = ['core-site.xml',
+                          'hdfs-site.xml',
+                          'hive-site.xml',
+                          'yarn-site.xml',
+                          'krb5.conf',
+                          'jaas.conf']
+
+    jupyter_conf_urls = os.getenv('JUPYTER_CONF_URLS')
+    if jupyter_conf_urls:
+        for url in jupyter_conf_urls.split(','):
+            for file in JUPYTER_CONF_FILES:
+                r = requests.get('{}/{}'.format(url, file), stream=True)
+                if r.status_code != requests.status_codes.codes.ok:
+                    continue
+                with open(file, 'wb') as f:
+                    for chunk in r.iter_content(chunk_size=1024):
+                        if chunk:  # filter out keep-alive new chunks
+                            f.write(chunk)
+
     # Copy ${MESOS_SANDBOX}/krb5.conf if it exists to /etc/krb5.conf
     if os.path.exists('krb5.conf'):
         copyfile('krb5.conf', '/etc/krb5.conf')
@@ -122,8 +143,15 @@ if os.getenv('SPARK_REPOSITORIES'):
 if os.getenv('SPARK_PY_FILES'):
     spark_opts.append('--py-files={}'.format(os.getenv('SPARK_PY_FILES')))
 
-if os.getenv('SPARK_FILES'):
-    spark_opts.append('--files={}'.format(os.getenv('SPARK_FILES')))
+# Forward Kerberos Credentials Cache (File) onto Spark Executors (for TensorFlowOnSpark)?
+if os.getenv('ENABLE_SPARK_KERBEROS_TICKET_FORWARDING'):
+    if os.getenv('SPARK_FILES'):
+        spark_opts.append('--files {},{}'.format(
+            os.getenv('KRB5CCNAME'), os.getenv('SPARK_FILES')))
+    else:
+        spark_opts.append('--files {}'.format(os.getenv('KRB5CCNAME')))
+    spark_opts.append('--conf spark.executorEnv.KRB5CCNAME={}/krb5cc_{}'.format(
+        os.getenv('MESOS_SANDBOX'), os.getuid()))
 
 if os.getenv('SPARK_PROPERTIES_FILE'):
     spark_opts.append('--properties-file={}'.format(os.getenv('SPARK_PROPERTIES_FILE')))
@@ -178,6 +206,10 @@ if os.getenv('PORT_SPARKBLOCKMANAGER'):
 
 if os.getenv('PORT_SPARKUI'):
     spark_opts.append('--conf spark.ui.port={}'.format(os.getenv('PORT_SPARKUI')))
+
+# Set Spark Executor Environment Variables for TensorFlowOnSpark
+spark_opts.append('--conf spark.executorEnv.CLASSPATH={}'.format(os.getenv('CLASSPATH')))
+spark_opts.append('--conf spark.executorEnv.LD_LIBRARY_PATH={}'.format(os.getenv('LD_LIBRARY_PATH')))
 
 # Accumulate Spark --conf properties specified in SPARK_CONF_<> env vars
 spark_conf_env_pattern = re.compile(r'^SPARK_CONF')

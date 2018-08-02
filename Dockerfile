@@ -2,7 +2,7 @@
 # https://github.com/docker-library/repo-info/blob/master/repos/debian/tag-details.md#debian94---linux-amd64
 FROM debian@sha256:316ebb92ca66bb8ddc79249fb29872bece4be384cb61b5344fac4e84ca4ed2b2
 
-ARG JUPYTER_DCOS_VERSION="0.32.1-1.1.0"
+ARG JUPYTER_DCOS_VERSION="1.1.0-0.33.4"
 ARG BUILD_DATE
 ARG CODENAME="stretch"
 ARG CONDA_DIR="/opt/conda"
@@ -238,31 +238,32 @@ RUN cd /tmp \
     && curl --retry 3 -fsSL -O "${CONDA_URL}/${CONDA_INSTALLER}" \
     && echo "${CONDA_MD5}  ${CONDA_INSTALLER}" | md5sum -c - \
     && bash "./${CONDA_INSTALLER}" -u -b -p "${CONDA_DIR}" \
-    && ${CONDA_DIR}/bin/conda config --system --prepend channels conda-forge \
     && ${CONDA_DIR}/bin/conda update --json --all -yq \
+    && ${CONDA_DIR}/bin/pip install --upgrade pip \
+    && ${CONDA_DIR}/bin/conda config --system --prepend channels conda-forge \
     && ${CONDA_DIR}/bin/conda config --system --set auto_update_conda false \
     && ${CONDA_DIR}/bin/conda config --system --set show_channel_urls true \
-    && ${CONDA_DIR}/bin/pip install --upgrade pip \
     && ${CONDA_DIR}/bin/conda env update --json -q -f "${CONDA_DIR}/${CONDA_ENV_YML}" \
     && ${CONDA_DIR}/bin/jupyter toree install --sys-prefix --interpreters=Scala,PySpark,SparkR,SQL \
-    && ${CONDA_DIR}/bin/jupyter labextension install @jupyter-widgets/jupyterlab-manager@0.35.0 \
+    && ${CONDA_DIR}/bin/jupyter labextension install @jupyter-widgets/jupyterlab-manager@0.36.0 \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/fasta-extension \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/geojson-extension \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/github \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/hub-extension \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/latex \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/plotly-extension \
+    && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/toc \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/vega2-extension \
     && ${CONDA_DIR}/bin/jupyter labextension install beakerx-jupyterlab@1.0.0 \
     && ${CONDA_DIR}/bin/jupyter labextension install bqplot \
     && ${CONDA_DIR}/bin/jupyter labextension install jupyterlab_bokeh \
-    && ${CONDA_DIR}/bin/jupyter labextension install jupyterlab_voyager \
     && ${CONDA_DIR}/bin/jupyter labextension install jupyterlab-kernelspy \
-    && ${CONDA_DIR}/bin/jupyter labextension install jupyterlab-toc \
     && ${CONDA_DIR}/bin/jupyter labextension install knowledgelab \
     && ${CONDA_DIR}/bin/jupyter labextension install qgrid \
+    && ${CONDA_DIR}/bin/jupyter-nbextension install --py --sys-prefix rise \
     && ${CONDA_DIR}/bin/jupyter nbextension install --py --sys-prefix sparkmonitor \
     && ${CONDA_DIR}/bin/jupyter nbextension enable --py --sys-prefix sparkmonitor \
+    && ${CONDA_DIR}/bin/jupyter serverextension enable --sys-prefix jupyter_spark_history_dcos \
     && ${CONDA_DIR}/bin/jupyter serverextension enable --sys-prefix jupyterlab_github \
     && ${CONDA_DIR}/bin/jupyter serverextension enable --py --sys-prefix sparkmonitor \
     && ipython profile create \
@@ -282,7 +283,6 @@ RUN cd /tmp \
 COPY --chown="1000:100" profile "${HOME}/.profile"
 COPY --chown="1000:100" bash_profile "${HOME}/.bash_profile"
 COPY --chown="1000:100" bashrc "${HOME}/.bashrc"
-COPY --chown="1000:100" dircolors "${HOME}/.dircolors"
 
 USER root
 
@@ -327,10 +327,6 @@ COPY --chown="1000:100" jupyter_notebook_config.py "${HOME}/.jupyter/"
 COPY --chown="1000:100" beakerx.json "${HOME}/.jupyter/"
 
 USER "${NB_UID}"
-
-RUN pip install https://github.com/vishnu2kmohan/jupyter-spark-history-dcos/archive/master.zip \
-    && jupyter serverextension enable --sys-prefix jupyter_spark_history_dcos \
-    && rm -rf "${HOME}/.cache/pip"
 
 # Patch TensorFlowOnSpark to handle all Hadoop 3.x supported Filesystem URIs
 COPY --chown="1000:100" TFNode.py "${CONDA_DIR}/lib/python3.6/site-packages/tensorflowonspark/"
