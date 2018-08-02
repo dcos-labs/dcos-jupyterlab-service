@@ -12,20 +12,6 @@
       "forcePullImage": true
     }
   },
-  "fetch": [
-    {
-      "uri": "http://api.devhdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/core-site.xml",
-      "executable": false,
-      "extract": false,
-      "cache": false
-    },
-    {
-      "uri": "http://api.devhdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/hdfs-site.xml",
-      "executable": false,
-      "extract": false,
-      "cache": false
-    }
-  ],
   "secrets": {
     "serviceCredential": {
       "source": "dev/jupyter/serviceCredential"
@@ -43,6 +29,7 @@
     "HADOOP_CONF_DIR": "/mnt/mesos/sandbox",
     "HOME": "/mnt/mesos/sandbox",
     "JAVA_OPTS": "'-server -XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/mnt/mesos/sandbox'",
+    "JUPYTER_CONF_URLS": "http://api.devhdfs.marathon.l4lb.thisdcos.directory/v1/endpoints",
     "JUPYTER_CONFIG_DIR": "/mnt/mesos/sandbox/.jupyter",
     "JUPYTER_RUNTIME_DIR": "/mnt/mesos/sandbox/.local/share/jupyter/runtime",
     "NGINX_LOG_LEVEL": "warn",
@@ -86,14 +73,11 @@
     "SPARK_CONF_MESOS_ROLE": "spark.mesos.role=dev-jupyter",
     "SPARK_CONF_MESOS_DRIVER_LABELS": "spark.mesos.driver.labels=DCOS_SPACE:/dev/jupyter",
     "SPARK_CONF_MESOS_TASK_LABELS": "spark.mesos.task.labels=DCOS_SPACE:/dev/jupyter",
-    "SPARK_CONF_SPARK_MESOS_DRIVERENV_SPARK_MESOS_KRB5_CONF_BASE64": "spark.mesos.driverEnv.SPARK_MESOS_KRB5_CONF_BASE64=W2xpYmRlZmF1bHRzXQoJZGVmYXVsdF9yZWFsbSA9IEFUSEVOQS5NSVQuRURVCgpbcmVhbG1zXQojIHVzZSAia2RjID0gLi4uIiBpZiByZWFsbSBhZG1pbnMgaGF2ZW4ndCBwdXQgU1JWIHJlY29yZHMgaW50byBETlMKCUFUSEVOQS5NSVQuRURVID0gewoJCWFkbWluX3NlcnZlciA9IGtlcmJlcm9zLm1pdC5lZHUKCX0KCUFORFJFVy5DTVUuRURVID0gewoJCWFkbWluX3NlcnZlciA9IGtkYy0wMS5hbmRyZXcuY211LmVkdQoJfQoKW2RvbWFpbl9yZWFsbV0KCW1pdC5lZHUgPSBBVEhFTkEuTUlULkVEVQoJY3NhaWwubWl0LmVkdSA9IENTQUlMLk1JVC5FRFUKCS51Y3NjLmVkdSA9IENBVFMuVUNTQy5FRFUKCltsb2dnaW5nXQojCWtkYyA9IENPTlNPTEUK",
-    "SPARK_CONF_SPARK_EXECUTORENV_SPARK_MESOS_KRB5_CONF_BASE64": "spark.executorEnv.SPARK_MESOS_KRB5_CONF_BASE64=W2xpYmRlZmF1bHRzXQoJZGVmYXVsdF9yZWFsbSA9IEFUSEVOQS5NSVQuRURVCgpbcmVhbG1zXQojIHVzZSAia2RjID0gLi4uIiBpZiByZWFsbSBhZG1pbnMgaGF2ZW4ndCBwdXQgU1JWIHJlY29yZHMgaW50byBETlMKCUFUSEVOQS5NSVQuRURVID0gewoJCWFkbWluX3NlcnZlciA9IGtlcmJlcm9zLm1pdC5lZHUKCX0KCUFORFJFVy5DTVUuRURVID0gewoJCWFkbWluX3NlcnZlciA9IGtkYy0wMS5hbmRyZXcuY211LmVkdQoJfQoKW2RvbWFpbl9yZWFsbV0KCW1pdC5lZHUgPSBBVEhFTkEuTUlULkVEVQoJY3NhaWwubWl0LmVkdSA9IENTQUlMLk1JVC5FRFUKCS51Y3NjLmVkdSA9IENBVFMuVUNTQy5FRFUKCltsb2dnaW5nXQojCWtkYyA9IENPTlNPTEUK",
     "SPARK_CONF_SPARK_EXECUTORENV_KRB5_CONFIG": "spark.executorEnv.KRB5_CONFIG=/mnt/mesos/sandbox/krb5.conf",
     "SPARK_CONF_SPARK_EXECUTORENV_JAVA_HOME": "spark.executorEnv.JAVA_HOME=/opt/jdk",
     "SPARK_CONF_SPARK_EXECUTORENV_HADOOP_HDFS_HOME": "spark.executorEnv.HADOOP_HDFS_HOME=/opt/hadoop",
-    "SPARK_CONF_SPARK_MESOS_URIS": "spark.mesos.uris=http://api.devhdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/hdfs-site.xml,http://api.devhdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/core-site.xml",
     "SPARK_CONF_SPARK_EXECUTORENV_HADOOP_OPTS": "spark.executorEnv.HADOOP_OPTS='-Djava.library.path=/opt/hadoop/lib/native -Djava.security.krb5.conf=/mnt/mesos/sandbox/krb5.conf'",
-    "SPARK_MESOS_KRB5_CONF_BASE64": "W2xpYmRlZmF1bHRzXQoJZGVmYXVsdF9yZWFsbSA9IEFUSEVOQS5NSVQuRURVCgpbcmVhbG1zXQojIHVzZSAia2RjID0gLi4uIiBpZiByZWFsbSBhZG1pbnMgaGF2ZW4ndCBwdXQgU1JWIHJlY29yZHMgaW50byBETlMKCUFUSEVOQS5NSVQuRURVID0gewoJCWFkbWluX3NlcnZlciA9IGtlcmJlcm9zLm1pdC5lZHUKCX0KCUFORFJFVy5DTVUuRURVID0gewoJCWFkbWluX3NlcnZlciA9IGtkYy0wMS5hbmRyZXcuY211LmVkdQoJfQoKW2RvbWFpbl9yZWFsbV0KCW1pdC5lZHUgPSBBVEhFTkEuTUlULkVEVQoJY3NhaWwubWl0LmVkdSA9IENTQUlMLk1JVC5FRFUKCS51Y3NjLmVkdSA9IENBVFMuVUNTQy5FRFUKCltsb2dnaW5nXQojCWtkYyA9IENPTlNPTEUK",
+    "SPARK_CONF_SPARK_JARS_PACKAGES": "spark.jars.packages=org.apache.spark:spark-streaming-kafka-0-10_2.11:2.2.1,org.apache.kafka:kafka_2.11:0.10.2.1",
     "TENSORBOARD_LOGDIR": "hdfs://hdfs/",
     "TERM": "xterm-256color"
   },
