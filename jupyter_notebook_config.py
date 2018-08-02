@@ -187,10 +187,6 @@ if os.getenv('PORT_SPARKUI'):
 spark_opts.append('--conf spark.executorEnv.CLASSPATH={}'.format(os.getenv('CLASSPATH')))
 spark_opts.append('--conf spark.executorEnv.LD_LIBRARY_PATH={}'.format(os.getenv('LD_LIBRARY_PATH')))
 
-# Accumulate Spark --conf properties specified in SPARK_CONF_<> env vars
-spark_conf_env_pattern = re.compile(r'^SPARK_CONF')
-spark_conf_envs = [env for env in os.environ if spark_conf_env_pattern.match(env)]
-
 # Download configuration files
 JUPYTER_CONF_FILES = ['core-site.xml',
                       'hdfs-site.xml',
@@ -219,6 +215,10 @@ if jupyter_conf_urls:
 # Copy ${MESOS_SANDBOX}/krb5.conf if it exists to /etc/krb5.conf
 if os.path.exists('krb5.conf'):
     copyfile('krb5.conf', '/etc/krb5.conf')
+
+# Accumulate Spark --conf properties specified in SPARK_CONF_<> env vars
+spark_conf_env_pattern = re.compile(r'^SPARK_CONF')
+spark_conf_envs = [env for env in os.environ if spark_conf_env_pattern.match(env)]
 
 for env in spark_conf_envs:
     spark_opts.append('--conf {}'.format(os.getenv(env)))
