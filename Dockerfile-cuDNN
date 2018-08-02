@@ -21,7 +21,7 @@ ARG NVIDIA_VOLUMES_NEEDED="nvidia_driver"
 ARG TENSORFLOW_JNI_SHA256="e657b0966c963cb9a0e5ff42917b589268b361bf463604c34e5fcf85ac87007e"
 ARG TENSORFLOW_URL="https://storage.googleapis.com/tensorflow"
 ARG TENSORFLOW_VARIANT="gpu"
-ARG TENSORFLOW_VERSION="1.8.0"
+ARG TENSORFLOW_VERSION="1.9.0"
 
 LABEL com.nvidia.volumes.needed=${NVIDIA_VOLUMES_NEEDED:-"nvidia_driver"} \
       com.nvidia.cuda.version="${NVIDIA_CUDA_PKG_VERSION}" \
