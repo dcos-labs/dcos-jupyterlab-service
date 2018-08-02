@@ -88,30 +88,6 @@ if (os.getenv('MESOS_SANDBOX')):
     # Set the current working directory to ${MESOS_SANDBOX}
     os.chdir(mesos_sandbox)
 
-    # Download configuration files
-    JUPYTER_CONF_FILES = ['core-site.xml',
-                          'hdfs-site.xml',
-                          'hive-site.xml',
-                          'yarn-site.xml',
-                          'krb5.conf',
-                          'jaas.conf']
-
-    jupyter_conf_urls = os.getenv('JUPYTER_CONF_URLS')
-    if jupyter_conf_urls:
-        for url in jupyter_conf_urls.split(','):
-            for file in JUPYTER_CONF_FILES:
-                r = requests.get('{}/{}'.format(url, file), stream=True)
-                if r.status_code != requests.status_codes.codes.ok:
-                    continue
-                with open(file, 'wb') as f:
-                    for chunk in r.iter_content(chunk_size=1024):
-                        if chunk:  # filter out keep-alive new chunks
-                            f.write(chunk)
-
-    # Copy ${MESOS_SANDBOX}/krb5.conf if it exists to /etc/krb5.conf
-    if os.path.exists('krb5.conf'):
-        copyfile('krb5.conf', '/etc/krb5.conf')
-
 # Build up ${SPARK_OPTS} for Apache Toree and to conveniently reuse with spark-submit:
 # eval spark-submit ${SPARK_OPTS} <...>
 spark_opts = []
@@ -146,10 +122,10 @@ if os.getenv('SPARK_PY_FILES'):
 # Forward Kerberos Credentials Cache (File) onto Spark Executors (for TensorFlowOnSpark)?
 if os.getenv('ENABLE_SPARK_KERBEROS_TICKET_FORWARDING'):
     if os.getenv('SPARK_FILES'):
-        spark_opts.append('--files {},{}'.format(
+        spark_opts.append('--files={},{}'.format(
             os.getenv('KRB5CCNAME'), os.getenv('SPARK_FILES')))
     else:
-        spark_opts.append('--files {}'.format(os.getenv('KRB5CCNAME')))
+        spark_opts.append('--files={}'.format(os.getenv('KRB5CCNAME')))
     spark_opts.append('--conf spark.executorEnv.KRB5CCNAME={}/krb5cc_{}'.format(
         os.getenv('MESOS_SANDBOX'), os.getuid()))
 
@@ -214,6 +190,35 @@ spark_opts.append('--conf spark.executorEnv.LD_LIBRARY_PATH={}'.format(os.getenv
 # Accumulate Spark --conf properties specified in SPARK_CONF_<> env vars
 spark_conf_env_pattern = re.compile(r'^SPARK_CONF')
 spark_conf_envs = [env for env in os.environ if spark_conf_env_pattern.match(env)]
+
+# Download configuration files
+JUPYTER_CONF_FILES = ['core-site.xml',
+                      'hdfs-site.xml',
+                      'hive-site.xml',
+                      'yarn-site.xml',
+                      'krb5.conf',
+                      'jaas.conf']
+
+jupyter_conf_urls = os.getenv('JUPYTER_CONF_URLS')
+if jupyter_conf_urls:
+    spark_mesos_uris = []
+    for url in jupyter_conf_urls.split(','):
+        for file in JUPYTER_CONF_FILES:
+            r = requests.get('{}/{}'.format(url, file), stream=True)
+            if r.status_code != requests.status_codes.codes.ok:
+                continue
+            spark_mesos_uris.append('{}/{}'.format(url, file))
+            with open(file, 'wb') as f:
+                for chunk in r.iter_content(chunk_size=1024):
+                    if chunk:  # filter out keep-alive new chunks
+                        f.write(chunk)
+    if spark_mesos_uris:
+        spark_opts.append('--conf spark.mesos.uris={}'.format(
+            ','.join(spark_mesos_uris)))
+
+# Copy ${MESOS_SANDBOX}/krb5.conf if it exists to /etc/krb5.conf
+if os.path.exists('krb5.conf'):
+    copyfile('krb5.conf', '/etc/krb5.conf')
 
 for env in spark_conf_envs:
     spark_opts.append('--conf {}'.format(os.getenv(env)))
