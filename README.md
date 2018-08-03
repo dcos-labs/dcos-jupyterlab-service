@@ -19,7 +19,7 @@ Tensors and Dynamic neural networks in Python with strong GPU acceleration. PyTo
 Ray is a flexible, high-performance distributed execution framework.
   * Ray Tune: Hyperparameter Optimization Framework
   * Ray RLlib: Scalable Reinforcement Learning
-* [Tensorflow](https://www.tensorflow.org)
+* [TensorFlow](https://www.tensorflow.org)
 TensorFlow™ is an open source software library for high performance numerical computation.
 * [TensorFlowOnSpark](https://github.com/yahoo/TensorFlowOnSpark)
 TensorFlowOnSpark brings TensorFlow programs onto Apache Spark clusters.
