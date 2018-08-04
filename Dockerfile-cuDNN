@@ -1,4 +1,4 @@
-FROM dcoslabs/dcos-jupyter
+FROM dcoslabs/dcos-jupyterlab
 
 ARG CONDA_ENV_YML="jupyter-root-conda-cudnn-env.yml"
 ARG IBM_GPU_ENABLER_JAR_SHA256="4d5919003fdf915a747f51af83d851bc07588706b415f2a8a24c666bb5a7f977"
