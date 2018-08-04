@@ -1,10 +1,5 @@
 server {
-    {{#PORT_NOTEBOOK}}
-    listen {{PORT_NOTEBOOK}};
-    {{/PORT_NOTEBOOK}}
-    {{^PORT_NOTEBOOK}}
     listen 8080;
-    {{/PORT_NOTEBOOK}}
     server_name default_server;
     {{#MARATHON_APP_ID}}
     port_in_redirect off;
