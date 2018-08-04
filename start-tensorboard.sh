@@ -5,7 +5,7 @@ set -o errexit -o pipefail
 TENSORBOARD_LOGDIR=${TENSORBOARD_LOGDIR:-"${MESOS_SANDBOX}"}
 
 if [ ${PORT_TFDBG+x} ]; then
-    TENSORBOARD_ARGS="${TENSORBOARD_ARGS} --debugger_port ${PORT_TFDBG}"
+    TENSORBOARD_ARGS="${TENSORBOARD_ARGS} --debugger_port 6046"
 fi
 
 tensorboard \
