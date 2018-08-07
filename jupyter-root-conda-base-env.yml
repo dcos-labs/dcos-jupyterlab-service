@@ -4,6 +4,7 @@ channels:
 - defaults
 dependencies:
 - altair
+- astunparse
 - atomicwrites
 - attrs
 - awscli
@@ -12,36 +13,46 @@ dependencies:
 - beautifulsoup4
 - bokeh
 - click
+- colour
 - cython
-- dask
+- dask=0.18.2
 - dask-ml
 - dask-tensorflow
 - dask-xgboost
-- distributed
+- distributed=1.22.1
 - flake8
+- flask
 - funcsigs
 - future
+- geojson
+- gitdb2
+- gitpython
+- gunicorn
 - grpcio
 - h5py
-- ipywidgets
 - invoke
+- ipywidgets=7.4.0
+- itsdangerous
 - jupyter_contrib_nbextensions
-- jupyterhub
-- jupyterlab=0.33.4
+- jupyterlab=0.33.7
 - keras
 - libhdfs3
 - lxml
+- lz4
 - matplotlib
 - more-itertools
 - mpi[openmpi]
 - mpi4py
+- mpld3
 - nbconvert
-- nodejs
-- numpy
+- nodejs=9.*
+- numpy=1.15.0
+- numpy-base=1.15.0
 - pandas
 - pep8
 - pillow
 - pluggy
+- protobuf
 - psutil
 - py
 - pyarrow
@@ -54,19 +65,25 @@ dependencies:
 - s3fs
 - scikit-learn
 - scipy
+- selenium
+- setuptools
+- smmap2
+- tabulate
+- widgetsnbextension=3.4.0
 - wrapt
 - xgboost
 - xlrd
 - yapf
 - pip:
+  - configparser
   - flatbuffers
   - gym[atari]
   - horovod
-  - https://dist.apache.org/repos/dist/dev/incubator/toree/0.2.0-incubating-rc5/toree-pip/toree-0.2.0.tar.gz
+  - https://dist.apache.org/repos/dist/dev/incubator/toree/0.2.0-incubating-rc6/toree-pip/toree-0.2.0.tar.gz
   - https://github.com/vishnu2kmohan/jupyter-spark-history-dcos/archive/0.1.0.zip
   - jupyterlab_github
   - knowledgelab
-  - mlflow
+  - mlflow==0.4.1
   - opencv-python
   - pixiedust
   - pixiedust_node
@@ -80,3 +97,4 @@ dependencies:
   - tensorflow==1.9.0
   - tensorflow-hub
   - tensorflowonspark==1.3.2
+  - uuid

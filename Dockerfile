@@ -1,8 +1,8 @@
-# debian:9.4 - linux; amd64
-# https://github.com/docker-library/repo-info/blob/master/repos/debian/tag-details.md#debian94---linux-amd64
-FROM debian@sha256:316ebb92ca66bb8ddc79249fb29872bece4be384cb61b5344fac4e84ca4ed2b2
+# debian:9.5 - linux; amd64
+# https://github.com/docker-library/repo-info/blob/master/repos/debian/tag-details.md#debian95---linux-amd64
+FROM debian@sha256:f1f61086ea01a72b30c7287adee8c929e569853de03b7c462a8ac75e0d0224c4
 
-ARG JUPYTER_DCOS_VERSION="1.1.0-0.33.4"
+ARG JUPYTER_DCOS_VERSION="1.2.0-0.33.7"
 ARG BUILD_DATE
 ARG CODENAME="stretch"
 ARG CONDA_DIR="/opt/conda"
@@ -240,12 +240,15 @@ RUN cd /tmp \
     && bash "./${CONDA_INSTALLER}" -u -b -p "${CONDA_DIR}" \
     && ${CONDA_DIR}/bin/conda update --json --all -yq \
     && ${CONDA_DIR}/bin/pip install --upgrade pip \
+    && ${CONDA_DIR}/bin/conda config --env --add pinned_packages defaults::numpy-base \
+    && ${CONDA_DIR}/bin/conda config --env --add pinned_packages defaults::numpy \
+    && ${CONDA_DIR}/bin/conda config --env --add pinned_packages defaults::scipy \
     && ${CONDA_DIR}/bin/conda config --system --prepend channels conda-forge \
     && ${CONDA_DIR}/bin/conda config --system --set auto_update_conda false \
     && ${CONDA_DIR}/bin/conda config --system --set show_channel_urls true \
     && ${CONDA_DIR}/bin/conda env update --json -q -f "${CONDA_DIR}/${CONDA_ENV_YML}" \
     && ${CONDA_DIR}/bin/jupyter toree install --sys-prefix --interpreters=Scala,PySpark,SparkR,SQL \
-    && ${CONDA_DIR}/bin/jupyter labextension install @jupyter-widgets/jupyterlab-manager@0.36.0 \
+    && ${CONDA_DIR}/bin/jupyter labextension install @jupyter-widgets/jupyterlab-manager@0.36.1 \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/fasta-extension \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/geojson-extension \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/github \
