@@ -196,7 +196,7 @@ JUPYTER_CONF_FILES = ['core-site.xml',
                       'jaas.conf']
 
 jupyter_conf_urls = os.getenv('JUPYTER_CONF_URLS')
-if jupyter_conf_urls:
+if (jupyter_conf_urls) and (jupyter_conf_urls != ''):
     spark_mesos_uris = []
     for url in jupyter_conf_urls.split(','):
         for file in JUPYTER_CONF_FILES:
