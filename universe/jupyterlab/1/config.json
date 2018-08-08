@@ -189,10 +189,15 @@
           "type": "string",
           "default": "\"-server -XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/mnt/mesos/sandbox\""
         },
+        "start_spark_history_server": {
+          "description": "Start Spark History Server.",
+          "type": "boolean",
+          "default": false
+        },
         "spark_history_fs_logdirectory": {
           "description": "Spark History FS Log Directory.",
           "type": "string",
-          "default": "hdfs://hdfs/history"
+          "default": "hdfs://hdfs/"
         },
         "spark_conf_spark_scheduler": {
           "description": "Spark Configuration Spark Scheduler Minimal Registered Resources Ratio.",
@@ -430,11 +435,6 @@
         },
         "start_ray_head_node": {
           "description": "Start Ray Head Node.",
-          "type": "boolean",
-          "default": false
-        },
-        "start_spark_history_server": {
-          "description": "Start Spark History Server.",
           "type": "boolean",
           "default": false
         },
