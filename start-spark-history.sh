@@ -2,6 +2,12 @@
 
 set -o errexit -o pipefail
 
+# Block until jupyter configuration is complete, as otherwise dependencies such as HDFS might be available yet.
+while [ ! -f "${MESOS_SANDBOX}"/JUPYTER_NOTEBOOK_CONFIG_COMPLETE ]
+do
+  sleep 2
+done
+
 SPARK_HISTORY_FS_LOGDIRECTORY=${SPARK_HISTORY_FS_LOGDIRECTORY:-"${MESOS_SANDBOX}"} \
 SPARK_LOG_DIR=${SPARK_LOG_DIR:-"${MESOS_SANDBOX}"} \
 PORT_SPARKHISTORY=${PORT_SPARKHISTORY:-"18080"} \
