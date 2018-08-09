@@ -5,7 +5,7 @@ def gitCommit = readFile('GIT_COMMIT').trim()
     return gitCommit
 }
 
-node {
+node('mesos-ubuntu') {
     // Checkout source code from Git
     stage 'Checkout'
     checkout scm
