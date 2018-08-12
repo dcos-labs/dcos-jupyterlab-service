@@ -2,7 +2,6 @@
 # https://github.com/docker-library/repo-info/blob/master/repos/debian/tag-details.md#debian95---linux-amd64
 FROM debian@sha256:f1f61086ea01a72b30c7287adee8c929e569853de03b7c462a8ac75e0d0224c4
 
-ARG JUPYTER_DCOS_VERSION="1.2.0-0.33.7"
 ARG BUILD_DATE
 ARG CODENAME="stretch"
 ARG CONDA_DIR="/opt/conda"
@@ -14,6 +13,7 @@ ARG DCOS_CLI_URL="https://downloads.dcos.io/binaries/cli/linux/x86-64"
 ARG DCOS_CLI_VERSION="1.11"
 ARG DCOS_COMMONS_URL="https://downloads.mesosphere.com/dcos-commons"
 ARG DCOS_COMMONS_VERSION="0.51.0"
+ARG DCOS_JUPYTERLAB_VERSION="1.2.0-0.33.8"
 ARG DEBCONF_NONINTERACTIVE_SEEN="true"
 ARG DEBIAN_FRONTEND="noninteractive"
 ARG DEBIAN_REPO="http://cdn-fastly.deb.debian.org"
@@ -73,8 +73,8 @@ LABEL maintainer="Vishnu Mohan <vishnu@mesosphere.com>" \
       org.label-schema.description="Project Jupyter exists to develop open-source software, open-standards, and services for interactive computing across dozens of programming languages." \
       org.label-schema.url="http://jupyter.org" \
       org.label-schema.vcs-ref="${VCS_REF}" \
-      org.label-schema.vcs-url="https://github.com/dcos-labs/dcos-jupyter-service" \
-      org.label-schema.version="${JUPYTER_DCOS_VERSION}" \
+      org.label-schema.vcs-url="https://github.com/dcos-labs/dcos-jupyterlab-service" \
+      org.label-schema.version="${DCOS_JUPYTERLAB_VERSION}" \
       org.label-schema.schema-version="1.0"
 
 ENV BOOTSTRAP="${MESOSPHERE_PREFIX}/bin/bootstrap" \
@@ -240,15 +240,19 @@ RUN cd /tmp \
     && bash "./${CONDA_INSTALLER}" -u -b -p "${CONDA_DIR}" \
     && ${CONDA_DIR}/bin/conda update --json --all -yq \
     && ${CONDA_DIR}/bin/pip install --upgrade pip \
+    && ${CONDA_DIR}/bin/conda config --env --add pinned_packages defaults::blas \
+    && ${CONDA_DIR}/bin/conda config --env --add pinned_packages defaults::gsl \
     && ${CONDA_DIR}/bin/conda config --env --add pinned_packages defaults::numpy-base \
     && ${CONDA_DIR}/bin/conda config --env --add pinned_packages defaults::numpy \
+    && ${CONDA_DIR}/bin/conda config --env --add pinned_packages defaults::openblas \
+    && ${CONDA_DIR}/bin/conda config --env --add pinned_packages defaults::scikit-learn \
     && ${CONDA_DIR}/bin/conda config --env --add pinned_packages defaults::scipy \
     && ${CONDA_DIR}/bin/conda config --system --prepend channels conda-forge \
     && ${CONDA_DIR}/bin/conda config --system --set auto_update_conda false \
     && ${CONDA_DIR}/bin/conda config --system --set show_channel_urls true \
     && ${CONDA_DIR}/bin/conda env update --json -q -f "${CONDA_DIR}/${CONDA_ENV_YML}" \
     && ${CONDA_DIR}/bin/jupyter toree install --sys-prefix --interpreters=Scala,PySpark,SparkR,SQL \
-    && ${CONDA_DIR}/bin/jupyter labextension install @jupyter-widgets/jupyterlab-manager@0.36.1 \
+    && ${CONDA_DIR}/bin/jupyter labextension install @jupyter-widgets/jupyterlab-manager@0.36.2 \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/fasta-extension \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/geojson-extension \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/github \
@@ -262,7 +266,6 @@ RUN cd /tmp \
     && ${CONDA_DIR}/bin/jupyter labextension install jupyterlab_bokeh \
     && ${CONDA_DIR}/bin/jupyter labextension install jupyterlab-kernelspy \
     && ${CONDA_DIR}/bin/jupyter labextension install knowledgelab \
-    && ${CONDA_DIR}/bin/jupyter labextension install qgrid \
     && ${CONDA_DIR}/bin/jupyter-nbextension install --py --sys-prefix rise \
     && ${CONDA_DIR}/bin/jupyter nbextension install --py --sys-prefix sparkmonitor \
     && ${CONDA_DIR}/bin/jupyter nbextension enable --py --sys-prefix sparkmonitor \
