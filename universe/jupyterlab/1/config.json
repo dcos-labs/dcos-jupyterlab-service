@@ -39,7 +39,7 @@
         },
         "gpu_support": {
           "type": "object",
-          "description": "GPU support and useful packages for Data Scientists.\n\nGPU specific packages:\nCUDA 9.0.176-1, CUDNN 7.1.4.18-1+cuda9.0, NCCL 2.2.13-1+cuda9.0, TensorFlow-GPU 1.9.0",
+          "description": "GPU support and useful packages for Data Scientists.\n\nGPU specific packages:\nCUDA 9.0.176-1, cuDNN 7.2.1.38-1+cuda9.0, NCCL 2.2.13-1+cuda9.0, TensorFlow-GPU 1.9.0",
           "properties": {
             "enabled": {
               "description": "Enable GPU support.\nNote: This requires at least 15GB disk space available with recent NVIDIA drivers installed.",
