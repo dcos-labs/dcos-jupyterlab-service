@@ -259,6 +259,16 @@
           "type": "string",
           "default": "spark.mesos.containerizer=mesos"
         },
+        "spark_conf_mesos_principal": {
+          "description": "Spark Mesos Principal.",
+          "type": "string",
+          "default": ""
+        },
+        "spark_conf_mesos_role": {
+          "description": "Spark Mesos Role.",
+          "type": "string",
+          "default": ""
+        },
         "spark_conf_mesos_driver_labels": {
           "description": "Spark Mesos Driver Labels.",
           "type": "string",
