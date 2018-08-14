@@ -5,11 +5,11 @@ ARG IBM_GPU_ENABLER_JAR_SHA256="4d5919003fdf915a747f51af83d851bc07588706b415f2a8
 ARG IBM_GPU_ENABLER_URL="https://s3.amazonaws.com/vishnu-mohan/ibm/gpu-enabler"
 ARG IBM_GPU_ENABLER_VERSION="2.0.0"
 ARG NVIDIA_CUDA_MAJOR_VERSION="9-0"
-ARG NVIDIA_CUDA_PKG_VERSION="9.0.176-1"
+ARG NVIDIA_CUDA_PKG_VERSION="9.0.176"
 ARG NVIDIA_CUDA_VERSION="9.0"
 ARG NVIDIA_CUDA_TOOLS_GPG_KEY="7fa2af80"
 ARG NVIDIA_CUDNN_MAJOR_VERSION="7"
-ARG NVIDIA_CUDNN_PKG_VERSION="7.1.4.18-1+cuda9.0"
+ARG NVIDIA_CUDNN_PKG_VERSION="7.2.1.38-1+cuda9.0"
 ARG NVIDIA_DISTRO="ubuntu1604"
 ARG NVIDIA_DRIVER_CAPABILITIES="compute,utility"
 ARG NVIDIA_NCCL_MAJOR_VERSION="2"
@@ -36,11 +36,13 @@ RUN unset LD_LIBRARY_PATH \
     && echo "deb ${NVIDIA_URL}/machine-learning/repos/${NVIDIA_DISTRO}/x86_64 /" > /etc/apt/sources.list.d/nvidia-ml.list \
     && apt-get update -yq --fix-missing \
     && apt-get install -yq --no-install-recommends \
-       "cuda-cudart-${NVIDIA_CUDA_MAJOR_VERSION}=${NVIDIA_CUDA_PKG_VERSION}" \
-       "cuda-libraries-${NVIDIA_CUDA_MAJOR_VERSION}=${NVIDIA_CUDA_PKG_VERSION}" \
-       "cuda-libraries-dev-${NVIDIA_CUDA_MAJOR_VERSION}=${NVIDIA_CUDA_PKG_VERSION}" \
+       "cuda-cudart-${NVIDIA_CUDA_MAJOR_VERSION}=${NVIDIA_CUDA_PKG_VERSION}-1" \
+       "cuda-libraries-${NVIDIA_CUDA_MAJOR_VERSION}=${NVIDIA_CUDA_PKG_VERSION}-1" \
+       "cuda-libraries-dev-${NVIDIA_CUDA_MAJOR_VERSION}=${NVIDIA_CUDA_PKG_VERSION}-1" \
        "libnccl${NVIDIA_NCCL_MAJOR_VERSION}=${NVIDIA_NCCL_PKG_VERSION}" \
        "libcudnn${NVIDIA_CUDNN_MAJOR_VERSION}=${NVIDIA_CUDNN_PKG_VERSION}" \
+    && apt-mark hold libnccl2 \
+    && apt-mark hold libcudnn7 \
     && cd /usr/local \
     && ln -s "cuda-${NVIDIA_CUDA_VERSION}" cuda \
     && cd cuda-"${NVIDIA_CUDA_VERSION}/targets/x86_64-linux/lib" \
