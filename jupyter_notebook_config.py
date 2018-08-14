@@ -274,3 +274,8 @@ if os.getenv('USE_HTTPS'):
         # Restrict access to PEM_FILE
         os.chmod(PEM_FILE, stat.S_IRUSR | stat.S_IWUSR)
     c.NotebookApp.certfile = PEM_FILE
+
+# Create empty file to signal configuration is complete
+SIGNAL_FILE = os.path.join(os.getenv('MESOS_SANDBOX'), 'JUPYTER_NOTEBOOK_CONFIG_COMPLETE')
+with open(SIGNAL_FILE, "w") as f:
+    f.write("")
