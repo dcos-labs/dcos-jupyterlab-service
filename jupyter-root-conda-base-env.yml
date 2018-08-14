@@ -34,7 +34,7 @@ dependencies:
 - ipywidgets=7.4.0
 - itsdangerous
 - jupyter_contrib_nbextensions
-- jupyterlab=0.33.7
+- jupyterlab=0.33.8
 - keras
 - libhdfs3
 - lxml
@@ -52,7 +52,6 @@ dependencies:
 - pep8
 - pillow
 - pluggy
-- protobuf
 - psutil
 - py
 - pyarrow
@@ -63,10 +62,10 @@ dependencies:
 - r-base
 - r-irkernel
 - s3fs
+- setuptools=40.0.0
 - scikit-learn
 - scipy
 - selenium
-- setuptools
 - smmap2
 - tabulate
 - widgetsnbextension=3.4.0
@@ -83,11 +82,12 @@ dependencies:
   - https://github.com/vishnu2kmohan/jupyter-spark-history-dcos/archive/0.1.0.zip
   - jupyterlab_github
   - knowledgelab
-  - mlflow==0.4.1
+  - mlflow==0.4.2
   - opencv-python
   - pixiedust
   - pixiedust_node
   - pixiegateway
+  - protobuf==3.6.0
   - pyglet
   - PyOpenGL
   - ray[rllib]==0.5.0
