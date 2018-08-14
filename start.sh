@@ -70,7 +70,7 @@ else
 
     # Start Spark History Server?
     if [ ${START_SPARK_HISTORY+x} ]; then
-    	/usr/local/bin/start-spark-history.sh 2>&1 &
+        /usr/local/bin/start-spark-history.sh 2>&1 &
     fi
 
     # Start Tensorboard?
