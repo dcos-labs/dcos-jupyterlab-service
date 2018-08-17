@@ -74,17 +74,8 @@ else
     fi
 
     # Start Tensorboard?
-    # TODO(joerg84): USE SCRIPT HERE
     if [ ${START_TENSORBOARD+x} ]; then
-        TENSORBOARD_LOGDIR=${TENSORBOARD_LOGDIR:-"${MESOS_SANDBOX}"}
-        if [ ${PORT_TFDBG+x} ]; then
-            TENSORBOARD_ARGS="${TENSORBOARD_ARGS} --debugger_port ${PORT_TFDBG}"
-        fi
-        tensorboard \
-            --host localhost \
-            --port 6006 \
-            --logdir "${TENSORBOARD_LOGDIR}" \
-            "${TENSORBOARD_ARGS}" 2>&1 &
+        /usr/local/bin/start-tensorboard.sh 2>&1 &
     fi
 
     # Start Dask Distributed Scheduler?
