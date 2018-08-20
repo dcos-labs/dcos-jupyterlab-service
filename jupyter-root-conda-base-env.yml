@@ -3,6 +3,7 @@ channels:
 - conda-forge
 - defaults
 dependencies:
+- alembic
 - altair
 - astunparse
 - atomicwrites
@@ -12,6 +13,7 @@ dependencies:
 - beakerx=1.0.0
 - beautifulsoup4
 - bokeh
+- cachetools
 - click
 - colour
 - cython
@@ -24,17 +26,24 @@ dependencies:
 - flask
 - funcsigs
 - future
+- gcsfs
 - geojson
 - gitdb2
 - gitpython
-- gunicorn
+- google-auth
+- google-auth-oauthlib
 - grpcio
+- gunicorn
 - h5py
 - invoke
 - ipywidgets=7.4.0
 - itsdangerous
+- jupyter
+- jupyterlab=0.34.0
+- jupyter_console
 - jupyter_contrib_nbextensions
-- jupyterlab=0.33.8
+- jupyter_enterprise_gateway
+- jupyter_kernel_gateway
 - keras
 - libhdfs3
 - lxml
@@ -46,28 +55,38 @@ dependencies:
 - mpld3
 - nbconvert
 - nodejs=9.*
+- nose
 - numpy=1.15.0
 - numpy-base=1.15.0
+- oauthlib
 - pandas
 - pep8
 - pillow
 - pluggy
 - psutil
+- psycopg2
 - py
 - pyarrow
+- pydotplus
 - pyfolio
 - pytest
 - python=3.6.*
+- python-editor
 - python-snappy
+- qtconsole
 - r-base
 - r-irkernel
+- requests-oauthlib
 - s3fs
-- setuptools=40.0.0
 - scikit-learn
 - scipy
 - selenium
+- simplejson
 - smmap2
+- sqlalchemy
 - tabulate
+- tox
+- virtualenv
 - widgetsnbextension=3.4.0
 - wrapt
 - xgboost
@@ -75,15 +94,18 @@ dependencies:
 - yapf
 - pip:
   - configparser
+  - databricks-cli
   - flatbuffers
   - gym[atari]
   - horovod
-  - https://dist.apache.org/repos/dist/dev/incubator/toree/0.2.0-incubating-rc6/toree-pip/toree-0.2.0.tar.gz
+  - https://dist.apache.org/repos/dist/release/incubator/toree/0.2.0-incubating/toree-pip/toree-0.2.0.tar.gz
   - https://github.com/vishnu2kmohan/jupyter-spark-history-dcos/archive/0.1.0.zip
   - jupyterlab_github
   - knowledgelab
-  - mlflow==0.4.2
+  - mlflow==0.5.0
+  - nb2kg
   - opencv-python
+  - pgcontents
   - pixiedust
   - pixiedust_node
   - pixiegateway
@@ -93,6 +115,8 @@ dependencies:
   - ray[rllib]==0.5.0
   - redis
   - rise
+  - s3contents
+  - setuptools==40.0.0
   - sparkmonitor
   - tensorflow==1.9.0
   - tensorflow-hub

@@ -1,12 +1,12 @@
 name: root
 channels:
 - conda-forge
-- pytorch
 - defaults
 dependencies:
 - cuda90
 - numba
-- pytorch
-- torchvision
+- pytorch::pytorch
+- pytorch::torchvision
 - pip:
+  - setuptools==40.0.0
   - tensorflow-gpu==1.9.0
