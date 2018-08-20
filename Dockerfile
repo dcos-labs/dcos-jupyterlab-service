@@ -12,8 +12,8 @@ ARG CONDA_URL="https://repo.continuum.io/miniconda"
 ARG DCOS_CLI_URL="https://downloads.dcos.io/binaries/cli/linux/x86-64"
 ARG DCOS_CLI_VERSION="1.11"
 ARG DCOS_COMMONS_URL="https://downloads.mesosphere.com/dcos-commons"
-ARG DCOS_COMMONS_VERSION="0.51.0"
-ARG DCOS_JUPYTERLAB_VERSION="1.2.0-0.33.8"
+ARG DCOS_COMMONS_VERSION="0.53.0"
+ARG DCOS_JUPYTERLAB_VERSION="1.2.0-0.34.0"
 ARG DEBCONF_NONINTERACTIVE_SEEN="true"
 ARG DEBIAN_FRONTEND="noninteractive"
 ARG DEBIAN_REPO="http://cdn-fastly.deb.debian.org"
@@ -241,6 +241,7 @@ RUN cd /tmp \
     && ${CONDA_DIR}/bin/conda update --json --all -yq \
     && ${CONDA_DIR}/bin/pip install --upgrade pip \
     && ${CONDA_DIR}/bin/conda config --env --add pinned_packages defaults::blas \
+    && ${CONDA_DIR}/bin/conda config --env --add pinned_packages defaults::conda \
     && ${CONDA_DIR}/bin/conda config --env --add pinned_packages defaults::gsl \
     && ${CONDA_DIR}/bin/conda config --env --add pinned_packages defaults::numpy-base \
     && ${CONDA_DIR}/bin/conda config --env --add pinned_packages defaults::numpy \
@@ -252,7 +253,7 @@ RUN cd /tmp \
     && ${CONDA_DIR}/bin/conda config --system --set show_channel_urls true \
     && ${CONDA_DIR}/bin/conda env update --json -q -f "${CONDA_DIR}/${CONDA_ENV_YML}" \
     && ${CONDA_DIR}/bin/jupyter toree install --sys-prefix --interpreters=Scala,PySpark,SparkR,SQL \
-    && ${CONDA_DIR}/bin/jupyter labextension install @jupyter-widgets/jupyterlab-manager@0.36.2 \
+    && ${CONDA_DIR}/bin/jupyter labextension install @jupyter-widgets/jupyterlab-manager@0.37.2 \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/fasta-extension \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/geojson-extension \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/github \
@@ -264,7 +265,6 @@ RUN cd /tmp \
     && ${CONDA_DIR}/bin/jupyter labextension install beakerx-jupyterlab@1.0.0 \
     && ${CONDA_DIR}/bin/jupyter labextension install bqplot \
     && ${CONDA_DIR}/bin/jupyter labextension install jupyterlab_bokeh \
-    && ${CONDA_DIR}/bin/jupyter labextension install jupyterlab-kernelspy \
     && ${CONDA_DIR}/bin/jupyter labextension install knowledgelab \
     && ${CONDA_DIR}/bin/jupyter-nbextension install --py --sys-prefix rise \
     && ${CONDA_DIR}/bin/jupyter nbextension install --py --sys-prefix sparkmonitor \
@@ -275,7 +275,7 @@ RUN cd /tmp \
     && ipython profile create \
     && echo "c.InteractiveShellApp.extensions.append('sparkmonitor.kernelextension')" \
        >> $(ipython profile locate default)/ipython_kernel_config.py \
-    && ${CONDA_DIR}/bin/conda remove --force --json -yq openjdk pyqt qt \
+    && ${CONDA_DIR}/bin/conda remove --force --json -yq openjdk pyqt qt qtconsole \
     && ${CONDA_DIR}/bin/npm cache clean --force \
     && rm -rf "${CONDA_DIR}/share/jupyter/lab/staging"  "${HOME}/.npm/_cacache" \
     && rm -rf "${HOME}/.cache/pip" "${HOME}/.cache/yarn" "${HOME}/.node-gyp" \
