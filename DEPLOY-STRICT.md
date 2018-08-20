@@ -159,6 +159,7 @@ hdfs dfs -ls -R mnist/tfr
 #### Remove existing CSV model folder in S3 bucket (if present)
 ```bash
 aws s3 rm --recursive s3://vishnu-mohan/tensorflow/mnist/mnist_csv_model
+aws s3 rm --recursive s3://vishnu-mohan/tensorflow/mnist/mnist_export
 ```
 
 #### Train
@@ -174,7 +175,8 @@ eval \
     --labels s3a://vishnu-mohan/tensorflow/mnist/csv/train/labels \
     --format csv \
     --mode train \
-    --model s3://vishnu-mohan/tensorflow/mnist/mnist_csv_model
+    --model s3://vishnu-mohan/tensorflow/mnist/mnist_csv_model \
+    --export_dir s3://vishnu-mohan/tensorflow/mnist/mnist_export
 ```
 
 #### List Model files trained from CSV on S3
@@ -187,6 +189,7 @@ aws s3 ls --recursive s3://vishnu-mohan/tensorflow/mnist/mnist_csv_model
 #### Remove existing TFR model folder in S3 bucket (if present)
 ```bash
 aws s3 rm --recursive s3://vishnu-mohan/tensorflow/mnist/mnist_tfr_model
+aws s3 rm --recursive s3://vishnu-mohan/tensorflow/mnist/mnist_export
 ```
 
 #### Train MNIST
@@ -201,12 +204,14 @@ eval \
   --images s3a://vishnu-mohan/tensorflow/mnist/tfr/train \
   --format tfr \
   --mode train \
-  --model s3://vishnu-mohan/tensorflow/mnist/mnist_tfr_model
+  --model s3://vishnu-mohan/tensorflow/mnist/mnist_tfr_model \
+  --export_dir s3://vishnu-mohan/tensorflow/mnist/mnist_export
 ```
 
 #### List Model files trained from TFRecords on S3
 ```bash
 aws s3 ls --recursive s3://vishnu-mohan/tensorflow/mnist/mnist_tfr_model
+aws s3 ls --recursive s3://vishnu-mohan/tensorflow/mnist/mnist_export
 ```
 
 ### Train MNIST from CSV on HDFS and store the model on HDFS (under hdfs://user/${USER}/mnist/mnist_csv_model)
@@ -214,6 +219,7 @@ aws s3 ls --recursive s3://vishnu-mohan/tensorflow/mnist/mnist_tfr_model
 #### Remove existing CSV model folder on HDFS (if present)
 ```bash
 hdfs dfs -rm -R -skipTrash mnist/mnist_csv_model
+hdfs dfs -rm -R -skipTrash mnist/mnist_export
 ```
 
 #### Train MNIST
@@ -229,12 +235,14 @@ eval \
   --labels mnist/csv/train/labels \
   --format csv \
   --mode train \
-  --model mnist/mnist_csv_model
+  --model mnist/mnist_csv_model \
+  --export_dir mnist/mnist_export
 ```
 
 #### List Model files trained from CSV on HDFS
 ```bash
 hdfs dfs -ls -R mnist/mnist_csv_model
+hdfs dfs -ls -R mnist/mnist_export
 ```
 
 ### Train MNIST from TFRecords on HDFS and store the model on HDFS (under hdfs://user/${USER}/mnist/mnist_tfr_model)
@@ -242,6 +250,7 @@ hdfs dfs -ls -R mnist/mnist_csv_model
 #### Remove existing TFR model folder on HDFS (if present)
 ```bash
 hdfs dfs -rm -R -skipTrash mnist/mnist_tfr_model
+hdfs dfs -rm -R -skipTrash mnist/mnist_export
 ```
 
 #### Train MNIST TFRecord for HDFS (under hdfs://user/${USER}/mnist/tfr)
@@ -256,10 +265,12 @@ eval \
   --images mnist/tfr/train \
   --format tfr \
   --mode train \
-  --model mnist/mnist_tfr_model
+  --model mnist/mnist_tfr_model \
+  --export_dir mnist/mnist_export
 ```
 
 #### List model files trained from TFRecords on HDFS
 ```bash
 hdfs dfs -ls -R mnist/mnist_tfr_model
+hdfs dfs -ls -R mnist/mnist_export
 ```
