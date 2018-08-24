@@ -6,7 +6,7 @@ set -o errexit -o pipefail
 while [ ! -f "${MESOS_SANDBOX}"/JUPYTER_NOTEBOOK_CONFIG_COMPLETE ]
 do
   sleep 2
-  echo "Waiting for Jupyter config to complete."
+  echo "Spark History: Waiting for Jupyter Notebook configuration to complete..."
 done
 
 SPARK_HISTORY_FS_LOGDIRECTORY=${SPARK_HISTORY_FS_LOGDIRECTORY:-"${MESOS_SANDBOX}"} \
