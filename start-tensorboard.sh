@@ -6,7 +6,7 @@ set -o errexit -o pipefail
 while [ ! -f "${MESOS_SANDBOX}"/JUPYTER_NOTEBOOK_CONFIG_COMPLETE ]
 do
   sleep 2
-  echo "Waiting for Jupyter config to complete."
+  echo "TensorBoard: Waiting for Jupyter Notebook configuration to complete..."
 done
 
 TENSORBOARD_LOGDIR=${TENSORBOARD_LOGDIR:-"${MESOS_SANDBOX}"}
