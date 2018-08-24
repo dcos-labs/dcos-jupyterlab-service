@@ -15,6 +15,7 @@ dependencies:
 - bokeh
 - cachetools
 - click
+- cmake
 - colour
 - cython
 - dask=0.18.2
@@ -80,6 +81,7 @@ dependencies:
 - s3fs
 - scikit-learn
 - scipy
+- sdl2
 - selenium
 - simplejson
 - smmap2
