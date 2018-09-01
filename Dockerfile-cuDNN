@@ -67,7 +67,6 @@ COPY --chown="1000:100" "${CONDA_ENV_YML}" "${CONDA_DIR}/"
 USER $NB_UID
 
 RUN ${CONDA_DIR}/bin/conda env update --json -q -f "${CONDA_DIR}/${CONDA_ENV_YML}" \
-    && ${CONDA_DIR}/bin/conda remove --force --json -yq cudatoolkit \
     && ${CONDA_DIR}/bin/conda clean --json -tipsy \
     && ${CONDA_DIR}/bin/npm cache clean --force \
     && rm -rf "${CONDA_DIR}/share/jupyter/lab/staging" \
