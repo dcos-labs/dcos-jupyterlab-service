@@ -253,7 +253,7 @@ RUN cd /tmp \
     && ${CONDA_DIR}/bin/conda config --system --set show_channel_urls true \
     && ${CONDA_DIR}/bin/conda env update --json -q -f "${CONDA_DIR}/${CONDA_ENV_YML}" \
     && ${CONDA_DIR}/bin/jupyter toree install --sys-prefix --interpreters=Scala,PySpark,SparkR,SQL \
-    && ${CONDA_DIR}/bin/jupyter labextension install @jupyter-widgets/jupyterlab-manager@0.37.2 \
+    && ${CONDA_DIR}/bin/jupyter labextension install @jupyter-widgets/jupyterlab-manager@0.36.2 \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/fasta-extension \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/geojson-extension \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/github \
@@ -262,7 +262,7 @@ RUN cd /tmp \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/plotly-extension \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/toc \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/vega2-extension \
-    && ${CONDA_DIR}/bin/jupyter labextension install beakerx-jupyterlab@1.0.0 \
+    && ${CONDA_DIR}/bin/jupyter labextension install beakerx-jupyterlab@1.1.0 \
     && ${CONDA_DIR}/bin/jupyter labextension install bqplot \
     && ${CONDA_DIR}/bin/jupyter labextension install jupyterlab_bokeh \
     && ${CONDA_DIR}/bin/jupyter labextension install knowledgelab \
