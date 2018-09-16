@@ -4,9 +4,10 @@ channels:
 - defaults
 dependencies:
 - cuda90
-- numba
 - pytorch::pytorch
 - pytorch::torchvision
 - pip:
-  - setuptools==40.2.0
-  - tensorflow-gpu==1.9.0
+  - pygdf
+  - quilt[img,pytorch,torchvision]
+  - setuptools==40.4.3
+  - tensorflow-gpu==1.11.0
