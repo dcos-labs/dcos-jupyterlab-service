@@ -11,7 +11,8 @@
     "container": {
       "docker": {
         "jupyter-docker": "dcoslabs/dcos-jupyterlab:1.2.0-0.33.7",
-        "jupyter-docker-gpu": "dcoslabs/dcos-jupyterlab:1.2.0-0.33.7-gpu"
+        "jupyter-docker-gpu": "dcoslabs/dcos-jupyterlab:1.2.0-0.33.7-gpu",
+        "spark-executor": "dcoslabs/dcos-spark:1.11.4-2.2.1"
       }
     }
   }
