@@ -242,7 +242,7 @@
         "spark_conf_jars_packages": {
           "description": "Spark Configuration for Spark Jars Packages.",
           "type": "string",
-          "default": "spark.jars.packages=org.apache.spark:spark-streaming-kafka-0-10_2.11:2.2.1,org.apache.kafka:kafka_2.11:0.10.2.1"
+          "default": "spark.jars.packages="
         },
         "spark_conf_mesos_executor_docker_image": {
           "description": "Docker Image for Spark Executor.",
