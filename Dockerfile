@@ -1,6 +1,6 @@
 # debian:9.5 - linux; amd64
 # https://github.com/docker-library/repo-info/blob/master/repos/debian/tag-details.md#debian95---linux-amd64
-FROM debian@sha256:f1f61086ea01a72b30c7287adee8c929e569853de03b7c462a8ac75e0d0224c4
+FROM debian@sha256:00c5748eb465a0139063c544de181177da504dfa4e545ac3c0ecd13b7363e70f
 
 ARG BUILD_DATE
 ARG CODENAME="stretch"
@@ -13,7 +13,7 @@ ARG DCOS_CLI_URL="https://downloads.dcos.io/binaries/cli/linux/x86-64"
 ARG DCOS_CLI_VERSION="1.11"
 ARG DCOS_COMMONS_URL="https://downloads.mesosphere.com/dcos-commons"
 ARG DCOS_COMMONS_VERSION="0.53.0"
-ARG DCOS_JUPYTERLAB_VERSION="1.2.0-0.34.0"
+ARG DCOS_JUPYTERLAB_VERSION="1.3.0-0.33.12"
 ARG DEBCONF_NONINTERACTIVE_SEEN="true"
 ARG DEBIAN_FRONTEND="noninteractive"
 ARG DEBIAN_REPO="http://cdn-fastly.deb.debian.org"
@@ -49,15 +49,15 @@ ARG SPARK_HOME="/opt/spark"
 ARG SPARK_MAJOR_VERSION="2.2"
 ARG SPARK_VERSION="2.2.1"
 ARG TENSORFLOW_ECO_URL="https://s3.amazonaws.com/vishnu-mohan/tensorflow"
-ARG TENSORFLOW_HADOOP_JAR_SHA256="23d8791de849a0567602436772de5cd7f1b72ae41931f4265f53a80db7e068b2"
-ARG TENSORFLOW_SPARK_JAR_SHA256="65a310a589b14e729ca5358de38341c73d4c599d014fdc4195874f0f4038d9cf"
-ARG TENSORFLOW_JAR_SHA256="140fe736c5d320c2d4cfd1542ad340b29793f2c993703052f010b80f931c24b9"
-ARG TENSORFLOW_JNI_SHA256="2a0e2c3d0846c8d7a05b78a7660a741f6b614ae530baa7a22ada9428381633c4"
+ARG TENSORFLOW_HADOOP_JAR_SHA256="668b326be1a7cfa4e621e8abaa9a5dbf1a813bad289ba0ad03e983ae8e841290"
+ARG TENSORFLOW_SPARK_JAR_SHA256="bcc3bcb48cfe72997f7c51e6fd8d379c64d26fd200cbd08617631fd8182a2fbf"
+ARG TENSORFLOW_JAR_SHA256="6a4e5c80bad7c826233a9b1750a7d4b5a28c6e5c8fccebefc1e6a0d5feeae4a3"
+ARG TENSORFLOW_JNI_SHA256="8f74ced6dece0e0889eb09b0731ef728feffe0aadadaf8d6401a3ff15aafcc6e"
 ARG TENSORFLOW_SERVING_APT_URL="http://storage.googleapis.com/tensorflow-serving-apt"
-ARG TENSORFLOW_SERVING_VERSION="1.9.0"
+ARG TENSORFLOW_SERVING_VERSION="1.10.0"
 ARG TENSORFLOW_URL="https://storage.googleapis.com/tensorflow"
 ARG TENSORFLOW_VARIANT="cpu"
-ARG TENSORFLOW_VERSION="1.9.0"
+ARG TENSORFLOW_VERSION="1.11.0"
 ARG TINI_GPG_KEY="595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7"
 ARG TINI_URL="https://github.com/krallin/tini/releases/download"
 ARG TINI_VERSION="v0.18.0"
@@ -131,6 +131,7 @@ RUN echo "deb ${DEBIAN_REPO}/${DISTRO} ${CODENAME} main" >> /etc/apt/sources.lis
        jq \
        kstart \
        less \
+       libaio1 \
        lmodern \
        luarocks \
        lua-socket \
@@ -239,18 +240,18 @@ RUN cd /tmp \
     && echo "${CONDA_MD5}  ${CONDA_INSTALLER}" | md5sum -c - \
     && bash "./${CONDA_INSTALLER}" -u -b -p "${CONDA_DIR}" \
     && ${CONDA_DIR}/bin/conda update --json --all -yq \
-    && ${CONDA_DIR}/bin/pip install --upgrade pip \
-    && ${CONDA_DIR}/bin/conda config --env --add pinned_packages defaults::blas \
     && ${CONDA_DIR}/bin/conda config --env --add pinned_packages defaults::conda \
-    && ${CONDA_DIR}/bin/conda config --env --add pinned_packages defaults::gsl \
-    && ${CONDA_DIR}/bin/conda config --env --add pinned_packages defaults::numpy-base \
-    && ${CONDA_DIR}/bin/conda config --env --add pinned_packages defaults::numpy \
-    && ${CONDA_DIR}/bin/conda config --env --add pinned_packages defaults::openblas \
-    && ${CONDA_DIR}/bin/conda config --env --add pinned_packages defaults::scikit-learn \
-    && ${CONDA_DIR}/bin/conda config --env --add pinned_packages defaults::scipy \
+    && ${CONDA_DIR}/bin/conda config --env --add pinned_packages conda-forge::blas \
+    && ${CONDA_DIR}/bin/conda config --env --add pinned_packages conda-forge::boost \
+    && ${CONDA_DIR}/bin/conda config --env --add pinned_packages conda-forge::gsl \
+    && ${CONDA_DIR}/bin/conda config --env --add pinned_packages conda-forge::numpy \
+    && ${CONDA_DIR}/bin/conda config --env --add pinned_packages conda-forge::openblas \
+    && ${CONDA_DIR}/bin/conda config --env --add pinned_packages conda-forge::scikit-learn \
+    && ${CONDA_DIR}/bin/conda config --env --add pinned_packages conda-forge::scipy \
     && ${CONDA_DIR}/bin/conda config --system --prepend channels conda-forge \
     && ${CONDA_DIR}/bin/conda config --system --set auto_update_conda false \
     && ${CONDA_DIR}/bin/conda config --system --set show_channel_urls true \
+    && ${CONDA_DIR}/bin/conda update --json -yq pip \
     && ${CONDA_DIR}/bin/conda env update --json -q -f "${CONDA_DIR}/${CONDA_ENV_YML}" \
     && ${CONDA_DIR}/bin/jupyter toree install --sys-prefix --interpreters=Scala,PySpark,SparkR,SQL \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyter-widgets/jupyterlab-manager@0.36.2 \
@@ -266,7 +267,7 @@ RUN cd /tmp \
     && ${CONDA_DIR}/bin/jupyter labextension install bqplot \
     && ${CONDA_DIR}/bin/jupyter labextension install jupyterlab_bokeh \
     && ${CONDA_DIR}/bin/jupyter labextension install knowledgelab \
-    && ${CONDA_DIR}/bin/jupyter-nbextension install --py --sys-prefix rise \
+    && ${CONDA_DIR}/bin/jupyter nbextension install --py --sys-prefix rise \
     && ${CONDA_DIR}/bin/jupyter nbextension install --py --sys-prefix sparkmonitor \
     && ${CONDA_DIR}/bin/jupyter nbextension enable --py --sys-prefix sparkmonitor \
     && ${CONDA_DIR}/bin/jupyter serverextension enable --sys-prefix jupyter_spark_history_dcos \
@@ -277,7 +278,7 @@ RUN cd /tmp \
        >> $(ipython profile locate default)/ipython_kernel_config.py \
     && ${CONDA_DIR}/bin/conda remove --force --json -yq openjdk pyqt qt qtconsole \
     && ${CONDA_DIR}/bin/npm cache clean --force \
-    && rm -rf "${CONDA_DIR}/share/jupyter/lab/staging"  "${HOME}/.npm/_cacache" \
+    && rm -rf "${CONDA_DIR}/share/jupyter/lab/staging" "${HOME}/.npm/_cacache" \
     && rm -rf "${HOME}/.cache/pip" "${HOME}/.cache/yarn" "${HOME}/.node-gyp" \
     && ${CONDA_DIR}/bin/conda clean --json -tipsy \
     && for dir in .conda/envs .jupyter .local/share/jupyter/runtime .sparkmagic bin work; \
@@ -333,6 +334,3 @@ COPY --chown="1000:100" jupyter_notebook_config.py "${HOME}/.jupyter/"
 COPY --chown="1000:100" beakerx.json "${HOME}/.jupyter/"
 
 USER "${NB_UID}"
-
-# Patch TensorFlowOnSpark to handle all Hadoop 3.x supported Filesystem URIs
-COPY --chown="1000:100" TFNode.py "${CONDA_DIR}/lib/python3.6/site-packages/tensorflowonspark/"
