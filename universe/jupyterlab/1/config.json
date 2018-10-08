@@ -119,6 +119,16 @@
           "type": "string",
           "default": "/logmeout"
         },
+        "oidc_authorization_params": {
+          "description": "OIDC Authorization Parameters.",
+          "type": "string",
+          "default": ""
+        },
+        "oidc_redirect_after_logout_uri": {
+          "description": "OIDC Redirect After Logout URI.",
+          "type": "string",
+          "default": ""
+        },
         "oidc_post_logout_redirect_uri": {
           "description": "OIDC Post Logout Redirect URI.",
           "type": "string",

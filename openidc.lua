@@ -248,6 +248,9 @@ end
 
 -- assemble the redirect_uri
 local function openidc_get_redirect_uri(opts)
+  if opts.redirect_uri then
+    return opts.redirect_uri
+  end
   local scheme = opts.redirect_uri_scheme or get_scheme()
   local host = get_host_name()
   if not host then
@@ -320,7 +323,6 @@ local function openidc_authorize(opts, session, target_url, prompt)
   end
 
   -- store state in the session
-  session:start()
   session.data.original_url = target_url
   session.data.state = state
   session.data.nonce = nonce
@@ -1030,7 +1032,6 @@ local function openidc_authorization_response(opts, session)
     return nil, err, session.data.original_url, session
   end
 
-  session:start()
   -- mark this sessions as authenticated
   session.data.authenticated = true
   -- clear state and nonce to protect against potential misuse
@@ -1179,7 +1180,6 @@ local function openidc_access_token(opts, session, try_to_renew)
   end
   log(DEBUG, "access_token refreshed: ", json.access_token, " updated refresh_token: ", json.refresh_token)
 
-  session:start()
   session.data.access_token = json.access_token
   session.data.access_token_expiration = current_time + openidc_access_token_expires_in(opts, json.expires_in)
   if json.refresh_token then
@@ -1203,24 +1203,37 @@ local function openidc_access_token(opts, session, try_to_renew)
   return session.data.access_token, err
 end
 
+function openidc_get_path(uri)
+  local without_query = uri:match("(.-)%?") or uri
+  return without_query:match(".-//[^/]+(/.*)") or without_query
+end
+
+function openidc_get_redirect_uri_path(opts)
+  return opts.redirect_uri and openidc_get_path(opts.redirect_uri) or opts.redirect_uri_path
+end
+
 -- main routine for OpenID Connect user authentication
 function openidc.authenticate(opts, target_url, unauth_action, session_opts)
 
+  if opts.redirect_uri_path or opts.redirect_uri_scheme then
+    log(WARN, "using deprecated option `opts.redirect_uri_path` or `opts.redirect_uri_scheme` for redirect_uri; switch to using an absolute URI and `opts.redirect_uri` instead")
+  end
+
   local err
 
-  local session = r_session.open(session_opts)
+  local session = r_session.start(session_opts)
 
   target_url = target_url or ngx.var.request_uri
 
   local access_token
 
   -- see if this is a request to the redirect_uri i.e. an authorization response
-  local path = target_url:match("(.-)%?") or target_url
-  if path == opts.redirect_uri_path then
+  local path = openidc_get_path(target_url)
+  if path == openidc_get_redirect_uri_path(opts) then
     log(DEBUG, "Redirect URI path (" .. path .. ") is currently navigated -> Processing authorization response coming from OP")
 
     if not session.present then
-      err = "request to the redirect_uri_path but there's no session state found"
+      err = "request to the redirect_uri path but there's no session state found"
       log(ERROR, err)
       return nil, err, target_url, session
     end
@@ -1324,7 +1337,7 @@ end
 -- get a valid access_token (eventually refreshing the token), or nil if there's no valid access_token
 function openidc.access_token(opts, session_opts)
 
-  local session = r_session.open(session_opts)
+  local session = r_session.start(session_opts)
 
   return openidc_access_token(opts, session, true)
 end
