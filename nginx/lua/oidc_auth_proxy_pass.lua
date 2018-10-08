@@ -30,15 +30,18 @@ end
 
 -- OpenID Connect Options - https://github.com/zmartzone/lua-resty-openidc
 local opts = {
-    redirect_uri_path = os.getenv("OIDC_REDIRECT_URI") or "/redirect_uri",
+    redirect_uri = os.getenv("OIDC_REDIRECT_URI"),
     discovery = os.getenv("OIDC_DISCOVERY_URI"),
     client_id = os.getenv("OIDC_CLIENT_ID"),
     client_secret = os.getenv("OIDC_CLIENT_SECRET"),
-    ssl_verify = os.getenv("OIDC_TLS_VERIFY") or "yes",
-    token_endpoint_auth_method = os.getenv("OIDC_AUTH_METHOD") or "client_secret_basic",
     scope = os.getenv("OIDC_SCOPE") or "openid profile email",
-    iat_slack = os.getenv("OIDC_IAT_SLACK") or 600,
+    refresh_session_interval = os.getenv("OIDC_REFRESH_SESSION_INTERVAL") or 3300,
+    iat_slack = os.getenv("OIDC_IAT_SLACK") or 300,
     logout_path = os.getenv("OIDC_LOGOUT_PATH") or "/logout",
+    redirect_after_logout_with_id_token_hint = os.getenv("OIDC_REDIRECT_AFTER_LOGOUT_WITH_ID_TOKEN_HINT") or true,
+    token_endpoint_auth_method = os.getenv("OIDC_TOKEN_ENDPOINT_AUTH_METHOD") or "client_secret_basic",
+    ssl_verify = os.getenv("OIDC_TLS_VERIFY") or "yes",
+    renew_access_token_on_expiry = os.getenv("OIDC_RENEW_ACCESS_TOKEN_ON_EXPIRY") or true,
     proxy_opts = proxy_opts
 }
 
@@ -46,6 +49,17 @@ ngx.log(ngx.DEBUG, "redirect_uri: " .. tostring(opts.redirect_uri_path))
 ngx.log(ngx.DEBUG, "discovery: " .. tostring(opts.discovery))
 ngx.log(ngx.DEBUG, "client_id: " .. tostring(opts.client_id))
 -- ngx.log(ngx.DEBUG, tostring(opts.client_secret))
+
+if is_not_empty(os.getenv("OIDC_AUTHORIZATION_PARAMS")) then
+    -- authorization_params = { hd="zmartzone.eu", resource="ABC:DEF:GH-12345-6789-foo-bar" },
+    opts["authorization_params"] = os.getenv("OIDC_AUTHORIZATION_PARAMS")
+    ngx.log(ngx.DEBUG, "authorization_params: " .. tostring(opts.authorization_params))
+end
+
+if is_not_empty(os.getenv("OIDC_REDIRECT_AFTER_LOGOUT_URI")) then
+    opts["redirect_after_logout_uri"] = os.getenv("OIDC_REDIRECT_AFTER_LOGOUT_URI")
+    ngx.log(ngx.DEBUG, "redirect_after_logout_uri: " .. tostring(opts.redirect_after_logout_uri))
+end
 
 if is_not_empty(os.getenv("OIDC_POST_LOGOUT_REDIRECT_URI")) then
     opts["post_logout_redirect_uri"] = os.getenv("OIDC_POST_LOGOUT_REDIRECT_URI")

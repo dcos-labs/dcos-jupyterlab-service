@@ -1,4 +1,5 @@
-env OIDC_AUTH_METHOD;
+# env vars to drive zmartzone/lua-resty-openidc (OpenResty) for OpenID Connect
+env OIDC_AUTHORIZATION_PARAMS;
 env OIDC_CLIENT_ID;
 env OIDC_CLIENT_SECRET;
 env OIDC_DISCOVERY_URI;
@@ -7,8 +8,13 @@ env OIDC_IAT_SLACK;
 env OIDC_LOGOUT_PATH;
 env OIDC_POST_LOGOUT_REDIRECT_URI;
 env OIDC_REDIRECT_URI;
+env OIDC_REDIRECT_AFTER_LOGOUT_URI;
+env OIDC_REDIRECT_AFTER_LOGOUT_WITH_ID_TOKEN_HINT;
+env OIDC_REFRESH_SESSION_INTERVAL;
+env OIDC_RENEW_ACCESS_TOKEN_ON_EXPIRY;
 env OIDC_SCOPE;
 env OIDC_TLS_VERIFY;
+env OIDC_TOKEN_ENDPOINT_AUTH_METHOD;
 env OIDC_UPN;
 env OIDC_USE_SPARTAN_RESOLVER;
 
@@ -67,6 +73,8 @@ http {
     lua_shared_dict discovery 1m;
     # cache for JWKs
     lua_shared_dict jwks 1m;
+    # cache for JWT verification results
+    lua_shared_dict introspection 10m;
 
     # NB: if you have "lua_code_cache off;", use:
     # set $session_secret xxxxxxxxxxxxxxxxxxx;
