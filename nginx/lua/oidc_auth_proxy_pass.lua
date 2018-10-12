@@ -45,7 +45,7 @@ local opts = {
     proxy_opts = proxy_opts
 }
 
-ngx.log(ngx.DEBUG, "redirect_uri: " .. tostring(opts.redirect_uri_path))
+ngx.log(ngx.DEBUG, "redirect_uri: " .. tostring(opts.redirect_uri))
 ngx.log(ngx.DEBUG, "discovery: " .. tostring(opts.discovery))
 ngx.log(ngx.DEBUG, "client_id: " .. tostring(opts.client_id))
 -- ngx.log(ngx.DEBUG, tostring(opts.client_secret))
