@@ -52,7 +52,7 @@ ngx.log(ngx.DEBUG, "client_id: " .. tostring(opts.client_id))
 
 if is_not_empty(os.getenv("OIDC_AUTHORIZATION_PARAMS")) then
     -- authorization_params = { hd="zmartzone.eu", resource="ABC:DEF:GH-12345-6789-foo-bar" },
-    opts["authorization_params"] = os.getenv("OIDC_AUTHORIZATION_PARAMS")
+    opts["authorization_params"] = require("cjson").decode(os.getenv("OIDC_AUTHORIZATION_PARAMS"))
     ngx.log(ngx.DEBUG, "authorization_params: " .. tostring(opts.authorization_params))
 end
 
