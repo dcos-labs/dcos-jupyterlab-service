@@ -248,8 +248,13 @@ end
 
 -- assemble the redirect_uri
 local function openidc_get_redirect_uri(opts)
+  local path = opts.redirect_uri_path
   if opts.redirect_uri then
-    return opts.redirect_uri
+    if opts.redirect_uri:sub(1, 1) == '/' then
+      path = opts.redirect_uri
+    else
+      return opts.redirect_uri
+    end
   end
   local scheme = opts.redirect_uri_scheme or get_scheme()
   local host = get_host_name()
@@ -257,7 +262,7 @@ local function openidc_get_redirect_uri(opts)
     -- possibly HTTP 1.0 and no Host header
     ngx.exit(ngx.HTTP_BAD_REQUEST)
   end
-  return scheme .. "://" .. host .. opts.redirect_uri_path
+  return scheme .. "://" .. host .. path
 end
 
 -- perform base64url decoding
@@ -376,7 +381,7 @@ local function openidc_configure_proxy(httpc, proxy_opts)
 end
 
 -- make a call to the token endpoint
-local function openidc_call_token_endpoint(opts, endpoint, body, auth, endpoint_name)
+function openidc.call_token_endpoint(opts, endpoint, body, auth, endpoint_name)
 
   local ep_name = endpoint_name or 'token'
   local headers = {
@@ -386,11 +391,11 @@ local function openidc_call_token_endpoint(opts, endpoint, body, auth, endpoint_
   if auth then
     if auth == "client_secret_basic" then
       if opts.client_secret then
-        headers.Authorization = "Basic " .. b64(opts.client_id .. ":" .. opts.client_secret)
+        headers.Authorization = "Basic " .. b64(ngx.escape_uri(opts.client_id) .. ":" .. ngx.escape_uri(opts.client_secret))
       else
       -- client_secret must not be set if Windows Integrated Authentication (WIA) is used with
       -- Active Directory Federation Services (AD FS) 4.0 (or newer) on Windows Server 2016 (or newer)
-        headers.Authorization = "Basic " .. b64(opts.client_id .. ":")
+        headers.Authorization = "Basic " .. b64(ngx.escape_uri(opts.client_id) .. ":")
       end
       log(DEBUG, "client_secret_basic: authorization header '" .. headers.Authorization .. "'")
     end
@@ -440,7 +445,7 @@ local function openidc_call_token_endpoint(opts, endpoint, body, auth, endpoint_
 end
 
 -- make a call to the userinfo endpoint
-local function openidc_call_userinfo_endpoint(opts, access_token)
+function openidc.call_userinfo_endpoint(opts, access_token)
   if not opts.discovery.userinfo_endpoint then
     log(DEBUG, "no userinfo endpoint supplied")
     return nil, nil
@@ -1022,7 +1027,7 @@ local function openidc_authorization_response(opts, session)
   local current_time = ngx.time()
   -- make the call to the token endpoint
   local json
-  json, err = openidc_call_token_endpoint(opts, opts.discovery.token_endpoint, body, opts.token_endpoint_auth_method)
+  json, err = openidc.call_token_endpoint(opts, opts.discovery.token_endpoint, body, opts.token_endpoint_auth_method)
   if err then
     return nil, err, session.data.original_url, session
   end
@@ -1045,7 +1050,7 @@ local function openidc_authorization_response(opts, session)
     -- call the user info endpoint
     -- TODO: should this error be checked?
     local user
-    user, err = openidc_call_userinfo_endpoint(opts, json.access_token)
+    user, err = openidc.call_userinfo_endpoint(opts, json.access_token)
 
     if err then
       log(ERROR, "error calling userinfo endpoint: " .. err)
@@ -1166,7 +1171,7 @@ local function openidc_access_token(opts, session, try_to_renew)
   }
 
   local json
-  json, err = openidc_call_token_endpoint(opts, opts.discovery.token_endpoint, body, opts.token_endpoint_auth_method)
+  json, err = openidc.call_token_endpoint(opts, opts.discovery.token_endpoint, body, opts.token_endpoint_auth_method)
   if err then
     return nil, err
   end
@@ -1215,8 +1220,8 @@ end
 -- main routine for OpenID Connect user authentication
 function openidc.authenticate(opts, target_url, unauth_action, session_opts)
 
-  if opts.redirect_uri_path or opts.redirect_uri_scheme then
-    log(WARN, "using deprecated option `opts.redirect_uri_path` or `opts.redirect_uri_scheme` for redirect_uri; switch to using an absolute URI and `opts.redirect_uri` instead")
+  if opts.redirect_uri_path then
+    log(WARN, "using deprecated option `opts.redirect_uri_path`; switch to using an absolute URI and `opts.redirect_uri` instead")
   end
 
   local err
@@ -1459,7 +1464,7 @@ function openidc.introspect(opts)
   end
 
   -- call the introspection endpoint
-  json, err = openidc_call_token_endpoint(opts, opts.introspection_endpoint, body, opts.introspection_endpoint_auth_method, "introspection")
+  json, err = openidc.call_token_endpoint(opts, opts.introspection_endpoint, body, opts.introspection_endpoint_auth_method, "introspection")
 
 
   if not json then
