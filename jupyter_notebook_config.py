@@ -227,7 +227,7 @@ if os.path.exists('krb5.conf'):
 
 # Set a sane base path for .ivy2
 spark_opts.append('--conf spark.jars.ivy={}/.ivy2'.format(
-    os.getenv('MESOS_SANDBOX', '/home/beakerx')))
+    os.getenv('MESOS_SANDBOX', '/home/jovyan')))
 
 # Accumulate Spark --conf properties specified in SPARK_CONF_<> env vars
 spark_conf_env_pattern = re.compile(r'^SPARK_CONF')
