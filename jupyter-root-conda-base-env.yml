@@ -98,7 +98,6 @@ dependencies:
 - r-shiny
 - r-sparklyr
 - r-tidyverse
-- rstudio
 - requests-oauthlib
 - s3fs
 - scikit-learn
@@ -107,7 +106,6 @@ dependencies:
 - selenium
 - simplejson
 - smmap2
-- spacy
 - sqlalchemy
 - tabulate
 - tox
