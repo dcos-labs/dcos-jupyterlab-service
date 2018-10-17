@@ -41,7 +41,7 @@ for env in ['OIDC_DISCOVERY_URI',
     except KeyError:
         pass
 
-# Setup the Notebook to listen on localhost:8888 by default
+# Setup the Notebook to listen on 127.0.0.1:8888 by default
 c.NotebookApp.ip = '127.0.0.1'
 c.NotebookApp.port = 8888
 c.NotebookApp.open_browser = False
@@ -127,7 +127,7 @@ if os.getenv('ENABLE_SPARK_KERBEROS_TICKET_FORWARDING'):
     else:
         spark_opts.append('--files={}'.format(os.getenv('KRB5CCNAME')))
     spark_opts.append('--conf spark.executorEnv.KRB5CCNAME={}/krb5cc_{}'.format(
-        os.getenv('MESOS_SANDBOX'), os.getuid()))
+        os.getenv('MESOS_SANDBOX', '/home/jovyan'), os.getuid()))
 
 if os.getenv('SPARK_PROPERTIES_FILE'):
     spark_opts.append('--properties-file={}'.format(os.getenv('SPARK_PROPERTIES_FILE')))
@@ -285,6 +285,6 @@ if os.getenv('USE_HTTPS'):
     c.NotebookApp.certfile = PEM_FILE
 
 # Create empty file to signal configuration is complete
-SIGNAL_FILE = os.path.join(os.getenv('MESOS_SANDBOX'), 'JUPYTER_NOTEBOOK_CONFIG_COMPLETE')
+SIGNAL_FILE = os.path.join(os.getenv('MESOS_SANDBOX', '/home/jovyan'), 'JUPYTER_NOTEBOOK_CONFIG_COMPLETE')
 with open(SIGNAL_FILE, "w") as f:
     f.write("")
