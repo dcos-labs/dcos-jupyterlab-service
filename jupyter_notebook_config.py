@@ -57,6 +57,9 @@ c.NotebookApp.trust_xheaders = True
 # Set the Access-Control-Allow-Origin header
 c.NotebookApp.allow_origin = '*'
 
+# Allow requests where the Host header doesn't point to a local server
+c.NotebookApp.allow_remote_access = True
+
 # If running under Apache Mesos:
 if (os.getenv('MESOS_SANDBOX')):
     if os.getenv('MARATHON_APP_LABEL_HAPROXY_0_VHOST'):
