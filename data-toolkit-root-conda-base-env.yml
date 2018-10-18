@@ -60,6 +60,7 @@ dependencies:
 - pandas
 - pep8
 - pillow
+- plotly
 - pluggy
 - psutil
 - psycopg2
@@ -75,11 +76,13 @@ dependencies:
 - python-editor
 - python-snappy
 - qtconsole
+- quandl
 - r-base
 - r-caret
 - r-devtools
 - r-forecast
 - r-nycflights13
+- r-plotly
 - r-randomforest
 - r-rsqlite
 - r-shiny
@@ -93,7 +96,6 @@ dependencies:
 - selenium
 - simplejson
 - smmap2
-- spacy
 - sqlalchemy
 - tabulate
 - tox

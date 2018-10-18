@@ -73,8 +73,8 @@ dependencies:
 - pandas
 - pep8
 - pillow
-- pluggy
 - plotly
+- pluggy
 - psutil
 - psycopg2
 - py
@@ -96,6 +96,7 @@ dependencies:
 - r-forecast
 - r-irkernel
 - r-nycflights13
+- r-plotly
 - r-randomforest
 - r-rsqlite
 - r-shiny
