@@ -42,11 +42,11 @@ dependencies:
 - h5py
 - ibis-framework
 - invoke
-- ipywidgets=7.4.1
+- ipywidgets=7.4.2
 - itsdangerous
 - jupyter
-- jupyterlab=0.33.12
-- jupyter_console=5.2.*
+- jupyterlab=0.35.*
+- jupyter_console
 - jupyter_contrib_nbextensions
 - jupyter_enterprise_gateway
 - jupyter_kernel_gateway
@@ -60,9 +60,11 @@ dependencies:
 - mpi4py
 - mpld3
 - nbconvert
-- nodejs=9.*
+- nbdime
+- nbserverproxy
+- nodejs=10.*
 - nose
-- notebook=5.6.*
+- notebook
 - numba
 - numexpr
 - numpy=1.15.2
@@ -87,6 +89,7 @@ dependencies:
 - python-editor
 - python-snappy
 - qtconsole
+- quandl
 - r-base
 - r-caret
 - r-devtools
@@ -111,7 +114,7 @@ dependencies:
 - tox
 - typing
 - virtualenv
-- widgetsnbextension=3.4.1
+- widgetsnbextension=3.4.2
 - wrapt
 - xgboost
 - xlrd
@@ -122,7 +125,7 @@ dependencies:
   - flatbuffers
   - gym[atari]
   - horovod
-  - https://dist.apache.org/repos/dist/release/incubator/toree/0.2.0-incubating/toree-pip/toree-0.2.0.tar.gz
+  - https://dist.apache.org/repos/dist/dev/incubator/toree/0.3.0-incubating-rc1/toree-pip/toree-0.3.0.tar.gz
   - https://github.com/vishnu2kmohan/jupyter-spark-history-dcos/archive/0.1.0.zip
   - jupyterlab_github
   - knowledgelab

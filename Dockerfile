@@ -252,26 +252,31 @@ RUN cd /tmp \
     && ${CONDA_DIR}/bin/conda config --system --set show_channel_urls true \
     && ${CONDA_DIR}/bin/conda update --json -yq pip \
     && ${CONDA_DIR}/bin/conda env update --json -q -f "${CONDA_DIR}/${CONDA_ENV_YML}" \
-    && ${CONDA_DIR}/bin/jupyter toree install --sys-prefix --interpreters=Scala,PySpark,SparkR,SQL \
-    && ${CONDA_DIR}/bin/jupyter labextension install @jupyter-widgets/jupyterlab-manager@0.36.2 \
+    && ${CONDA_DIR}/bin/jupyter toree install --sys-prefix --interpreters=Scala,SQL \
+    && ${CONDA_DIR}/bin/jupyter labextension install @jupyter-widgets/jupyterlab-manager@0.38.1 \
+    && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/celltags \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/fasta-extension \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/geojson-extension \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/github \
-    && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/hub-extension \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/latex \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/plotly-extension \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/toc \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/vega2-extension \
     && ${CONDA_DIR}/bin/jupyter labextension install beakerx-jupyterlab@1.1.0 \
     && ${CONDA_DIR}/bin/jupyter labextension install bqplot \
+    && ${CONDA_DIR}/bin/jupyter labextension install dask-labextension \
     && ${CONDA_DIR}/bin/jupyter labextension install jupyterlab_bokeh \
+    && ${CONDA_DIR}/bin/jupyter labextension install jupyterlab-drawio \
     && ${CONDA_DIR}/bin/jupyter labextension install knowledgelab \
+    && ${CONDA_DIR}/bin/jupyter labextension install nbdime-jupyterlab \
     && ${CONDA_DIR}/bin/jupyter nbextension install --py --sys-prefix rise \
     && ${CONDA_DIR}/bin/jupyter nbextension install --py --sys-prefix sparkmonitor \
     && ${CONDA_DIR}/bin/jupyter nbextension enable --py --sys-prefix sparkmonitor \
     && ${CONDA_DIR}/bin/jupyter serverextension enable --sys-prefix jupyter_spark_history_dcos \
     && ${CONDA_DIR}/bin/jupyter serverextension enable --sys-prefix jupyterlab_github \
+    && ${CONDA_DIR}/bin/jupyter serverextension enable --py --sys-prefix nbserverproxy \
     && ${CONDA_DIR}/bin/jupyter serverextension enable --py --sys-prefix sparkmonitor \
+    && nbdime config-git --enable --global \
     && ipython profile create \
     && echo "c.InteractiveShellApp.extensions.append('sparkmonitor.kernelextension')" \
        >> $(ipython profile locate default)/ipython_kernel_config.py \
