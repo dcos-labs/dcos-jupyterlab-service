@@ -257,6 +257,7 @@ RUN cd /tmp \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/celltags \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/fasta-extension \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/geojson-extension \
+    && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/git \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/github \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/latex \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/plotly-extension \

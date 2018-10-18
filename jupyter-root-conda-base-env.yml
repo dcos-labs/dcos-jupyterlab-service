@@ -127,13 +127,13 @@ dependencies:
   - gym[atari]
   - horovod
   - https://dist.apache.org/repos/dist/dev/incubator/toree/0.3.0-incubating-rc1/toree-pip/toree-0.3.0.tar.gz
+  - https://github.com/quantopian/pgcontents/archive/master.tar.gz
   - https://github.com/vishnu2kmohan/jupyter-spark-history-dcos/archive/0.1.0.zip
   - jupyterlab_github
   - knowledgelab
   - mlflow==0.7.*
   - nb2kg
   - opencv-python
-  - pgcontents
   - pixiedust
   - pixiedust_node
   - pixiegateway
@@ -143,6 +143,7 @@ dependencies:
   - ray[rllib]==0.5.*
   - redis
   - rise
+  - s3cmd
   - s3contents
   - setuptools==40.4.*
   - sparkmonitor
