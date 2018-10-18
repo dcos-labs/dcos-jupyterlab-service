@@ -9,5 +9,5 @@ dependencies:
 - pip:
   - pygdf
   - quilt[img,pytorch,torchvision]
-  - setuptools==40.4.3
-  - tensorflow-gpu==1.11.0
+  - setuptools==40.4.*
+  - tensorflow-gpu==1.11.*

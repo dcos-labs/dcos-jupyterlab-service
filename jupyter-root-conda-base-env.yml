@@ -10,7 +10,7 @@ dependencies:
 - attrs
 - awscli
 - bazel
-- beakerx=1.1.0
+- beakerx=1.2.*
 - beautifulsoup4
 - bokeh
 - boost
@@ -20,11 +20,11 @@ dependencies:
 - colour
 - conda-pack
 - cython
-- dask=0.19.3
+- dask=0.19.*
 - dask-ml
 - dask-tensorflow
 - dask-xgboost
-- distributed=1.23.3
+- distributed=1.23.*
 - flake8
 - flask
 - funcsigs
@@ -42,7 +42,7 @@ dependencies:
 - h5py
 - ibis-framework
 - invoke
-- ipywidgets=7.4.2
+- ipywidgets=7.4.*
 - itsdangerous
 - jupyter
 - jupyterlab=0.35.*
@@ -67,7 +67,7 @@ dependencies:
 - notebook
 - numba
 - numexpr
-- numpy=1.15.2
+- numpy=1.15.*
 - oauthlib
 - openblas
 - pandas
@@ -78,7 +78,7 @@ dependencies:
 - psutil
 - psycopg2
 - py
-- pyarrow=0.10.0
+- pyarrow=0.11.*
 - pydotplus
 - pyfolio
 - pyomo
@@ -115,7 +115,7 @@ dependencies:
 - tox
 - typing
 - virtualenv
-- widgetsnbextension=3.4.2
+- widgetsnbextension=3.4.*
 - wrapt
 - xgboost
 - xlrd
@@ -130,23 +130,23 @@ dependencies:
   - https://github.com/vishnu2kmohan/jupyter-spark-history-dcos/archive/0.1.0.zip
   - jupyterlab_github
   - knowledgelab
-  - mlflow==0.7.0
+  - mlflow==0.7.*
   - nb2kg
   - opencv-python
   - pgcontents
   - pixiedust
   - pixiedust_node
   - pixiegateway
-  - protobuf==3.6.1
+  - protobuf==3.6.*
   - pyglet
   - PyOpenGL
-  - ray[rllib]==0.5.3
+  - ray[rllib]==0.5.*
   - redis
   - rise
   - s3contents
-  - setuptools==40.4.3
+  - setuptools==40.4.*
   - sparkmonitor
-  - tensorflow==1.11.0
+  - tensorflow==1.11.*
   - tensorflow-hub
-  - tensorflowonspark==1.3.4
+  - tensorflowonspark==1.3.*
   - uuid
