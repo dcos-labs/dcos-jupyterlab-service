@@ -14,6 +14,7 @@ dependencies:
 - beautifulsoup4
 - bokeh
 - boost
+- bqplot
 - cachetools
 - click
 - cmake
@@ -89,6 +90,7 @@ dependencies:
 - python-editor
 - python-snappy
 - qtconsole
+- qgrid
 - quandl
 - r-base
 - r-caret
@@ -129,7 +131,9 @@ dependencies:
   - https://dist.apache.org/repos/dist/dev/incubator/toree/0.3.0-incubating-rc1/toree-pip/toree-0.3.0.tar.gz
   - https://github.com/quantopian/pgcontents/archive/master.tar.gz
   - https://github.com/vishnu2kmohan/jupyter-spark-history-dcos/archive/0.1.0.zip
+  - jupyterlab-git
   - jupyterlab_github
+  - jupyterlab_iframe
   - knowledgelab
   - mlflow==0.7.*
   - nb2kg

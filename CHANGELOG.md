@@ -48,11 +48,13 @@
 ### Jupyter Extensions Additions
 
 * [@jupyterlab/celltags](https://github.com/jupyterlab/jupyterlab-celltags)
-* [jupyterlab/git](https://github.com/jupyterlab/jupyterlab-git)
 * [dask-labextension](https://github.com/dask/dask-labextension)
+* [jupyterlab/git](https://github.com/jupyterlab/jupyterlab-git)
 * [jupyterlab-drawio](https://github.com/QuantStack/jupyterlab-drawio)
+* [jupyterlab_iframe](jupyterlab_iframe)
 * [nbdime-jupyterlab](https://github.com/jupyter/nbdime)
 * [nbserverproxy](https://github.com/jupyterhub/nbserverproxy)
+* [qgrid](https://github.com/quantopian/qgrid)
 
 ### NVIDIA Library Bumps
 
@@ -61,7 +63,7 @@
 
 ### Miscellaneous Bumps
 
-* lua-resty-openidc.lua [8dfd8c7](https://github.com/zmartzone/lua-resty-openidc/commit/8dfd8c790cfd5af3af0b8a0cdf705baf568ef3ae)
+* zmartzone/lua-resty-openidc [8dfd8c7](https://github.com/zmartzone/lua-resty-openidc/commit/8dfd8c790cfd5af3af0b8a0cdf705baf568ef3ae)
 
 ### OpenID Connect
 

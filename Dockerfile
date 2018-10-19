@@ -259,6 +259,7 @@ RUN cd /tmp \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/geojson-extension \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/git \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/github \
+    && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/hub-extension \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/latex \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/plotly-extension \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/toc \
@@ -266,15 +267,21 @@ RUN cd /tmp \
     && ${CONDA_DIR}/bin/jupyter labextension install beakerx-jupyterlab@1.1.0 \
     && ${CONDA_DIR}/bin/jupyter labextension install bqplot \
     && ${CONDA_DIR}/bin/jupyter labextension install dask-labextension \
-    && ${CONDA_DIR}/bin/jupyter labextension install jupyterlab_bokeh \
     && ${CONDA_DIR}/bin/jupyter labextension install jupyterlab-drawio \
+    && ${CONDA_DIR}/bin/jupyter labextension install jupyterlab_bokeh \
+    && ${CONDA_DIR}/bin/jupyter labextension install jupyterlab_iframe \
     && ${CONDA_DIR}/bin/jupyter labextension install knowledgelab \
     && ${CONDA_DIR}/bin/jupyter labextension install nbdime-jupyterlab \
+    && ${CONDA_DIR}/bin/jupyter labextension install plotlywidget \
+    && ${CONDA_DIR}/bin/jupyter labextension install qgrid \
     && ${CONDA_DIR}/bin/jupyter nbextension install --py --sys-prefix rise \
     && ${CONDA_DIR}/bin/jupyter nbextension install --py --sys-prefix sparkmonitor \
     && ${CONDA_DIR}/bin/jupyter nbextension enable --py --sys-prefix sparkmonitor \
     && ${CONDA_DIR}/bin/jupyter serverextension enable --sys-prefix jupyter_spark_history_dcos \
+    && ${CONDA_DIR}/bin/jupyter serverextension enable --sys-prefix jupyterlab_git \
     && ${CONDA_DIR}/bin/jupyter serverextension enable --sys-prefix jupyterlab_github \
+    && ${CONDA_DIR}/bin/jupyter serverextension enable --sys-prefix jupyterlab_iframe \
+    && ${CONDA_DIR}/bin/jupyter serverextension enable --sys-prefix knowledgelab \
     && ${CONDA_DIR}/bin/jupyter serverextension enable --py --sys-prefix nbserverproxy \
     && ${CONDA_DIR}/bin/jupyter serverextension enable --py --sys-prefix sparkmonitor \
     && nbdime config-git --enable --global \
@@ -329,7 +336,6 @@ RUN mkdir -p /usr/local/bin/start-notebook.d \
     && chmod ugo+rw /usr/local/openresty/nginx/conf/nginx.conf \
     && chmod ugo+rw /usr/local/openresty/nginx/conf/sites/proxy.conf
 
-COPY openidc.lua /usr/local/openresty/site/lualib/resty/
 COPY nginx.conf.mustache /opt/mesosphere/
 COPY proxy.conf.mustache /opt/mesosphere/
 COPY start.sh /usr/local/bin/
