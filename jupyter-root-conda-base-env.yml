@@ -77,7 +77,6 @@ dependencies:
 - plotly
 - pluggy
 - psutil
-- psycopg2
 - py
 - pyarrow=0.11.*
 - pydotplus
@@ -142,6 +141,7 @@ dependencies:
   - pixiedust_node
   - pixiegateway
   - protobuf==3.6.*
+  - psycopg2-binary
   - pyglet
   - PyOpenGL
   - ray[rllib]==0.5.*
