@@ -195,9 +195,9 @@ JUPYTER_CONF_FILES = ['core-site.xml',
                       'krb5.conf',
                       'jaas.conf']
 
+spark_mesos_uris = []
 jupyter_conf_urls = os.getenv('JUPYTER_CONF_URLS')
 if (jupyter_conf_urls) and (jupyter_conf_urls != ''):
-    spark_mesos_uris = []
     for url in jupyter_conf_urls.split(','):
         for file in JUPYTER_CONF_FILES:
             r = requests.get('{}/{}'.format(url, file), stream=True)
@@ -208,9 +208,18 @@ if (jupyter_conf_urls) and (jupyter_conf_urls != ''):
                 for chunk in r.iter_content(chunk_size=1024):
                     if chunk:  # filter out keep-alive new chunks
                         f.write(chunk)
-    if spark_mesos_uris:
-        spark_opts.append('--conf spark.mesos.uris={}'.format(
-            ','.join(spark_mesos_uris)))
+
+spark_conf_spark_mesos_uris = os.getenv('SPARK_CONF_SPARK_MESOS_URIS')
+if (spark_conf_spark_mesos_uris) and (spark_conf_spark_mesos_uris != ''):
+    spark_mesos_uris.extend(spark_conf_spark_mesos_uris.split('=')[1].split(','))
+    # Deduplicate URIs with set() and return a list()
+    spark_mesos_uris = list(set(spark_mesos_uris))
+    # Remove from the environment so it's not picked up (redundantly) later on
+    del(os.environ['SPARK_CONF_SPARK_MESOS_URIS'])
+
+if spark_mesos_uris:
+    spark_opts.append('--conf spark.mesos.uris={}'.format(
+        ','.join(spark_mesos_uris)))
 
 # Copy ${MESOS_SANDBOX}/krb5.conf if it exists to /etc/krb5.conf
 if os.path.exists('krb5.conf'):
