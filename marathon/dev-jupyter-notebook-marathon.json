@@ -40,7 +40,6 @@
     "OIDC_TLS_VERIFY": "no",
     "OIDC_EMAIL": "vishnu2kmohan@yahoo.com",
     "OIDC_LOGOUT_PATH": "/dev/jupyter/notebook/logmeout",
-    "OIDC_REDIRECT_AFTER_LOGOUT_URI": "https://vhost.example.com/dev/jupyter/notebook",
     "OIDC_POST_LOGOUT_REDIRECT_URI": "https://vhost.example.com/dev/jupyter/notebook",
     "OIDC_USE_SPARTAN_RESOLVER": "true",
     "USER": "nobody",
