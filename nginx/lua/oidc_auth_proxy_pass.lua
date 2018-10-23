@@ -42,6 +42,7 @@ local opts = {
     token_endpoint_auth_method = os.getenv("OIDC_TOKEN_ENDPOINT_AUTH_METHOD") or "client_secret_basic",
     ssl_verify = os.getenv("OIDC_TLS_VERIFY") or "yes",
     renew_access_token_on_expiry = os.getenv("OIDC_RENEW_ACCESS_TOKEN_ON_EXPIRY") or true,
+    revoke_tokens_on_logout = os.getenv("OIDC_REVOKE_TOKENS_ON_LOGOUT") or true,
     proxy_opts = proxy_opts
 }
 
