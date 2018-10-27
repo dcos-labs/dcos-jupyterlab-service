@@ -56,7 +56,7 @@ git clone https://github.com/yahoo/TensorFlowOnSpark
 
 ```bash
 cd $MESOS_SANDBOX
-curl -fsSL -O https:///downloads.mesosphere.io/mesosphere-jupyter-service/assets/tensorflow/mnist/mnist.zip
+curl -fsSL -O https://downloads.mesosphere.com/mesosphere-jupyter-service/assets/tensorflow/mnist/mnist.zip
 unzip mnist.zip
 ```
 
