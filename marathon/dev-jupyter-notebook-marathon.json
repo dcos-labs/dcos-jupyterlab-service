@@ -8,7 +8,7 @@
   "container": {
     "type": "MESOS",
     "docker": {
-      "image": "dcoslabs/dcos-jupyterlab:latest",
+      "image": "mesosphere/mesosphere-jupyter-service:latest",
       "forcePullImage": true
     }
   },
@@ -65,7 +65,7 @@
     "SPARK_CONF_EVENTLOG_ENABLED": "spark.eventLog.enabled=true",
     "SPARK_CONF_EVENTLOG_DIR": "spark.eventLog.dir=hdfs://hdfs/history",
     "SPARK_CONF_HADOOP_FS_S3A_AWS_CREDENTIALS_PROVIDER": "spark.hadoop.fs.s3a.aws.credentials.provider=com.amazonaws.auth.InstanceProfileCredentialsProvider",
-    "SPARK_CONF_MESOS_EXECUTOR_DOCKER_IMAGE": "spark.mesos.executor.docker.image=dcoslabs/dcos-jupyterlab:latest",
+    "SPARK_CONF_MESOS_EXECUTOR_DOCKER_IMAGE": "spark.mesos.executor.docker.image=mesosphere/mesosphere-data-toolkit:latest",
     "SPARK_CONF_SPARK_MESOS_EXECUTOR_DOCKER_FORCEPULLIMAGE": "spark.mesos.executor.docker.forcePullImage=true",
     "SPARK_CONF_MESOS_EXECUTOR_HOME": "spark.mesos.executor.home=/opt/spark",
     "SPARK_CONF_MESOS_CONTAINERIZER": "spark.mesos.containerizer=mesos",

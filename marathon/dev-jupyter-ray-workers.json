@@ -8,7 +8,7 @@
   "container": {
     "type": "MESOS",
     "docker": {
-      "image": "dcoslabs/dcos-ml-worker:latest",
+      "image": "mesosphere/mesosphere-data-toolkit:latest",
       "forcePullImage": true
     }
   },
