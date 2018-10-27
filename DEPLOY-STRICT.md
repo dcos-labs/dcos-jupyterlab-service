@@ -56,7 +56,7 @@ git clone https://github.com/yahoo/TensorFlowOnSpark
 
 ```bash
 cd $MESOS_SANDBOX
-curl -fsSL -O https://s3.amazonaws.com/vishnu-mohan/tensorflow/mnist/mnist.zip
+curl -fsSL -O https://downloads.mesosphere.com/mesosphere-jupyter-service/assets/tensorflow/mnist/mnist.zip
 unzip mnist.zip
 ```
 
@@ -64,7 +64,7 @@ unzip mnist.zip
 
 #### Remove existing csv folder in S3 bucket (if present)
 ```bash
-aws s3 rm --recursive s3://vishnu-mohan/tensorflow/mnist/csv 
+aws s3 rm --recursive s3://<your-bucket>/tensorflow/mnist/csv
 ```
 
 #### Prepare MINST as CSV for S3
@@ -74,13 +74,13 @@ eval \
   ${SPARK_OPTS} \
   --verbose \
   $(pwd)/TensorFlowOnSpark/examples/mnist/mnist_data_setup.py \
-    --output s3a://vishnu-mohan/tensorflow/mnist/csv \
+    --output s3a://<your-bucket>/tensorflow/mnist/csv \
     --format csv
 ```
 
 #### List prepared CSV files on S3
 ```bash
-aws s3 ls --recursive s3://vishnu-mohan/tensorflow/mnist/csv
+aws s3 ls --recursive s3://<your-bucket>/tensorflow/mnist/csv
 ```
 
 ### Prepare MNIST Dataset in CSV format and store on HDFS (under hdfs://user/${USER}/mnist/csv)
@@ -110,7 +110,7 @@ hdfs dfs -ls -R mnist/csv
 
 #### Remove existing bucket (if present)
 ```bash
-aws s3 rm --recursive s3://vishnu-mohan/tensorflow/mnist/tfr
+aws s3 rm --recursive s3://<your-bucket>/tensorflow/mnist/tfr
 ```
 
 #### Prepare MNIST as TFRecord for S3
@@ -120,13 +120,13 @@ eval \
   ${SPARK_OPTS} \
   --verbose \
   $(pwd)/TensorFlowOnSpark/examples/mnist/mnist_data_setup.py \
-    --output s3a://vishnu-mohan/tensorflow/mnist/tfr \
+    --output s3a://<your-bucket>/tensorflow/mnist/tfr \
     --format tfr
 ```
 
 #### List prepared TFRecord files on S3
 ```bash
-aws s3 ls --recursive s3://vishnu-mohan/tensorflow/mnist/tfr
+aws s3 ls --recursive s3://<your-bucket>/tensorflow/mnist/tfr
 ```
 
 ### Prepare MNIST Dataset in Tensorflow Record format and store on HDFS (under hdfs://user/${USER}/mnist/tfr)
@@ -158,8 +158,8 @@ hdfs dfs -ls -R mnist/tfr
 
 #### Remove existing CSV model folder in S3 bucket (if present)
 ```bash
-aws s3 rm --recursive s3://vishnu-mohan/tensorflow/mnist/mnist_csv_model
-aws s3 rm --recursive s3://vishnu-mohan/tensorflow/mnist/mnist_export
+aws s3 rm --recursive s3://<your-bucket>/tensorflow/mnist/mnist_csv_model
+aws s3 rm --recursive s3://<your-bucket>/tensorflow/mnist/mnist_export
 ```
 
 #### Train
@@ -171,25 +171,25 @@ eval \
   --py-files $(pwd)/TensorFlowOnSpark/examples/mnist/spark/mnist_dist.py \
   $(pwd)/TensorFlowOnSpark/examples/mnist/spark/mnist_spark.py \
     --cluster_size 5 \
-    --images s3a://vishnu-mohan/tensorflow/mnist/csv/train/images \
-    --labels s3a://vishnu-mohan/tensorflow/mnist/csv/train/labels \
+    --images s3a://<your-bucket>/tensorflow/mnist/csv/train/images \
+    --labels s3a://<your-bucket>/tensorflow/mnist/csv/train/labels \
     --format csv \
     --mode train \
-    --model s3://vishnu-mohan/tensorflow/mnist/mnist_csv_model \
-    --export_dir s3://vishnu-mohan/tensorflow/mnist/mnist_export
+    --model s3://<your-bucket>/tensorflow/mnist/mnist_csv_model \
+    --export_dir s3://<your-bucket>/tensorflow/mnist/mnist_export
 ```
 
 #### List Model files trained from CSV on S3
 ```bash
-aws s3 ls --recursive s3://vishnu-mohan/tensorflow/mnist/mnist_csv_model
+aws s3 ls --recursive s3://<your-bucket>/tensorflow/mnist/mnist_csv_model
 ```
 
 ### Train MNIST from S3 in TFRecord format and store model in S3
 
 #### Remove existing TFR model folder in S3 bucket (if present)
 ```bash
-aws s3 rm --recursive s3://vishnu-mohan/tensorflow/mnist/mnist_tfr_model
-aws s3 rm --recursive s3://vishnu-mohan/tensorflow/mnist/mnist_export
+aws s3 rm --recursive s3://<your-bucket>/tensorflow/mnist/mnist_tfr_model
+aws s3 rm --recursive s3://<your-bucket>/tensorflow/mnist/mnist_export
 ```
 
 #### Train MNIST
@@ -201,17 +201,17 @@ eval \
   --py-files $(pwd)/TensorFlowOnSpark/examples/mnist/spark/mnist_dist.py \
   $(pwd)/TensorFlowOnSpark/examples/mnist/spark/mnist_spark.py \
   --cluster_size 5 \
-  --images s3a://vishnu-mohan/tensorflow/mnist/tfr/train \
+  --images s3a://<your-bucket>/tensorflow/mnist/tfr/train \
   --format tfr \
   --mode train \
-  --model s3://vishnu-mohan/tensorflow/mnist/mnist_tfr_model \
-  --export_dir s3://vishnu-mohan/tensorflow/mnist/mnist_export
+  --model s3://<your-bucket>/tensorflow/mnist/mnist_tfr_model \
+  --export_dir s3://<your-bucket>/tensorflow/mnist/mnist_export
 ```
 
 #### List Model files trained from TFRecords on S3
 ```bash
-aws s3 ls --recursive s3://vishnu-mohan/tensorflow/mnist/mnist_tfr_model
-aws s3 ls --recursive s3://vishnu-mohan/tensorflow/mnist/mnist_export
+aws s3 ls --recursive s3://<your-bucket>/tensorflow/mnist/mnist_tfr_model
+aws s3 ls --recursive s3://<your-bucket>/tensorflow/mnist/mnist_export
 ```
 
 ### Train MNIST from CSV on HDFS and store the model on HDFS (under hdfs://user/${USER}/mnist/mnist_csv_model)

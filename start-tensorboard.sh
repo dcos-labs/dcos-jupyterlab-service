@@ -12,11 +12,18 @@ done
 TENSORBOARD_LOGDIR=${TENSORBOARD_LOGDIR:-"${MESOS_SANDBOX}"}
 
 if [ ${PORT_TFDBG+x} ]; then
-    TENSORBOARD_ARGS="${TENSORBOARD_ARGS} --debugger_port ${PORT_TFDBG}"
+    tensorboard \
+        --host 127.0.0.1 \
+        --port 6006 \
+        --logdir "${TENSORBOARD_LOGDIR}" \
+        --path_prefix "${MARATHON_APP_LABEL_HAPROXY_0_PATH}/tensorboard" \
+        --debugger_port "${PORT_TFDBG}" \
+        >> "${MESOS_SANDBOX}/tensorboard.log" 2>&1 &
+else
+    tensorboard \
+        --host 127.0.0.1 \
+        --port 6006 \
+        --logdir "${TENSORBOARD_LOGDIR}" \
+        --path_prefix "${MARATHON_APP_LABEL_HAPROXY_0_PATH}/tensorboard" \
+        >> "${MESOS_SANDBOX}/tensorboard.log" 2>&1 &
 fi
-
-tensorboard \
-    --host localhost \
-    --port 6006 \
-    --logdir "${TENSORBOARD_LOGDIR}" \
-    "${TENSORBOARD_ARGS}" >> "${MESOS_SANDBOX}/tensorboard.log" 2>&1 &

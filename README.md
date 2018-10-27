@@ -32,11 +32,10 @@ Also includes support for:
 * S3 connectivity
 * GPUs with the `<image>:<tag>-gpu` Docker Image variant built from `Dockerfile-cuDNN`
 
-Pre-built JupyterLab Docker Images for Mesosphere DC/OS: https://hub.docker.com/r/dcoslabs/dcos-jupyter/tags/
+Mesosphere Jupyter Service Docker Images for Mesosphere DC/OS: https://hub.docker.com/r/mesosphere/mesosphere-jupyter-service/tags/
 
 Related Docker Images:
-* Machine Learning Worker on Mesosphere DC/OS: https://hub.docker.com/r/dcoslabs/dcos-ml-worker/tags/
-* Apache Spark (with GPU support) on Mesosphere DC/OS: https://hub.docker.com/r/dcoslabs/dcos-spark/tags/
+* Apache Spark and Machine Learning Worker for Mesosphere DC/OS: https://hub.docker.com/r/mesosphere/mesosphere-data-toolkit/tags/
 
 Built `FROM:` [debian:jessie](https://hub.docker.com/r/library/debian) with [Miniconda3](https://repo.continuum.io/miniconda/)
 

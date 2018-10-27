@@ -8,7 +8,7 @@
   "container": {
     "type": "MESOS",
     "docker": {
-      "image": "dcoslabs/dcos-jupyter:latest",
+      "image": "mesosphere/mesosphere-jupyter-service:latest",
       "forcePullImage": true
     },
     "portMappings": [
@@ -120,7 +120,6 @@
     "OIDC_TLS_VERIFY": "no",
     "OIDC_EMAIL": "vishnu2kmohan@yahoo.com",
     "OIDC_LOGOUT_PATH": "/dev/jupyter/cni-notebook/logmeout",
-    "OIDC_REDIRECT_AFTER_LOGOUT_URI": "https://vhost.example.com/dev/jupyter/cni-notebook",
     "OIDC_POST_LOGOUT_REDIRECT_URI": "https://vhost.example.com/dev/jupyter/cni-notebook",
     "OIDC_USE_SPARTAN_RESOLVER": "true",
     "USER": "nobody",
@@ -146,7 +145,7 @@
     "SPARK_CONF_EVENTLOG_ENABLED": "spark.eventLog.enabled=true",
     "SPARK_CONF_EVENTLOG_DIR": "spark.eventLog.dir=hdfs://hdfs/history",
     "SPARK_CONF_HADOOP_FS_S3A_AWS_CREDENTIALS_PROVIDER": "spark.hadoop.fs.s3a.aws.credentials.provider=com.amazonaws.auth.InstanceProfileCredentialsProvider",
-    "SPARK_CONF_MESOS_EXECUTOR_DOCKER_IMAGE": "spark.mesos.executor.docker.image=dcoslabs/dcos-spark:latest",
+    "SPARK_CONF_MESOS_EXECUTOR_DOCKER_IMAGE": "spark.mesos.executor.docker.image=mesosphere/mesosphere-data-toolkit:latest",
     "SPARK_CONF_SPARK_MESOS_EXECUTOR_DOCKER_FORCEPULLIMAGE": "spark.mesos.executor.docker.forcePullImage=true",
     "SPARK_CONF_MESOS_EXECUTOR_HOME": "spark.mesos.executor.home=/opt/spark",
     "SPARK_CONF_MESOS_CONTAINERIZER": "spark.mesos.containerizer=mesos",
