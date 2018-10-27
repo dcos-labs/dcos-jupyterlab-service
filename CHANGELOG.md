@@ -84,4 +84,4 @@
 
 ### Features
 
-* Apache Toree, as of [0.3.0-incubating-rc1](https://github.com/apache/incubator-toree/releases/tag/v0.3.0-incubating-rc1) has [removed support for PySpark and SparkR](https://github.com/apache/incubator-toree/commit/276165ae2ac136a59d208058a031caf769bb312e), only the Scala and SQL interpreters will remain available. The [vanilla PySpark and SparkR kernels, however retain their ability to launch pre-configured Spark Jobs](https://github.com/dcos-labs/dcos-jupyterlab-service/blob/master/jupyter_notebook_config.py#L231-L232)
+* Apache Toree, as of [0.3.0-incubating-rc1](https://github.com/apache/incubator-toree/releases/tag/v0.3.0-incubating-rc1) has [removed support for PySpark and SparkR](https://github.com/apache/incubator-toree/commit/276165ae2ac136a59d208058a031caf769bb312e), only the Scala and SQL interpreters will remain available. The [vanilla PySpark and SparkR kernels, however retain their ability to launch pre-configured Spark Jobs](https://github.com/mesosphere/mesosphere-jupyter-service/blob/master/jupyter_notebook_config.py#L231-L232)

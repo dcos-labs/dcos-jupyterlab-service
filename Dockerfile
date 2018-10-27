@@ -43,12 +43,12 @@ ARG NB_GID="100"
 ARG NB_UID="1000"
 ARG NB_USER="jovyan"
 ARG OPENRESTY_REPO="https://openresty.org/package"
-ARG SPARK_DIST_URL="https://s3.amazonaws.com/vishnu-mohan/spark"
+ARG SPARK_DIST_URL="https:///downloads.mesosphere.io/mesosphere-jupyter-service/assets/spark"
 ARG SPARK_DIST_SHA256="52e29e83a65688e29da975d1ace7815c6a5b55e76c41d43a28e5e80de2b29843"
 ARG SPARK_HOME="/opt/spark"
 ARG SPARK_MAJOR_VERSION="2.2"
 ARG SPARK_VERSION="2.2.1"
-ARG TENSORFLOW_ECO_URL="https://s3.amazonaws.com/vishnu-mohan/tensorflow"
+ARG TENSORFLOW_ECO_URL="https:///downloads.mesosphere.io/mesosphere-jupyter-service/assets/tensorflow"
 ARG TENSORFLOW_HADOOP_JAR_SHA256="668b326be1a7cfa4e621e8abaa9a5dbf1a813bad289ba0ad03e983ae8e841290"
 ARG TENSORFLOW_SPARK_JAR_SHA256="bcc3bcb48cfe72997f7c51e6fd8d379c64d26fd200cbd08617631fd8182a2fbf"
 ARG TENSORFLOW_JAR_SHA256="6a4e5c80bad7c826233a9b1750a7d4b5a28c6e5c8fccebefc1e6a0d5feeae4a3"
@@ -64,7 +64,7 @@ ARG TINI_VERSION="v0.18.0"
 ARG VCS_REF
 ARG XGBOOST_JAVA_JAR_SHA256="4a6599ee3f1bd10d984e8b03747d5bc3cb637aeb791474178de2c285857bf69e"
 ARG XGBOOST_SPARK_JAR_SHA256="cd31fb96b26fee197e126215949bc4f5c9a3cafd7ff157ab0037a63777c2935e"
-ARG XGBOOST_URL="https://s3.amazonaws.com/vishnu-mohan/xgboost"
+ARG XGBOOST_URL="https:///downloads.mesosphere.io/mesosphere-jupyter-service/assets/xgboost"
 ARG XGBOOST_VERSION="0.71"
 
 LABEL maintainer="Mesosphere Support <support+jupyter@mesosphere.com>" \
@@ -73,7 +73,7 @@ LABEL maintainer="Mesosphere Support <support+jupyter@mesosphere.com>" \
       org.label-schema.description="Project Jupyter exists to develop open-source software, open-standards, and services for interactive computing across dozens of programming languages." \
       org.label-schema.url="http://jupyter.org" \
       org.label-schema.vcs-ref="${VCS_REF}" \
-      org.label-schema.vcs-url="https://github.com/dcos-labs/dcos-jupyterlab-service" \
+      org.label-schema.vcs-url="https://github.com/mesosphere/mesosphere-jupyter-service" \
       org.label-schema.version="${MESOSPHERE_JUPYTER_VERSION}" \
       org.label-schema.schema-version="1.0"
 

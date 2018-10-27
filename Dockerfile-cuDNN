@@ -1,8 +1,8 @@
-FROM dcoslabs/dcos-jupyterlab
+FROM mesosphere/jupyter
 
 ARG CONDA_ENV_YML="jupyter-root-conda-cudnn-env.yml"
 ARG IBM_GPU_ENABLER_JAR_SHA256="4d5919003fdf915a747f51af83d851bc07588706b415f2a8a24c666bb5a7f977"
-ARG IBM_GPU_ENABLER_URL="https://s3.amazonaws.com/vishnu-mohan/ibm/gpu-enabler"
+ARG IBM_GPU_ENABLER_URL="https:///downloads.mesosphere.io/mesosphere-jupyter-service/assets/ibm/gpu-enabler"
 ARG IBM_GPU_ENABLER_VERSION="2.0.0"
 ARG NVIDIA_CUDA_MAJOR_VERSION="9-0"
 ARG NVIDIA_CUDA_PKG_VERSION="9.0.176"
