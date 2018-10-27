@@ -26,7 +26,7 @@ ARG HADOOP_VERSION="2.9.1"
 ARG HOME="/root"
 ARG JAVA_HOME="/opt/jdk"
 ARG JAVA_URL="https://downloads.mesosphere.com/java"
-ARG JAVA_VERSION="8u172"
+ARG JAVA_VERSION="8u192"
 ARG LANG="en_US.UTF-8"
 ARG LANGUAGE="en_US.UTF-8"
 ARG LC_ALL="en_US.UTF-8"
@@ -233,15 +233,17 @@ RUN cd /tmp \
     && ${CONDA_DIR}/bin/conda update --json -yq pip \
     && ${CONDA_DIR}/bin/conda env update --json -q -f "${CONDA_DIR}/${CONDA_ENV_YML}" \
     && ${CONDA_DIR}/bin/conda remove --force --json -yq openjdk pyqt qt qtconsole \
-    && rm -rf "${HOME}/.npm/_cacache" "${HOME}/.node-gyp" \
-    && rm -rf "${HOME}/.cache/pip" "${HOME}/.cache/yarn" "${HOME}/.node-gyp" \
+    && rm -rf "${HOME}/.cache/pip" "${HOME}/.cache/yarn" "${HOME}/.npm/_cacache" "${HOME}/.node-gyp" \
     && ${CONDA_DIR}/bin/conda clean --json -tipsy \
     && for dir in .conda/envs bin work; \
        do mkdir -p "${HOME}/${dir}"; done \
     && rm -rf /tmp/*
 
+COPY profile "/etc/skel/.profile"
 COPY profile "${HOME}/.profile"
+COPY bash_profile "/etc/skel/.bash_profile"
 COPY bash_profile "${HOME}/.bash_profile"
+COPY bashrc "/etc/skel/.bashrc"
 COPY bashrc "${HOME}/.bashrc"
 
 RUN cp "${MESOSPHERE_PREFIX}/libmesos-bundle/lib/libcurl.so.4" /usr/lib/x86_64-linux-gnu/libcurl.so.4.4.0
@@ -265,6 +267,9 @@ RUN chmod -R ugo+rw "${SPARK_HOME}/conf" \
     && chmod ugo+rw /usr/local/openresty/nginx/conf/nginx.conf \
     && chmod ugo+rw /usr/local/openresty/nginx/conf/sites/proxy.conf
 
-COPY openidc.lua /usr/local/openresty/site/lualib/resty/
 COPY start-spark-history.sh /usr/local/bin/
 COPY start-tensorboard.sh /usr/local/bin/
+COPY start-worker.sh "/usr/local/bin/"
+COPY start-dask-worker.sh "/usr/local/bin/"
+COPY start-ray-worker.sh "/usr/local/bin/"
+COPY ray-worker-health-check.sh "/usr/local/bin/"
