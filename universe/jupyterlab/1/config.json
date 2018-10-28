@@ -4,31 +4,31 @@
     "service": {
       "type": "object",
       "id": "https://github.com/dcos/examples/tree/master/jupyterlab",
-      "title": "DC/OS JuptyerLab Service Configuration",
-      "description": "DC/OS JupyterLab Service Configuration Properties.",
+      "title": "Mesosphere Jupyter Service Configuration",
+      "description": "Mesospere Jupyter Service Configuration Properties.",
       "properties": {
         "name": {
           "type": "string",
-          "title": "DC/OS JupyterLab Service Name",
+          "title": "Mesosphere Jupyter Service Name",
           "description": "Unique name for this DC/OS JupyterLab service instance.",
-          "default": "/jupyterlab-notebook"
+          "default": "/jupyter-notebook"
         },
         "cmd": {
           "type": "string",
-          "title": "DC/OS JupyterLab Service Entrypoint",
-          "description": "The shell command to use to launch the DC/OS JupyterLab Service.",
+          "title": "Mesosphere Jupyter Service Entrypoint",
+          "description": "The shell command to use to launch the Mesosphere Jupyter Service.",
           "default": "/usr/local/bin/start.sh ${CONDA_DIR}/bin/jupyter lab --notebook-dir=\"${MESOS_SANDBOX}\""
         },
         "cpus": {
           "type": "number",
-          "title": "DC/OS JupyterLab Service CPU Allocation",
+          "title": "Mesosphere Jupyter Service CPU Allocation",
           "description": "CPU shares to allocate to this DC/OS JupyterLab service instance.",
           "minimum": 1.0,
           "default": 2.0
         },
         "mem": {
           "type": "integer",
-          "title": "DC/OS JupyterLab Service Memory Allocation",
+          "title": "Mesosphere Jupyter Service Memory Allocation",
           "description": "Memory to allocate to the service instance in MB.",
           "minimum": 4096,
           "default": 8192
@@ -46,8 +46,8 @@
             },
             "gpus": {
               "type": "integer",
-              "title": "DC/OS JupyterLab Service Nvidia GPU Allocation",
-              "description": "Number of Nvidia GPUs to allocate to the DC/OS JupyterLab Service.\nNote: GPU support has to be enabled.",
+              "title": "Mesosphere Jupyter Service Nvidia GPU Allocation",
+              "description": "Number of Nvidia GPUs to allocate to the Mesosphere Jupyter Service.\nNote: GPU support has to be enabled.",
               "minimum": 0,
               "default": 0
             }
@@ -61,7 +61,7 @@
         },
         "service_account": {
           "type": "string",
-          "title": "DC/OS JupyterLab Service Account",
+          "title": "Mesosphere Jupyter Service Account",
           "description": "The DC/OS Service Account to use for service authentication, or empty to use the default.",
           "default": ""
         },
@@ -90,7 +90,7 @@
       "properties": {
         "enable_oidc": {
           "type": "boolean",
-          "title": "Enable OpenID Connect Authentication for the DC/OS JupyterLab Service?",
+          "title": "Enable OpenID Connect Authentication for the Mesosphere Jupyter Service?",
           "description": "Enable OpenID Connect Authentication (and optional Authorization)?",
           "default": false
         },
@@ -346,8 +346,8 @@
     },
     "storage": {
       "type": "object",
-      "title": "DC/OS JupyterLab Service Storage Configuration.",
-      "description": "DC/OS JupyterLab Service Storage Configuration.",
+      "title": "Mesosphere Jupyter Service Storage Configuration.",
+      "description": "Mesosphere Jupyter Service Storage Configuration.",
       "properties": {
         "s3": {
           "type": "object",

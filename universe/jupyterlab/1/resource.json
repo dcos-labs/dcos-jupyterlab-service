@@ -10,10 +10,10 @@
   "assets": {
     "container": {
       "docker": {
-        "jupyter-docker": "dcoslabs/dcos-jupyterlab:1.2.0-0.33.7",
-        "jupyter-docker-gpu": "dcoslabs/dcos-jupyterlab:1.2.0-0.33.7-gpu",
-        "spark-executor": "dcoslabs/dcos-spark:1.11.4-2.2.1",
-        "spark-executor-gpu": "dcoslabs/dcos-spark:1.11.4-2.2.1-gpu"
+        "jupyter-docker": "mesosphere/mesosphere-jupyter-service:1.3.0-0.35.2",
+        "jupyter-docker-gpu": "mesosphere/mesosphere-jupyter-service:1.3.0-0.35.2",
+        "worker-docker": "mesosphere/mesosphere-data-toolkit:1.0.0-1.0.0",
+        "worker-docker-gpu": "mesosphere/mesosphere-data-toolkit:1.0.0-1.0.0-gpu"
       }
     }
   }
