@@ -9,38 +9,38 @@
       "properties": {
         "name": {
           "type": "string",
-          "title": "Mesosphere Jupyter Service Name",
-          "description": "Unique name for this DC/OS JupyterLab service instance.",
+          "title": "Service Name",
+          "description": "Unique name for this Mesosphere Jupyter Service instance.",
           "default": "/jupyter-notebook"
         },
         "cmd": {
           "type": "string",
-          "title": "Mesosphere Jupyter Service Entrypoint",
+          "title": "Entrypoint",
           "description": "The shell command to use to launch the Mesosphere Jupyter Service.",
           "default": "/usr/local/bin/start.sh ${CONDA_DIR}/bin/jupyter lab --notebook-dir=\"${MESOS_SANDBOX}\""
         },
         "cpus": {
           "type": "number",
-          "title": "Mesosphere Jupyter Service CPU Allocation",
-          "description": "CPU shares to allocate to this DC/OS JupyterLab service instance.",
+          "title": "CPU Allocation",
+          "description": "CPU shares to allocate to this service instance - e.g., 2.0",
           "minimum": 1.0,
           "default": 2.0
         },
         "mem": {
           "type": "integer",
-          "title": "Mesosphere Jupyter Service Memory Allocation",
-          "description": "Memory to allocate to the service instance in MB.",
+          "title": "Memory Allocation",
+          "description": "Memory to allocate to the service instance in MiB - e.g., 8192",
           "minimum": 4096,
           "default": 8192
         },
         "gpu_support": {
           "type": "object",
           "title": "Nvidia GPU Configuration",
-          "description": "Nvidia GPU configuration for the JupyterLab Notebook.",
+          "description": "Nvidia GPU Allocation Configuration.",
           "properties": {
             "enabled": {
               "title": "Enable Nvidia GPU Support?",
-              "description": "Note: This requires that CUDA 9.0.176-compatible Nvidia drivers be installed on the DC/OS agents that have GPUs.",
+              "description": "Note: This requires that CUDA 9.0-compatible Nvidia drivers be installed on the DC/OS agents that have GPUs.",
               "type": "boolean",
               "default": false
             },
@@ -55,14 +55,14 @@
         },
         "user": {
           "type": "string",
-          "title": "Linux User (Process Execution Context)",
-          "description": "The Linux user under which the JupyterLab Notebook will run.",
+          "title": "Linux User (Notebook Process Execution Context)",
+          "description": "The Linux user account name as whom the Jupyter Notebook will run.",
           "default": "nobody"
         },
         "service_account": {
           "type": "string",
-          "title": "Mesosphere Jupyter Service Account",
-          "description": "The DC/OS Service Account to use for service authentication, or empty to use the default.",
+          "title": "Jupyter Notebook Service Account",
+          "description": "The DC/OS Service Account to use for Service Authentication (e.g., Apache Spark), or leave empty to use the default.",
           "default": ""
         },
         "service_account_secret": {
@@ -73,8 +73,8 @@
         },
         "force_pull_image": {
           "type": "boolean",
-          "title": "Force-Pull DC/OS JupyterLab Docker?",
-          "description": "Always force a pull of the DC/OS JupyterLab Docker image?",
+          "title": "Force-Pull Mesosphere Jupyter Service Docker Image?",
+          "description": "Always force a pull of the Meossphere Jupyter Service Docker Image?",
           "default": false
         }
       },
@@ -116,7 +116,7 @@
           "type": "string",
           "title": "OIDC Client Secret",
           "description": "OpenID Connect Client Secret.",
-          "default": "b874f6e9-8f3f-41a6-a206-53e928d24fb1"
+          "default": ""
         },
         "oidc_tls_verify": {
           "type": "boolean",
@@ -133,7 +133,7 @@
         "oidc_authorized_upn": {
           "type": "string",
           "title": "User Principal Name (UPN) to Authorize",
-          "description": "(Optional) Windows Active Directory Federation Services UPN to be authorized (e.g., user007), once authenticated.",
+          "description": "(Optional) Windows Active Directory Federation Services (AD FS) UPN to be authorized (e.g., user007), once authenticated.",
           "default": ""
         },
         "oidc_logout_path": {
@@ -166,8 +166,8 @@
           "title": "spark.cores.max",
           "description": "The maximum amount of CPU cores to request for the application from across the cluster.",
           "type": "integer",
-          "minimum": "1",
-          "default": "5"
+          "minimum": 1,
+          "default": 5
         },
         "spark_driver_cores": {
           "type": "integer",
@@ -178,15 +178,15 @@
         },
         "spark_conf_executor_cores": {
           "title": "spark.executor.cores",
-          "description": "The number of cores to use on each executor.",
+          "description": "The number of cores to use on each executor. Note: This MUST be set to 1 if using TensorFlowOnSpark",
           "type": "integer",
-          "minimum": "1",
-          "default": "1"
+          "minimum": 1,
+          "default": 1
         },
         "spark_driver_memory": {
           "type": "string",
           "title": "spark.driver.memory",
-          "description": "Amount of memory (--driver-memory) to use for the driver process, i.e. where SparkContext is initialized, in MiB unless otherwise specified (e.g. 1g, 2g).",
+          "description": "Amount of memory (--driver-memory) to use for the driver process, i.e. where SparkContext is initialized, in MiB unless otherwise specified (e.g. 1g, 2g). Note: This must be less than 75% of the memory allocation for the Notebook.",
           "default": "6g"
         },
         "spark_conf_executor_memory": {
@@ -197,11 +197,11 @@
         },
         "spark_conf_spark_scheduler_min_registered_resources_ratio": {
           "title": "spark.scheduler.minRegisteredResourcesRatio",
-          "description": "The minimum ratio of registered resources.",
+          "description": "The minimum ratio of registered resources before the Spark Driver will allocate work to the Spark Executors.",
           "type": "number",
-          "minimum": "0.0",
-          "maximum": "1.0",
-          "default": "1.0"
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "default": 1.0
         },
         "spark_driver_java_options": {
           "type": "string",
@@ -229,63 +229,37 @@
         },
         "spark_conf_hadoop_fs_s3a_aws_credentials_provider": {
           "type": "string",
-          "enum":[
-              "com.amazonaws.auth.InstanceProfileCredentialsProvider", 
-              "com.amazonaws.auth.EnvironmentVariableCredentialsProvider"
-          ],
-          "title": "spark.hadoop.fs.s3a.aws.credentials.provider",
-          "description": "Hadoop FS S3A Client Credentials Provider.",
-          "default": "com.amazonaws.auth.InstanceProfileCredentialsProvider"
-        },
-        "spark_conf_jars_packages": {
-          "type": "string",
-          "title": "spark.jars.packages",
-          "description": "Comma-separated list of Maven coordinates of jars to include on the driver and executor classpaths.",
-          "default": "org.apache.spark:spark-streaming-kafka-0-10_2.11:2.2.1,org.apache.kafka:kafka_2.11:0.10.2.1"
-        },
-        "spark_conf_mesos_executor_docker_image": {
-          "type": "string",
-          "title": "spark.mesos.executor.docker.image",
-          "description": "Set the name of the docker image that the Spark executors will run in.",
-          "default": "dcoslabs/dcos-spark:1.11.4-2.2.1"
-        },
-        "spark_conf_mesos_executor_home": {
-          "type": "string",
-          "title": "spark.mesos.executor.home",
-          "description": "Set the directory in which Spark is installed on the executors in Mesos.",
-          "default": "/opt/spark"
-        },
-        "spark_conf_mesos_containerizer": {
-          "type": "string",
           "enum": [
               "mesos",
               "docker"
           ],
-          "id": "https://docs.mesosphere.com/1.11/deploying-services/containerizers/#container-runtime-features",
+          "id": "https://docs.mesosphere.com/1.12/deploying-services/containerizers/#container-runtime-features",
           "title": "spark.mesos.containerizer",
           "description": "Must be one of 'mesos' or 'docker'. Note: The Docker Containerizer does not support GPUs or File-Based Secrets",
           "default": "mesos"
         },
         "spark_conf_mesos_principal": {
-          "description": "Spark Mesos Principal.",
           "type": "string",
+          "title": "",
+          "description": "Spark Mesos Principal.",
           "default": ""
         },
         "spark_conf_mesos_role": {
-          "description": "Spark Mesos Role.",
           "type": "string",
+          "title": "",
+          "description": "Spark Mesos Role.",
           "default": ""
         },
         "spark_conf_mesos_driver_labels": {
           "type": "string",
           "title": "spark.mesos.driver.labels",
-          "description": "Mesos labels to add to the driver. Labels are free-form key-value pairs. Key-value pairs should be separated by a colon, and commas used to list more than one. If your label includes a colon or comma, you can escape it with a backslash. Ex. key:value,key2:a\:b.",
+          "description": "Mesos labels to add to the driver. Labels are free-form key-value pairs. Key-value pairs should be separated by a colon, and commas used to list more than one. If your label includes a colon or comma, you can escape it with a backslash. Ex. key:value,key2:a\\:b.",
           "default": "DCOS_SPACE:"
         },
         "spark_conf_mesos_task_labels": {
           "type": "string",
           "title": "spark.mesos.task.labels",
-          "description": "Set the Mesos labels to add to each task. Labels are free-form key-value pairs. Key-value pairs should be separated by a colon, and commas used to list more than one. If your label includes a colon or comma, you can escape it with a backslash. Ex. key:value,key2:a\:b.",
+          "description": "Set the Mesos labels to add to each task. Labels are free-form key-value pairs. Key-value pairs should be separated by a colon, and commas used to list more than one. If your label includes a colon or comma, you can escape it with a backslash. Ex. key:value,key2:a\\:b.",
           "default": "DCOS_SPACE:"
         },
         "spark_conf_executor_krb5_config": {
@@ -403,16 +377,17 @@
     },
     "networking": {
       "type": "object",
-      "title": "DC/OS JupyterLab Networking Configuration",
-      "description": "DC/OS JupyterLab Networking Configuration.",
+      "title": "Mesosphere Jupyter Service Networking Configuration",
+      "description": "Mesosphere Jupyter Service Networking Configuration.",
       "properties": {
         "cni_support": {
           "type": "object",
+          "title": "",
           "description": "Enable Container Networking Interface (CNI) Support.",
           "properties": {
             "enabled": {
-              "description": "Enable CNI support for this JupyterLab instance.",
               "type": "boolean",
+              "description": "Enable CNI support for this Jupyter Notebook instance.",
               "default": true
             }
           }
@@ -422,13 +397,13 @@
           "description": "Enable access from outside the cluster through Marathon-LB.\nNOTE: this connection is unencrypted.",
           "properties": {
             "enabled": {
-              "description": "Enable or disable external access through a public node via Marathon-LB.",
               "type": "boolean",
+              "description": "Enable or disable external access through a public node via Marathon-LB.",
               "default": true
             },
             "external_public_agent_hostname": {
-              "description": "For external access, DNS to be used for Marathon-LB vHost: For example use your public slave ELB DNS.",
               "type": "string",
+              "description": "For external access, DNS to be used for Marathon-LB vHost: For example use your public slave ELB DNS.",
               "default": ""
             }
           }
@@ -437,86 +412,108 @@
     },
     "environment": {
       "type": "object",
-      "description": "Additional Configuration Options.\n\nE.g. setting a JupyterLab password, overwriting the TensorBoard log directory.",
+      "title": "",
+      "description": "Additional Configuration Options.",
       "properties": {
         "conda_envs_path": {
-          "description": "Conda Environments Path.",
           "type": "string",
+          "title": "Conda Environment Paths",
+          "description": "Conda Environment Paths (CONDA_ENVS_PATH).",
           "default": "/mnt/mesos/sandbox/conda/envs:/opt/conda/envs"
         },
         "conda_pkgs_dir": {
-          "description": "Conda Packages Directories.",
           "type": "string",
+          "title": "Conda Package Directory Paths",
+          "description": "Conda Package Directory Paths (CONDA_PKGS_DIRS).",
           "default": "/mnt/mesos/sandbox/conda/pkgs:/opt/conda/pkgs"
         },
         "dcos_dir": {
-          "description": "DC/OS CLI Config Directory.",
           "type": "string",
+          "title": "DC/OS CLI Configuration Directory",
+          "description": "DC/OS CLI Config Directory (DCOS_DIR).",
           "default": "/mnt/mesos/sandbox/.dcos"
         },
         "hadoop_conf_dir": {
-          "description": "Hadoop Configuration Directory.",
           "type": "string",
+          "title": "Haddop Configuration Directory",
+          "description": "Hadoop Configuration Directory (HADOOP_CONF_DIR).",
           "default": "/mnt/mesos/sandbox"
         },
         "home": {
-          "description": "Your Home Directory.",
           "type": "string",
+          "title": "Home Directory",
+          "description": "Your Home Directory (HOME).",
           "default": "/mnt/mesos/sandbox"
         },
         "java_opts": {
-          "description": "Java Options.",
           "type": "string",
+          "title": "JVM Options",
+          "description": "JVM Options (JAVA_OPTS).",
           "default": "'-server -XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/mnt/mesos/sandbox'"
         },
         "jupyter_conf_urls": {
-          "description": "Jupyter Configuration URLs as comma seperated list of URLs.",
           "type": "string",
+          "title": "Jupyter Configuration URLs",
+          "description": "Jupyter Configuration URLs as comma seperated list of URLs (JUPYTER_CONF_URLS).",
           "default": ""
         },
         "jupyter_config_dir": {
-          "description": "Jupyter Configuration Directory.",
           "type": "string",
+          "title": "Jupyter Notebook Configuration Directory",
+          "description": "Jupyter Notebook Configuration Directory (JUPYTER_CONFIG_DIR).",
           "default": "/mnt/mesos/sandbox/.jupyter"
         },
         "jupyter_password": {
-          "description": "Jupyter Password.\n\nIf empty it defaults to password: \"jupyter\"",
           "type": "string",
-          "default": ""
+          "title": "Jupyter Notebook Password",
+          "description": "Jupyter Notebook Password (JUPYTER_PASSWORD).\n\nDefaults to\"jupyter\" unless deployed into a folder",
+          "default": "jupyter"
         },
         "jupyter_runtime_dir": {
-          "description": "Jupyter Runtime Directory.",
           "type": "string",
+          "title": "Jupyter Notebook Runtime Directory",
+          "description": "Jupyter Notebook Runtime Directory (JUPYTER_RUNTIME_DIR).",
           "default": "/mnt/mesos/sandbox/.local/share/jupyter/runtime"
         },
         "nginx_log_level": {
-          "description": "NGINX log level.",
           "type": "string",
+          "enum": [
+              "debug",
+              "warn",
+              "info"
+          ],
+          "title": "NGINX Log Level",
+          "description": "NGINX Log Level (NGINX_LOG_LEVEL).",
           "default": "warn"
         },
         "start_dask_distributed": {
-          "description": "Start Dask distributed.",
           "type": "boolean",
+          "title": "Start Dask Distributed?",
+          "description": "Start Dask's Distributed Scheduler?",
           "default": false
         },
         "start_ray_head_node": {
-          "description": "Start Ray Head Node.",
           "type": "boolean",
+          "title": "Start Ray Head Node?",
+          "description": "Start Ray Head Node?",
           "default": false
         },
         "start_tensorboard": {
-          "description": "Start TensorBoard.",
           "type": "boolean",
+          "title": "Start TensorBoard?",
+          "description": "Start TensorBoard?",
           "default": false
         },
         "tensorboard_logdir": {
-          "description": "TensorBoard Log Dir.",
           "type": "string",
+          "title": "TensorBoard Log Directory",
+          "description": "TensorBoard Log Directory.",
           "default": "hdfs://hdfs/"
         },
         "term": {
-          "description": "Unix Terminal Type.",
           "type": "string",
+          "title": "Terminal (TTY) Type",
+          "description": "Unix Terminal Type.",
           "default": "xterm-256color"
         }
       }

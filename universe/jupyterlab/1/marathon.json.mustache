@@ -11,8 +11,8 @@
 
   "container": {
     "type": "MESOS",
-    "volumes": [
     {{#storage.persistence.enable}}
+    "volumes": [
         {
         "persistent": {
         "type": "root",
@@ -27,8 +27,8 @@
         "hostPath": "persistent_data",
         "mode": "RW"
         }
-    {{/storage.persistence.enable}}
     ],
+    {{/storage.persistence.enable}}
     "docker": {
       {{#service.gpu_support.enabled}}
       "image": "{{resource.assets.container.docker.jupyter-docker-gpu}}",
