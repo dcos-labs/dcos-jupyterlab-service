@@ -21,11 +21,11 @@ dependencies:
 - colour
 - conda-pack
 - cython
-- dask=0.19.*
+- dask=0.20.*
 - dask-ml
 - dask-tensorflow
 - dask-xgboost
-- distributed=1.23.*
+- distributed=1.24.*
 - flake8
 - flask
 - funcsigs
@@ -43,6 +43,7 @@ dependencies:
 - h5py
 - ibis-framework
 - invoke
+- ipyleaflet
 - ipywidgets=7.4.*
 - itsdangerous
 - jupyter
@@ -91,7 +92,7 @@ dependencies:
 - qtconsole
 - qgrid
 - quandl
-- r-base
+- r-base=3.5.*
 - r-caret
 - r-devtools
 - r-forecast
