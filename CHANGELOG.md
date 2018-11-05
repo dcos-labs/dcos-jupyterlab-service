@@ -1,4 +1,4 @@
-# Release: 1.3.0-0.35.2
+# Release: 1.3.0-0.35.3
 
 ## Major Features and Improvements
 
@@ -9,6 +9,7 @@
 * gensim
 * h2oai::h2o
 * ibis-framework
+* ipyleaflet
 * nbdime
 * nbserverproxy
 * numexpr
@@ -34,11 +35,12 @@
 
 ### Package Bumps
 
-* dask 0.19.4
-* distributed 1.23.3
-* jupyterlab 0.35.2
+* dask 0.20.0
+* distributed 1.24.0
+* jupyterlab 0.35.3
 * mlflow 0.7.0
 * pyarrow 0.11.0
+* r-base 3.5.1
 * ray[rllib] 0.5.3
 * setuptools 40.4.3
 * tensorflow 1.11.0
@@ -51,6 +53,8 @@
 * [dask-labextension](https://github.com/dask/dask-labextension)
 * [jupyterlab/git](https://github.com/jupyterlab/jupyterlab-git)
 * [jupyterlab-drawio](https://github.com/QuantStack/jupyterlab-drawio)
+* [jupyter-leaflet](https://github.com/jupyter-widgets/ipyleaflet)
+* [jupyterlab-kernelspy](https://github.com/vidartf/jupyterlab-kernelspy)
 * [jupyterlab_iframe](jupyterlab_iframe)
 * [nbdime-jupyterlab](https://github.com/jupyter/nbdime)
 * [nbserverproxy](https://github.com/jupyterhub/nbserverproxy)
@@ -63,7 +67,8 @@
 
 ### Miscellaneous Bumps
 
-* zmartzone/lua-resty-openidc [8dfd8c7](https://github.com/zmartzone/lua-resty-openidc/commit/8dfd8c790cfd5af3af0b8a0cdf705baf568ef3ae)
+* libmesos-bundle [1.12.0](https://downloads.mesosphere.com/libmesos-bundle/libmesos-bundle-1.12.0.tar.gz)
+* zmartzone/lua-resty-openidc [1.7.0](https://github.com/zmartzone/lua-resty-openidc/releases/tag/v1.7.0)
 
 ### OpenID Connect
 

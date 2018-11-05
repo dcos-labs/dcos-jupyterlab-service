@@ -30,15 +30,15 @@ ARG JAVA_VERSION="8u192"
 ARG LANG="en_US.UTF-8"
 ARG LANGUAGE="en_US.UTF-8"
 ARG LC_ALL="en_US.UTF-8"
-ARG LIBMESOS_BUNDLE_SHA256="bd4a785393f0477da7f012bf9624aa7dd65aa243c94d38ffe94adaa10de30274"
+ARG LIBMESOS_BUNDLE_SHA256="5ae872665cfe7ba370cc2d68f4402b594e35971a4cbbe2933b8883ff34781052"
 ARG LIBMESOS_BUNDLE_URL="https://downloads.mesosphere.com/libmesos-bundle"
-ARG LIBMESOS_BUNDLE_VERSION="1.11.0"
+ARG LIBMESOS_BUNDLE_VERSION="1.12.0"
 ARG MESOSPHERE_PREFIX="/opt/mesosphere"
 ARG MESOS_JAR_SHA1="aab2e3118b01536af38c3b4243224149c625f008"
 ARG MESOS_MAVEN_URL="https://repo1.maven.org/maven2/org/apache/mesos/mesos"
 ARG MESOS_PROTOBUF_JAR_SHA1="bfb740747d97e5781c7f6c04bbfa93f5c2df0d4f"
 ARG MESOS_VERSION="1.7.0"
-ARG MESOSPHERE_JUPYTER_VERSION="1.3.0-0.35.2"
+ARG MESOSPHERE_JUPYTER_VERSION="1.3.0-0.35.3"
 ARG NB_GID="100"
 ARG NB_UID="1000"
 ARG NB_USER="jovyan"
@@ -267,7 +267,9 @@ RUN cd /tmp \
     && ${CONDA_DIR}/bin/jupyter labextension install beakerx-jupyterlab@1.1.0 \
     && ${CONDA_DIR}/bin/jupyter labextension install bqplot \
     && ${CONDA_DIR}/bin/jupyter labextension install dask-labextension \
+    && ${CONDA_DIR}/bin/jupyter labextension install jupyter-leaflet \
     && ${CONDA_DIR}/bin/jupyter labextension install jupyterlab-drawio \
+    && ${CONDA_DIR}/bin/jupyter labextension install jupyterlab-kernelspy \
     && ${CONDA_DIR}/bin/jupyter labextension install jupyterlab_bokeh \
     && ${CONDA_DIR}/bin/jupyter labextension install jupyterlab_iframe \
     && ${CONDA_DIR}/bin/jupyter labextension install knowledgelab \
