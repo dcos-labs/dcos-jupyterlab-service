@@ -47,7 +47,7 @@ dependencies:
 - ipywidgets=7.4.*
 - itsdangerous
 - jupyter
-- jupyterlab=0.35.*
+- jupyterlab=0.35.4
 - jupyter_console
 - jupyter_contrib_nbextensions
 - jupyter_enterprise_gateway
