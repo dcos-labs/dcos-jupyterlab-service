@@ -1,4 +1,4 @@
-# Release: 1.3.0-0.35.3
+# Release: 1.3.0-0.34.12
 
 ## Major Features and Improvements
 
@@ -37,7 +37,7 @@
 
 * dask 0.20.0
 * distributed 1.24.0
-* jupyterlab 0.35.3
+* jupyterlab 0.34.12
 * mlflow 0.7.0
 * pyarrow 0.11.0
 * r-base 3.5.1
