@@ -38,7 +38,7 @@ ARG MESOS_JAR_SHA1="aab2e3118b01536af38c3b4243224149c625f008"
 ARG MESOS_MAVEN_URL="https://repo1.maven.org/maven2/org/apache/mesos/mesos"
 ARG MESOS_PROTOBUF_JAR_SHA1="bfb740747d97e5781c7f6c04bbfa93f5c2df0d4f"
 ARG MESOS_VERSION="1.7.0"
-ARG MESOSPHERE_JUPYTER_VERSION="1.3.0-0.35.3"
+ARG MESOSPHERE_JUPYTER_VERSION="1.3.0-0.35.4"
 ARG NB_GID="100"
 ARG NB_UID="1000"
 ARG NB_USER="jovyan"
@@ -264,7 +264,7 @@ RUN cd /tmp \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/plotly-extension \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/toc \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/vega2-extension \
-    && ${CONDA_DIR}/bin/jupyter labextension install beakerx-jupyterlab@1.1.0 \
+    && ${CONDA_DIR}/bin/jupyter labextension install beakerx-jupyterlab@1.2.0 \
     && ${CONDA_DIR}/bin/jupyter labextension install bqplot \
     && ${CONDA_DIR}/bin/jupyter labextension install dask-labextension \
     && ${CONDA_DIR}/bin/jupyter labextension install jupyter-leaflet \
