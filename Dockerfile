@@ -347,3 +347,6 @@ COPY --chown="1000:100" jupyter_notebook_config.py "${HOME}/.jupyter/"
 COPY --chown="1000:100" beakerx.json "${HOME}/.jupyter/"
 
 USER "${NB_UID}"
+
+# Patch to work with TensorFlow 1.11 - https://github.com/yahoo/TensorFlowOnSpark/pull/361
+COPY --chown="1000:100" TFSparkNode.py "${CONDA_DIR}/lib/python3.6/site-packages/tensorflowonspark/"

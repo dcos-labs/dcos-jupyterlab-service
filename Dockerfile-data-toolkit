@@ -273,3 +273,6 @@ COPY start-worker.sh "/usr/local/bin/"
 COPY start-dask-worker.sh "/usr/local/bin/"
 COPY start-ray-worker.sh "/usr/local/bin/"
 COPY ray-worker-health-check.sh "/usr/local/bin/"
+
+# Patch to work with TensorFlow 1.11 - https://github.com/yahoo/TensorFlowOnSpark/pull/361
+COPY TFSparkNode.py "${CONDA_DIR}/lib/python3.6/site-packages/tensorflowonspark/"
