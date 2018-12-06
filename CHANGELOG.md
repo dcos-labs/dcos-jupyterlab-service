@@ -37,6 +37,7 @@
 
 * dask 1.0.0
 * distributed 1.25.0
+* hadoop 2.9.2
 * jupyterlab 0.35.4
 * mlflow 0.8.0
 * pyarrow 0.11.0
