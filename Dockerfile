@@ -12,7 +12,7 @@ ARG CONDA_URL="https://repo.continuum.io/miniconda"
 ARG DCOS_CLI_URL="https://downloads.dcos.io/binaries/cli/linux/x86-64"
 ARG DCOS_CLI_VERSION="1.12"
 ARG DCOS_COMMONS_URL="https://downloads.mesosphere.com/dcos-commons"
-ARG DCOS_COMMONS_VERSION="0.54.0"
+ARG DCOS_COMMONS_VERSION="0.54.3"
 ARG DEBCONF_NONINTERACTIVE_SEEN="true"
 ARG DEBIAN_FRONTEND="noninteractive"
 ARG DEBIAN_REPO="http://cdn-fastly.deb.debian.org"
@@ -264,7 +264,7 @@ RUN cd /tmp \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/plotly-extension \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/toc \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/vega2-extension \
-    && ${CONDA_DIR}/bin/jupyter labextension install beakerx-jupyterlab@1.2.0 \
+    && ${CONDA_DIR}/bin/jupyter labextension install beakerx-jupyterlab@1.3.0 \
     && ${CONDA_DIR}/bin/jupyter labextension install bqplot \
     && ${CONDA_DIR}/bin/jupyter labextension install dask-labextension \
     && ${CONDA_DIR}/bin/jupyter labextension install jupyter-leaflet \
@@ -347,6 +347,3 @@ COPY --chown="1000:100" jupyter_notebook_config.py "${HOME}/.jupyter/"
 COPY --chown="1000:100" beakerx.json "${HOME}/.jupyter/"
 
 USER "${NB_UID}"
-
-# Patch to work with TensorFlow 1.11 - https://github.com/yahoo/TensorFlowOnSpark/pull/361
-COPY --chown="1000:100" TFSparkNode.py "${CONDA_DIR}/lib/python3.6/site-packages/tensorflowonspark/"

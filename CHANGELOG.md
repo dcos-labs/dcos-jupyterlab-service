@@ -35,17 +35,17 @@
 
 ### Package Bumps
 
-* dask 0.20.0
-* distributed 1.24.0
+* dask 1.0.0
+* distributed 1.25.0
 * jupyterlab 0.35.4
-* mlflow 0.7.0
+* mlflow 0.8.0
 * pyarrow 0.11.0
 * r-base 3.5.1
-* ray[rllib] 0.5.3
+* ray[rllib] 0.6.0
 * setuptools 40.4.3
 * tensorflow 1.11.0
-* tensorflowonspark 1.3.4
-* toree 0.3.0-incubating-rc1
+* tensorflowonspark 1.4.1
+* toree 0.3.0-incubating
 
 ### Jupyter Extensions Additions
 
@@ -62,8 +62,8 @@
 
 ### NVIDIA Library Bumps
 
-* cuDNN 7.3.1.20-1+cuda9.0
-* NCCL 2.3.5-2+cuda9.0
+* cuDNN 7.4.1.5-1+cuda9.0
+* NCCL 2.3.7-1+cuda9.0
 
 ### Miscellaneous Bumps
 
@@ -89,4 +89,4 @@
 
 ### Features
 
-* Apache Toree, as of [0.3.0-incubating-rc1](https://github.com/apache/incubator-toree/releases/tag/v0.3.0-incubating-rc1) has [removed support for PySpark and SparkR](https://github.com/apache/incubator-toree/commit/276165ae2ac136a59d208058a031caf769bb312e), only the Scala and SQL interpreters will remain available. The [vanilla PySpark and SparkR kernels, however retain their ability to launch pre-configured Spark Jobs](https://github.com/mesosphere/mesosphere-jupyter-service/blob/master/jupyter_notebook_config.py#L231-L232)
+* Apache Toree, as of [0.3.0-incubating](https://github.com/apache/incubator-toree/releases/tag/v0.3.0-incubating) has [removed support for PySpark and SparkR](https://github.com/apache/incubator-toree/commit/276165ae2ac136a59d208058a031caf769bb312e), only the Scala and SQL interpreters will remain available. The [vanilla PySpark and SparkR kernels, however retain their ability to launch pre-configured Spark Jobs](https://github.com/mesosphere/mesosphere-jupyter-service/blob/master/jupyter_notebook_config.py#L231-L232)
