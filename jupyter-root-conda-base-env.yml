@@ -10,7 +10,7 @@ dependencies:
 - attrs
 - awscli
 - bazel
-- beakerx=1.2.*
+- beakerx=1.3.*
 - beautifulsoup4
 - bokeh
 - boost
@@ -21,11 +21,11 @@ dependencies:
 - colour
 - conda-pack
 - cython
-- dask=0.20.*
+- dask=1.0.*
 - dask-ml
 - dask-tensorflow
 - dask-xgboost
-- distributed=1.24.*
+- distributed=1.25.*
 - flake8
 - flask
 - funcsigs
@@ -110,6 +110,7 @@ dependencies:
 - scipy
 - sdl2
 - selenium
+- setproctitle
 - simplejson
 - smmap2
 - sqlalchemy
@@ -128,14 +129,14 @@ dependencies:
   - flatbuffers
   - gym[atari]
   - horovod
-  - https://dist.apache.org/repos/dist/dev/incubator/toree/0.3.0-incubating-rc1/toree-pip/toree-0.3.0.tar.gz
+  - https://dist.apache.org/repos/dist/release/incubator/toree/0.3.0-incubating/toree-pip/toree-0.3.0.tar.gz
   - https://github.com/quantopian/pgcontents/archive/master.tar.gz
   - https://github.com/vishnu2kmohan/jupyter-spark-history-dcos/archive/0.1.0.zip
   - jupyterlab-git
   - jupyterlab_github
   - jupyterlab_iframe
   - knowledgelab
-  - mlflow==0.7.*
+  - mlflow==0.8.*
   - nb2kg
   - opencv-python
   - pixiedust
@@ -145,7 +146,7 @@ dependencies:
   - psycopg2-binary
   - pyglet
   - PyOpenGL
-  - ray[rllib]==0.5.*
+  - ray[rllib]==0.6.*
   - redis
   - rise
   - s3cmd
@@ -154,5 +155,5 @@ dependencies:
   - sparkmonitor
   - tensorflow==1.11.*
   - tensorflow-hub
-  - tensorflowonspark==1.3.*
+  - tensorflowonspark==1.4.*
   - uuid

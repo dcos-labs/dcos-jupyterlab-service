@@ -12,7 +12,7 @@ ARG CONDA_URL="https://repo.continuum.io/miniconda"
 ARG DCOS_CLI_URL="https://downloads.dcos.io/binaries/cli/linux/x86-64"
 ARG DCOS_CLI_VERSION="1.12"
 ARG DCOS_COMMONS_URL="https://downloads.mesosphere.com/dcos-commons"
-ARG DCOS_COMMONS_VERSION="0.54.0"
+ARG DCOS_COMMONS_VERSION="0.54.3"
 ARG DEBCONF_NONINTERACTIVE_SEEN="true"
 ARG DEBIAN_FRONTEND="noninteractive"
 ARG DEBIAN_REPO="http://cdn-fastly.deb.debian.org"
@@ -20,9 +20,9 @@ ARG DISTRO="debian"
 ARG GPG_KEYSERVER="hkps://zimmermann.mayfirst.org"
 ARG HADOOP_HDFS_HOME="/opt/hadoop"
 ARG HADOOP_MAJOR_VERSION="2.9"
-ARG HADOOP_SHA256="eed6015a123644d3b4247bac58770e4a8b31340fa62721987430e15a0dd942fc"
+ARG HADOOP_SHA256="3d2023c46b1156c1b102461ad08cbc17c8cc53004eae95dab40a1f659839f28a"
 ARG HADOOP_URL="http://www-us.apache.org/dist/hadoop/common"
-ARG HADOOP_VERSION="2.9.1"
+ARG HADOOP_VERSION="2.9.2"
 ARG HOME="/home/jovyan"
 ARG JAVA_HOME="/opt/jdk"
 ARG JAVA_URL="https://downloads.mesosphere.com/java"
@@ -30,7 +30,7 @@ ARG JAVA_VERSION="8u192"
 ARG LANG="en_US.UTF-8"
 ARG LANGUAGE="en_US.UTF-8"
 ARG LC_ALL="en_US.UTF-8"
-ARG LIBMESOS_BUNDLE_SHA256="5ae872665cfe7ba370cc2d68f4402b594e35971a4cbbe2933b8883ff34781052"
+ARG LIBMESOS_BUNDLE_SHA256="217c43e4b642c1abdfe0fe309bbaede878cbc9a925562678b1c44273d140d40a"
 ARG LIBMESOS_BUNDLE_URL="https://downloads.mesosphere.com/libmesos-bundle"
 ARG LIBMESOS_BUNDLE_VERSION="1.12.0"
 ARG MESOSPHERE_PREFIX="/opt/mesosphere"
@@ -107,7 +107,7 @@ ENV BOOTSTRAP="${MESOSPHERE_PREFIX}/bin/bootstrap" \
 RUN echo "deb ${DEBIAN_REPO}/${DISTRO} ${CODENAME} main" >> /etc/apt/sources.list \
     && echo "deb ${DEBIAN_REPO}/${DISTRO}-security ${CODENAME}/updates main" >> /etc/apt/sources.list \
     && apt-get update -yq --fix-missing \
-    && apt-get install -yq --no-install-recommends apt-transport-https apt-utils ca-certificates curl dirmngr gnupg locales \
+    && apt-get install -yq --no-install-recommends apt-transport-https apt-utils ca-certificates curl dirmngr gnupg2 locales \
     && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
     && locale-gen \
     && curl --retry 3 -fsSL https://openresty.org/package/pubkey.gpg -o /tmp/openresty-pubkey.gpg \
@@ -163,12 +163,12 @@ RUN echo "deb ${DEBIAN_REPO}/${DISTRO} ${CODENAME} main" >> /etc/apt/sources.lis
 COPY fix-permissions /usr/local/bin/
 
 RUN cd /tmp \
-    && apt-key adv --keyserver "${GPG_KEYSERVER}" --recv-keys "${TINI_GPG_KEY}" \
+    && apt-key adv --no-tty --keyserver "${GPG_KEYSERVER}" --recv-keys "${TINI_GPG_KEY}" \
     && curl --retry 3 -fsSL "${TINI_URL}/${TINI_VERSION}/tini" -o /usr/bin/tini \
     && curl --retry 3 -fsSL -O "${TINI_URL}/${TINI_VERSION}/tini.asc" \
     && export GNUPGHOME="$(mktemp -d)" \
-    && gpg --keyserver "${GPG_KEYSERVER}" --recv-keys "${TINI_GPG_KEY}" \
-    && gpg --batch --verify tini.asc /usr/bin/tini \
+    && gpg --no-tty --keyserver "${GPG_KEYSERVER}" --recv-keys "${TINI_GPG_KEY}" \
+    && gpg --no-tty --batch --verify tini.asc /usr/bin/tini \
     && rm -rf "${GNUPGHOME}" tini.asc \
     && chmod +x /usr/bin/tini \
     && mkdir -p "${CONDA_DIR}" "${HADOOP_HDFS_HOME}" "${JAVA_HOME}" "${MESOSPHERE_PREFIX}/bin" "${SPARK_HOME}" \
@@ -264,7 +264,7 @@ RUN cd /tmp \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/plotly-extension \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/toc \
     && ${CONDA_DIR}/bin/jupyter labextension install @jupyterlab/vega2-extension \
-    && ${CONDA_DIR}/bin/jupyter labextension install beakerx-jupyterlab@1.2.0 \
+    && ${CONDA_DIR}/bin/jupyter labextension install beakerx-jupyterlab@1.3.0 \
     && ${CONDA_DIR}/bin/jupyter labextension install bqplot \
     && ${CONDA_DIR}/bin/jupyter labextension install dask-labextension \
     && ${CONDA_DIR}/bin/jupyter labextension install jupyter-leaflet \
@@ -347,6 +347,3 @@ COPY --chown="1000:100" jupyter_notebook_config.py "${HOME}/.jupyter/"
 COPY --chown="1000:100" beakerx.json "${HOME}/.jupyter/"
 
 USER "${NB_UID}"
-
-# Patch to work with TensorFlow 1.11 - https://github.com/yahoo/TensorFlowOnSpark/pull/361
-COPY --chown="1000:100" TFSparkNode.py "${CONDA_DIR}/lib/python3.6/site-packages/tensorflowonspark/"
