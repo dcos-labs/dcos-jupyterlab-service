@@ -110,6 +110,7 @@ dependencies:
 - scipy
 - sdl2
 - selenium
+- setproctitle
 - simplejson
 - smmap2
 - sqlalchemy

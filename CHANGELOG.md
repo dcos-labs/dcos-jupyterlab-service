@@ -29,6 +29,7 @@
 * r-sparklyr
 * r-tidyverse
 * s3cmd
+* setproctitle
 * typing
 * pygdf
 * quilt[img,pytorch,torchvision]
