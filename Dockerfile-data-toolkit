@@ -30,7 +30,7 @@ ARG JAVA_VERSION="8u192"
 ARG LANG="en_US.UTF-8"
 ARG LANGUAGE="en_US.UTF-8"
 ARG LC_ALL="en_US.UTF-8"
-ARG LIBMESOS_BUNDLE_SHA256="5ae872665cfe7ba370cc2d68f4402b594e35971a4cbbe2933b8883ff34781052"
+ARG LIBMESOS_BUNDLE_SHA256="217c43e4b642c1abdfe0fe309bbaede878cbc9a925562678b1c44273d140d40a"
 ARG LIBMESOS_BUNDLE_URL="https://downloads.mesosphere.com/libmesos-bundle"
 ARG LIBMESOS_BUNDLE_VERSION="1.12.0"
 ARG MESOSPHERE_PREFIX="/opt/mesosphere"
@@ -101,7 +101,7 @@ ENV BOOTSTRAP="${MESOSPHERE_PREFIX}/bin/bootstrap" \
 RUN echo "deb ${DEBIAN_REPO}/${DISTRO} ${CODENAME} main" >> /etc/apt/sources.list \
     && echo "deb ${DEBIAN_REPO}/${DISTRO}-security ${CODENAME}/updates main" >> /etc/apt/sources.list \
     && apt-get update -yq --fix-missing \
-    && apt-get install -yq --no-install-recommends apt-transport-https apt-utils ca-certificates curl dirmngr gnupg locales \
+    && apt-get install -yq --no-install-recommends apt-transport-https apt-utils ca-certificates curl dirmngr gnupg2 locales \
     && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
     && locale-gen \
     && curl --retry 3 -fsSL https://openresty.org/package/pubkey.gpg -o /tmp/openresty-pubkey.gpg \
@@ -153,12 +153,12 @@ RUN echo "deb ${DEBIAN_REPO}/${DISTRO} ${CODENAME} main" >> /etc/apt/sources.lis
     && usermod -a -G users nobody
 
 RUN cd /tmp \
-    && apt-key adv --keyserver "${GPG_KEYSERVER}" --recv-keys "${TINI_GPG_KEY}" \
+    && apt-key adv --no-tty --keyserver "${GPG_KEYSERVER}" --recv-keys "${TINI_GPG_KEY}" \
     && curl --retry 3 -fsSL "${TINI_URL}/${TINI_VERSION}/tini" -o /usr/bin/tini \
     && curl --retry 3 -fsSL -O "${TINI_URL}/${TINI_VERSION}/tini.asc" \
     && export GNUPGHOME="$(mktemp -d)" \
-    && gpg --keyserver "${GPG_KEYSERVER}" --recv-keys "${TINI_GPG_KEY}" \
-    && gpg --batch --verify tini.asc /usr/bin/tini \
+    && gpg --no-tty --keyserver "${GPG_KEYSERVER}" --recv-keys "${TINI_GPG_KEY}" \
+    && gpg --no-tty --batch --verify tini.asc /usr/bin/tini \
     && rm -rf "${GNUPGHOME}" tini.asc \
     && chmod +x /usr/bin/tini \
     && mkdir -p "${CONDA_DIR}" "${HADOOP_HDFS_HOME}" "${JAVA_HOME}" "${MESOSPHERE_PREFIX}/bin" "${SPARK_HOME}" \
