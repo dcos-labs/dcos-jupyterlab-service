@@ -18,6 +18,7 @@ dependencies:
 - cmake
 - colour
 - conda-pack
+- curl=7.62.*
 - cython
 - dask=1.0.*
 - dask-ml
@@ -43,6 +44,7 @@ dependencies:
 - invoke
 - itsdangerous
 - keras
+- libcurl=7.62.*
 - libhdfs3
 - lxml
 - lz4
@@ -62,6 +64,7 @@ dependencies:
 - pillow
 - plotly
 - pluggy
+- protobuf=3.6.*
 - psutil
 - py
 - pyarrow=0.11.*
@@ -94,6 +97,7 @@ dependencies:
 - sdl2
 - selenium
 - setproctitle
+- setuptools=40.6.*
 - simplejson
 - smmap2
 - sqlalchemy
@@ -113,13 +117,12 @@ dependencies:
   - horovod
   - mlflow==0.8.*
   - opencv-python
-  - protobuf==3.6.*
   - psycopg2-binary
   - pyglet
   - PyOpenGL
-  - ray[rllib]==0.6.*
+  - ray[debug,rllib]==0.6.*
   - redis
-  - setuptools==40.4.*
+  - s3cmd
   - tensorflow==1.11.*
   - tensorflow-hub
   - tensorflowonspark==1.4.*

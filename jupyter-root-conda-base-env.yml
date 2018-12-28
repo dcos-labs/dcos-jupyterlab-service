@@ -20,6 +20,7 @@ dependencies:
 - cmake
 - colour
 - conda-pack
+- curl=7.62.*
 - cython
 - dask=1.0.*
 - dask-ml
@@ -53,6 +54,7 @@ dependencies:
 - jupyter_enterprise_gateway
 - jupyter_kernel_gateway
 - keras
+- libcurl=7.62.*
 - libhdfs3
 - lxml
 - lz4
@@ -77,6 +79,7 @@ dependencies:
 - pillow
 - plotly
 - pluggy
+- protobuf=3.6.*
 - psutil
 - py
 - pyarrow=0.11.*
@@ -111,6 +114,7 @@ dependencies:
 - sdl2
 - selenium
 - setproctitle
+- setuptools=40.6.*
 - simplejson
 - smmap2
 - sqlalchemy
@@ -132,6 +136,7 @@ dependencies:
   - https://dist.apache.org/repos/dist/release/incubator/toree/0.3.0-incubating/toree-pip/toree-0.3.0.tar.gz
   - https://github.com/quantopian/pgcontents/archive/master.tar.gz
   - https://github.com/vishnu2kmohan/jupyter-spark-history-dcos/archive/0.1.0.zip
+  - ipykernel==5.1.*
   - jupyterlab-git
   - jupyterlab_github
   - jupyterlab_iframe
@@ -142,16 +147,14 @@ dependencies:
   - pixiedust
   - pixiedust_node
   - pixiegateway
-  - protobuf==3.6.*
   - psycopg2-binary
   - pyglet
   - PyOpenGL
-  - ray[rllib]==0.6.*
+  - ray[debug,rllib]==0.6.*
   - redis
   - rise
   - s3cmd
   - s3contents
-  - setuptools==40.4.*
   - sparkmonitor
   - tensorflow==1.11.*
   - tensorflow-hub
