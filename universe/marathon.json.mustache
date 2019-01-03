@@ -2,9 +2,11 @@
   "id": "{{service.name}}",
   "instances": 1,
   "cpus": {{service.cpus}},
+
   {{#service.gpu.enabled}}
   "gpus": {{service.gpu.gpus}},
   {{/service.gpu.enabled}}
+
   "mem": {{service.mem}},
   "user": "{{service.user}}",
   "cmd": "{{service.cmd}}",
@@ -12,16 +14,19 @@
   "container": {
     "type": "MESOS",
     "volumes": [
+
       {{#service.service_account_secret}}
       {
         "containerPath": "secrets/service-account.json",
         "secret": "serviceCredential"
+
       {{#storage.local_persistence.enabled}}
       },
       {{/storage.local_persistence.enabled}}
       {{^storage.local_persistence.enabled}}
       }
       {{/storage.local_persistence.enabled}}
+
       {{/service.service_account_secret}}
 
       {{#storage.local_persistence.enabled}}
@@ -35,21 +40,25 @@
         }
       },
       {
-        "containerPath": "/mnt/mesos/sandbox/{{storage.local_persistence.volume_path}}",
+        "containerPath": "{{advanced.sandbox}}/{{storage.local_persistence.volume_path}}",
         "hostPath": "{{storage.local_persistence.volume_path}}",
         "mode": "RW"
       }
       {{/storage.local_persistence.enabled}}
+
     ],
     "docker": {
+
       {{#service.gpu.enabled}}
       "image": "{{resource.assets.container.docker.jupyter-docker-gpu}}",
       {{/service.gpu.enabled}}
       {{^service.gpu.enabled}}
       "image": "{{resource.assets.container.docker.jupyter-docker}}",
       {{/service.gpu.enabled}}
+
       "forcePullImage": {{advanced.force_pull_jupyter_image}}
     }
+
     {{#networking.cni_network_enabled}}
     ,
     "portMappings": [
@@ -127,16 +136,20 @@
         }
     ]
   {{/networking.cni_network_enabled}}
+
   },
+
   {{#networking.cni_network_enabled}}
   "networks": [
       {
         "mode": "container",
         "name": "dcos"
+
         {{#networking.cni_network_plugin_labels}}
         ,
         "labels": "{{networking.cni_network_plugin_labels}}"
         {{/networking.cni_network_plugin_labels}}
+
       }
   ],
   {{/networking.cni_network_enabled}}
@@ -221,6 +234,7 @@
     }
   ],
   {{/networking.cni_network_enabled}}
+
   {{#service.service_account_secret}}
   "secrets": {
     "serviceCredential": {
@@ -228,20 +242,22 @@
     }
   },
   {{/service.service_account_secret}}
+
   "env": {
+
     {{#service.service_account_secret}}
     "DCOS_SERVICE_ACCOUNT_CREDENTIAL": "file://secrets/service-account.json",
     "MESOS_MODULES": "{\"libraries\":[{\"file\":\"\/opt\/mesosphere\/libmesos-bundle\/lib\/mesos\/libdcos_security.so\",\"modules\":[{\"name\": \"com_mesosphere_dcos_ClassicRPCAuthenticatee\",\"parameters\":[{\"key\":\"service_account_credential\",\"value\":\"file://secrets/service-account.json\"}]},{\"name\":\"com_mesosphere_dcos_http_Authenticatee\",\"parameters\":[{\"key\":\"service_account_credential\",\"value\":\"file://secrets/service-account.json\"},{\"key\":\"jwt_exp_timeout\",\"value\":\"5mins\"},{\"key\":\"preemptive_refresh_duration\",\"value\":\"30mins\"}]}]}]}",
     {{/service.service_account_secret}}
 
     {{#storage.local_persistence.enabled}}
-    "CONDA_ENVS_PATH": "/mnt/mesos/sandbox/{{storage.local_persistence.volume_path}}/conda/envs:/opt/conda/envs",
-    "CONDA_PKGS_DIRS": "/mnt/mesos/sandbox/{{storage.local_persistence.volume_path}}/conda/pkgs:/opt/conda/pkgs",
-    "DCOS_DIR": "/mnt/mesos/sandbox/{{storage.local_persistence.volume_path}}/.dcos",
-    "HADOOP_CONF_DIR": "/mnt/mesos/sandbox/{{storage.local_persistence.volume_path}}",
-    "HOME": "/mnt/mesos/sandbox/{{storage.local_persistence.volume_path}}",
-    "JUPYTER_CONFIG_DIR": "/mnt/mesos/sandbox/{{storage.local_persistence.volume_path}}/.jupyter",
-    "JUPYTER_RUNTIME_DIR": "/mnt/mesos/sandbox/{{storage.local_persistence.volume_path}}/.local/share/jupyter/runtime",
+    "CONDA_ENVS_PATH": "{{advanced.sandbox}}/{{storage.local_persistence.volume_path}}/conda/envs:/opt/conda/envs",
+    "CONDA_PKGS_DIRS": "{{advanced.sandbox}}/{{storage.local_persistence.volume_path}}/conda/pkgs:/opt/conda/pkgs",
+    "DCOS_DIR": "{{advanced.sandbox}}/{{storage.local_persistence.volume_path}}/.dcos",
+    "HADOOP_CONF_DIR": "{{advanced.sandbox}}/{{storage.local_persistence.volume_path}}",
+    "HOME": "{{advanced.sandbox}}/{{storage.local_persistence.volume_path}}",
+    "JUPYTER_CONFIG_DIR": "{{advanced.sandbox}}/{{storage.local_persistence.volume_path}}/.jupyter",
+    "JUPYTER_RUNTIME_DIR": "{{advanced.sandbox}}/{{storage.local_persistence.volume_path}}/.local/share/jupyter/runtime",
     {{/storage.local_persistence.enabled}}
     {{^storage.local_persistence.enabled}}
     "CONDA_ENVS_PATH": "{{advanced.conda_envs_path}}",
@@ -253,9 +269,8 @@
     "JUPYTER_RUNTIME_DIR": "{{advanced.jupyter_runtime_dir}}",
     {{/storage.local_persistence.enabled}}
     
-    "ENABLE_SPARK_MONITOR": "{{spark.spark_monitor_enabled}}",
+    "ENABLE_SPARK_MONITOR": "{{advanced.spark_monitor_enabled}}",
     "JAVA_OPTS": "'{{advanced.java_opts}}'",
-
     
     {{#service.jupyter_conf_urls}}
     "JUPYTER_CONF_URLS": "{{service.jupyter_conf_urls}}",
@@ -266,7 +281,6 @@
     "NGINX_LOG_LEVEL": "{{advanced.nginx_log_level}}",
 
     {{#oidc.enabled}}
-    
     {{#oidc.authorization_params}}
     "OIDC_AUTHORIZATION_PARAMS": "{{oidc.authorization_params}}",
     {{/oidc.authorization_params}}
@@ -337,8 +351,10 @@
     "SPARK_CONF_EXECUTOR_CORES": "spark.executor.cores={{spark.spark_conf_executor_cores}}",
     "SPARK_CONF_EXECUTOR_MEMORY": "spark.executor.memory={{spark.spark_conf_executor_memory}}",
     "SPARK_CONF_EXECUTOR_JAVA_OPTIONS": "spark.executor.extraJavaOptions='{{spark.spark_conf_executor_java_options}}'",
+
     "SPARK_CONF_EVENTLOG_ENABLED": "spark.eventLog.enabled={{spark.spark_conf_eventlog_enabled}}",
     "SPARK_CONF_EVENTLOG_DIR": "spark.eventLog.dir={{spark.spark_conf_eventlog_dir}}",
+
     "SPARK_CONF_HADOOP_FS_S3A_AWS_CREDENTIALS_PROVIDER": "spark.hadoop.fs.s3a.aws.credentials.provider={{spark.spark_conf_hadoop_fs_s3a_aws_credentials_provider}}",
 
     {{#service.gpu.enabled}}
@@ -355,6 +371,7 @@
     {{#spark.spark_conf_mesos_principal}}
     "SPARK_CONF_MESOS_PRINCIPAL": "spark.mesos.principal={{spark.spark_conf_mesos_principal}}",
     {{/spark.spark_conf_mesos_principal}}
+
     {{#spark.spark_conf_mesos_role}}
     "SPARK_CONF_MESOS_ROLE": "spark.mesos.role={{spark.spark_conf_mesos_role}}",
     {{/spark.spark_conf_mesos_role}}
@@ -371,6 +388,7 @@
     "SPARK_CONF_SPARK_EXECUTORENV_JAVA_HOME": "spark.executorEnv.JAVA_HOME={{spark.spark_conf_executor_java_home}}",
     "SPARK_CONF_SPARK_EXECUTORENV_HADOOP_HDFS_HOME": "spark.executorEnv.HADOOP_HDFS_HOME={{spark.spark_conf_executor_hadoop_hdfs_home}}",
     "SPARK_CONF_SPARK_EXECUTORENV_HADOOP_OPTS": "spark.executorEnv.HADOOP_OPTS='{{spark.spark_conf_executor_hadoop_opts}}'",
+
     {{#spark.spark_conf_jars_packages}}
     "SPARK_CONF_SPARK_JARS_PACKAGES": "spark.jars.packages={{spark.spark_conf_jars_packages}}",
     {{/spark.spark_conf_jars_packages}}
@@ -397,6 +415,7 @@
   },
   "labels": {
     "DCOS_PACKAGE_IS_FRAMEWORK": "true",
+
     {{#networking.ingress.enabled}}
     "HAPROXY_GROUP": "external",
     "HAPROXY_0_ENABLED": "true",
@@ -406,6 +425,7 @@
     "HAPROXY_2_ENABLED": "true",
     "HAPROXY_2_REDIRECT_TO_HTTPS": "true",
     {{/networking.ingress.enabled}}
+
     "MARATHON_SINGLE_INSTANCE_APP": "true"
   },
   "healthChecks": [
@@ -419,12 +439,14 @@
       "maxConsecutiveFailures": 3
     }
   ],
+
   {{^storage.local_persistence.enabled}}
   "unreachableStrategy": {
     "expungeAfterSeconds": 0,
     "inactiveAfterSeconds": 0
   },
   {{/storage.local_persistence.enabled}}
+
   "upgradeStrategy": {
     "minimumHealthCapacity": 0,
     "maximumOverCapacity": 0

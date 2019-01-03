@@ -17,14 +17,14 @@
         "cpus": {
           "type": "number",
           "title": "CPU Allocation",
-          "description": "CPU shares to allocate to this service instance - e.g., 2.0",
+          "description": "CPU shares to allocate to this service instance (e.g., 2.0)",
           "minimum": 1.0,
           "default": 2.0
         },
         "mem": {
           "type": "integer",
           "title": "Memory Allocation",
-          "description": "Memory to allocate to the service instance in MiB - e.g., 8192",
+          "description": "Memory to allocate to the service instance in MiB (e.g., 8192)",
           "minimum": 4096,
           "default": 8192
         },
@@ -34,16 +34,16 @@
           "description": "Nvidia GPU Allocation Configuration",
           "properties": {
             "enabled": {
+              "type": "boolean",
               "title": "Enable Nvidia GPU Support?",
               "id": "https://www.nvidia.com/object/unix.html",
               "description": "Enable Nvidia GPU Support? Note: This requires that CUDA 9.0-compatible Nvidia GPU Drivers (ideally the \"Latest Long Lived Branch Version\" - ref https://www.nvidia.com/object/unix.html) be installed on the DC/OS agents that have GPUs",
-              "type": "boolean",
               "default": false
             },
             "gpus": {
               "type": "integer",
               "title": "Nvidia GPU Allocation",
-              "description": "Number of Nvidia GPUs to allocate to this service instance - e.g., 2 Note: Nvidia GPU Support must be enabled",
+              "description": "Number of Nvidia GPUs to allocate (e.g., 2) to this service (Jupyter Notebook) instance. Note: Nvidia GPU Support must be enabled for this to take effect.",
               "minimum": 0,
               "default": 0
             }
@@ -58,7 +58,7 @@
         "jupyter_conf_urls": {
           "type": "string",
           "title": "Jupyter Configuration URLs",
-          "description": "Jupyter Configuration URLs as comma seperated list of URLs (JUPYTER_CONF_URLS) to download additional configuration artifacts - e.g., http://api.hdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/core-site.xml,http://api.hdfs.marathon.l4lb.thisdcos.directory/v1/endpoints/hdfs-site.xml,http://artifacts.contoso.com/jaas.conf",
+          "description": "Jupyter Configuration URLs as comma seperated list of URLs (JUPYTER_CONF_URLS) to download additional configuration artifacts (e.g., http://api.hdfs.marathon.l4lb.thisdcos.directory/v1/endpoints,http://artifacts.contoso.com/jaas.conf)",
           "default": ""
         },
         "service_account": {
@@ -136,7 +136,7 @@
         "cni_network_plugin_labels": {
           "type": "string",
           "title": "(CNI) Virtual Network Labels",
-          "description": "Labels to pass to the (CNI) Virtual Network plugin. Comma-separated key:value pairs - e.g., k_0:v_0,k_1:v_1,...,k_n:v_n",
+          "description": "Labels to pass to the (CNI) Virtual Network plugin. Comma-separated key:value pairs (e.g., k_0:v_0,k_1:v_1,...,k_n:v_n)",
           "default": ""
         },
         "ingress": {
@@ -147,13 +147,13 @@
             "enabled": {
               "type": "boolean",
               "title": "Enable Ingress via Loadbalancer (Marathon-LB)?",
-              "description": "Enable external access through a public agent running Marathon-LB? Note: If enabled, you must set a hostname below",
+              "description": "Enable external access through a public agent running Marathon-LB? Note: If enabled, you must set a hostname below for the service to be reachable",
               "default": true
             },
             "hostname": {
               "type": "string",
               "title": "VHOST FQDN",
-              "description": "This is typically the (Elastic) Loadbalancer's Fully Qualified Domain Name (FQDN) or a Virtual Hostname (VHOST) FQDN whose DNS record was specifically created for this Mesosphere Jupyter Service instance",
+              "description": "This is typically the (Elastic) Loadbalancer's Fully Qualified Domain Name (FQDN) that fronts the Public Agent(s) or a Virtual Hostname (VHOST) FQDN whose DNS record was specifically created for this Mesosphere Jupyter Service instance",
               "default": ""
             }
           }
@@ -237,31 +237,31 @@
         "discovery_uri": {
           "type": "string",
           "title": "OIDC Discovery URI",
-          "description": "OpenID Connect Discovery URI",
+          "description": "OpenID Connect Discovery URI (e.g., https://keycloak.contoso.com/auth/realms/notebook/.well-known/openid-configuration)",
           "default": "https://keycloak.contoso.com/auth/realms/notebook/.well-known/openid-configuration"
         },
         "client_id": {
           "type": "string",
           "title": "OIDC Client ID",
-          "description": "OpenID Connect Client ID",
+          "description": "OpenID Connect Client ID (e.g., notebook)",
           "default": "notebook"
         },
         "client_secret": {
           "type": "string",
-          "title": "OIDC Client Secret. Note: This must not be set if using Windows Integrated Authentication (WIA) with Active Directory Federation Services (ADFS) on Windows Server 2016 or newer",
-          "description": "OpenID Connect Client Secret",
+          "title": "OIDC Client Secret",
+          "description": "OpenID Connect Client Secret (e.g., b874f6e9-8f3f-41a6-a206-53e928d24fb1). Note: This must not be set if using Windows Integrated Authentication (WIA) with Active Directory Federation Services (ADFS) on Windows Server 2016 or newer",
           "default": ""
         },
         "scope": {
           "type": "string",
           "title": "OIDC Scope",
-          "description": "OpenID Scope. Note: This typically does not need to be modified",
+          "description": "OpenID Scope (e.g., openid profile email). Note: This typically does not need to be modified",
           "default": "openid profile email"
         },
         "authorization_params": {
           "type": "string",
           "title": "OIDC Authorization Parameters",
-          "description": "(Optional) Authorization Parameters (e.g., hd=\"zmartzone.eu\", resource=\"ABC:DEF:GH-12345-6789-foo-bar\"). Note: Windows Integrated Authentication requires that the resource parameter be set",
+          "description": "(Optional) Authorization Parameters (e.g., hd=\\\"zmartzone.eu\\\", resource=\\\"ABC:DEF:GH-12345-6789-foo-bar\\\"). Note: Windows Integrated Authentication requires that the resource parameter be set",
           "default": ""
         },
         "authorized_email": {
@@ -279,13 +279,13 @@
         "redirect_after_logout_uri": {
           "type": "string",
           "title": "OIDC Redirect After Logout URI",
-          "description": "OpenID Connect Redirect After Redirect URI. Note: This typically does not need to be set - e.g., https://notebooks.contoso.com/jupyter",
+          "description": "OpenID Connect Redirect After Redirect URI (e.g., https://notebooks.contoso.com/jupyter). Note: This typically does not need to be set",
           "default": ""
         },
         "post_logout_redirect_uri": {
           "type": "string",
           "title": "OIDC Post Logout Redirect URI",
-          "description": "OpenID Post Logout Redirect URI. Note: This typically does not need to be set - e.g., https://notebooks.contoso.com/jupyter",
+          "description": "OpenID Post Logout Redirect URI (e.g., https://notebooks.contoso.com/jupyter). Note: This typically does not need to be set",
           "default": ""
         },
         "tls_verify": {
@@ -297,19 +297,19 @@
         "redirect_uri": {
           "type": "string",
           "title": "OIDC Redirect URI",
-          "description": "OpenID Connect Redirect URI. Note: This typically does not need to be modified",
+          "description": "OpenID Connect Redirect URI (e.g., /oidc-redirect-callback). Note: This typically does not need to be modified",
           "default": "/oidc-redirect-callback"
         },
         "logout_path": {
           "type": "string",
           "title": "OIDC Logout Path",
-          "description": "OpenID Connect Logout Path. Note: This typically does not need to be modified",
+          "description": "OpenID Connect Logout Path (e.g., /logmeout). Note: This typically does not need to be modified",
           "default": "/logmeout"
         },
         "token_endpoint_auth_method": {
           "type": "string",
           "title": "OIDC Token Endpoint Authentication Method",
-          "description": "OpenID Token Endpoint Authentication Method. Note: This typically does not need to be modified",
+          "description": "OpenID Token Endpoint Authentication Method (e.g., client_secret_basic). Note: This typically does not need to be modified",
           "default": "client_secret_basic"
         },
         "use_spartan_resolver": {
@@ -353,6 +353,22 @@
           "minimum": 1,
           "default": 1
         },
+        "spark_conf_mesos_gpus_max": {
+          "type": "integer",
+          "id": "https://spark.apache.org/docs/latest/running-on-mesos.html",
+          "title": "spark.mesos.gpus.max",
+          "description": "Set the maximum number GPU resources to acquire for this job. Warning: Executors will still launch when no GPU resources are found since this configuration is just a upper limit and not a guaranteed amount. Note: GPU Support must be enabled for this to take effect",
+          "minimum": 0,
+          "default": 0
+        },
+        "spark_conf_mesos_executor_gpus": {
+          "type": "integer",
+          "id": "https://spark.apache.org/docs/latest/running-on-mesos.html",
+          "title": "spark.mesos.executor.gpus",
+          "description": "Set the hard limit on the (integer) number of gpus to request for each executor. Note: GPU Support must be enabled for this to take effect",
+          "minimum": 0,
+          "default": 0
+        },
         "spark_driver_memory": {
           "type": "string",
           "title": "spark.driver.memory",
@@ -365,13 +381,92 @@
           "description": "spark.executor.memory: Amount of memory to use per executor process, in MiB unless otherwise specified. (e.g. 2g, 8g)",
           "default": "6g"
         },
+        "spark_conf_eventlog_enabled": {
+          "type": "boolean",
+          "title": "spark.eventLog.enabled",
+          "description": "Whether to log Spark events, useful for reconstructing the Web UI after the application has finished",
+          "default": true
+        },
+        "spark_conf_eventlog_dir": {
+          "type": "string",
+          "title": "spark.eventLog.dir",
+          "description": "Base directory to which Spark events are logged, if spark.eventLog.enabled is true (e.g., hdfs://hdfs/ or s3a://path/to/bucket). Note: You'd typically want to set this to point to distributed/HA storage",
+          "default": "/mnt/mesos/sandbox/"
+        },
+        "start_spark_history_server": {
+          "type": "boolean",
+          "title": "Start Spark History Server?",
+          "description": "Start Spark History Server",
+          "default": true
+        },
+        "spark_history_fs_logdirectory": {
+          "type": "string",
+          "title": "Spark EventLog Directory",
+          "description": "Spark EvenLog Directory from which to load events for prior Spark job runs (e.g., hdfs://hdfs/ or s3a://path/to/bucket). Note: You'd typically want to set this to point to distributed/HA storage",
+          "default": "/mnt/mesos/sandbox/"
+        },
+        "spark_conf_jars_packages": {
+          "type": "string",
+          "title": "spark.jars.packages",
+          "description": "Comma-separated list of Maven coordinates of jars to include on the driver and executor classpaths (e.g., org.apache.spark:spark-streaming-kafka-0-10_2.11:2.2.1,org.apache.kafka:kafka_2.11:0.10.2.1)",
+          "default": ""
+        },
+        "spark_conf_mesos_principal": {
+          "type": "string",
+          "title": "",
+          "description": "Spark Mesos Principal. Typically set to the Service Account Name provisioned for the Mesosphere Jupyter Service (e.g., dev_jupyter)",
+          "default": ""
+        },
+        "spark_conf_mesos_role": {
+          "type": "string",
+          "title": "",
+          "description": "Spark Mesos Role. Typically set to the Mesos Role to which the Service Account for the Mesosphere Jupyter Service has been provisioned (e.g., dev-jupyter-role)",
+          "default": ""
+        },
+        "spark_conf_mesos_driver_labels": {
+          "type": "string",
+          "title": "spark.mesos.driver.labels",
+          "description": "Mesos labels to add to the driver. Labels are free-form key-value pairs. Key-value pairs should be separated by a colon, and commas used to list more than one. If your label includes a colon or comma, you can escape it with a backslash (e.g., DCOS_SPACE:/jupyter,key:value,key2:a\\:b)",
+          "default": ""
+        },
+        "spark_conf_mesos_task_labels": {
+          "type": "string",
+          "title": "spark.mesos.task.labels",
+          "description": "Set the Mesos labels to add to each task. Labels are free-form key-value pairs. Key-value pairs should be separated by a colon, and commas used to list more than one. If your label includes a colon or comma, you can escape it with a backslash (e.g., DCOS_SPACE:/jupyter,key:value,key2:a\\:b)",
+          "default": ""
+        },
+        "spark_conf_executor_krb5_config": {
+          "type": "string",
+          "title": "spark.executorEnv.KRB5_CONFIG",
+          "description": "Location of the krb5.conf file passed via the KRB5_CONFIG environment variable to the Spark Executors",
+          "default": "/mnt/mesos/sandbox/krb5.conf"
+        },
         "spark_conf_spark_scheduler_min_registered_resources_ratio": {
           "title": "spark.scheduler.minRegisteredResourcesRatio",
           "description": "The minimum ratio (range: 0.0 - 1.0) of registered resources before the Spark Driver will allocate work to the Spark Executors",
           "type": "number",
           "minimum": 0.0,
           "maximum": 1.0,
-          "default": 0.8
+          "default": 1.0
+        },
+        "spark_conf_mesos_containerizer": {
+          "description": "Spark Mesos Containerizer.",
+          "type": "string",
+          "enum": [
+            "mesos",
+            "docker"
+          ],
+          "default": "mesos"
+        },
+        "spark_conf_hadoop_fs_s3a_aws_credentials_provider": {
+          "type": "string",
+          "title": "spark.hadoop.fs.s3a.aws.credentials.provider",
+          "description": "Hadoop FS S3A Client Credentials Provider",
+          "enum": [
+            "com.amazonaws.auth.InstanceProfileCredentialsProvider",
+            "com.amazonaws.auth.EnvironmentVariableCredentialsProvider"
+          ],
+          "default": "com.amazonaws.auth.InstanceProfileCredentialsProvider"
         },
         "spark_driver_java_options": {
           "type": "string",
@@ -385,78 +480,11 @@
           "description": "A string of extra JVM options to pass to executors",
           "default": "-server -XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/mnt/mesos/sandbox"
         },
-        "spark_conf_eventlog_enabled": {
-          "type": "boolean",
-          "title": "spark.eventLog.enabled",
-          "description": "Whether to log Spark events, useful for reconstructing the Web UI after the application has finished",
-          "default": false
-        },
-        "spark_conf_eventlog_dir": {
-          "type": "string",
-          "title": "spark.eventLog.dir",
-          "description": "Base directory to which Spark events are logged, if spark.eventLog.enabled is true",
-          "default": "hdfs://hdfs/"
-        },
-        "spark_conf_hadoop_fs_s3a_aws_credentials_provider": {
-          "type": "string",
-          "title": "spark.hadoop.fs.s3a.aws.credentials.provider",
-          "description": "Hadoop FS S3A Client Credentials Provider",
-          "enum": [
-            "com.amazonaws.auth.InstanceProfileCredentialsProvider",
-            "com.amazonaws.auth.EnvironmentVariableCredentialsProvider"
-          ],
-          "default": "com.amazonaws.auth.InstanceProfileCredentialsProvider"
-        },
-        "spark_conf_jars_packages": {
-          "type": "string",
-          "title": "spark.jars.packages",
-          "description": "Comma-separated list of Maven coordinates of jars to include on the driver and executor classpaths - e.g., org.apache.spark:spark-streaming-kafka-0-10_2.11:2.2.1,org.apache.kafka:kafka_2.11:0.10.2.1",
-          "default": ""
-        },
         "spark_conf_mesos_executor_home": {
           "type": "string",
           "title": "spark.mesos.executor.home",
           "description": "Set the directory into which Spark is installed for the Executors when running on Apache Mesos",
           "default": "/opt/spark"
-        },
-        "spark_conf_mesos_containerizer": {
-          "description": "Spark Mesos Containerizer.",
-          "type": "string",
-          "enum": [
-            "mesos",
-            "docker"
-          ],
-          "default": "mesos"
-        },
-        "spark_conf_mesos_principal": {
-          "type": "string",
-          "title": "",
-          "description": "Spark Mesos Principal. Typically set to the Service Account Name provisioned for the Mesosphere Jupyter Service",
-          "default": ""
-        },
-        "spark_conf_mesos_role": {
-          "type": "string",
-          "title": "",
-          "description": "Spark Mesos Role. Typically set to the Mesos Role to which the Service Account for the Mesosphere Jupyter Service has been provisioned",
-          "default": ""
-        },
-        "spark_conf_mesos_driver_labels": {
-          "type": "string",
-          "title": "spark.mesos.driver.labels",
-          "description": "Mesos labels to add to the driver. Labels are free-form key-value pairs. Key-value pairs should be separated by a colon, and commas used to list more than one. If your label includes a colon or comma, you can escape it with a backslash. Ex. DCOS_SPACE:/jupyter,key:value,key2:a\\:b",
-          "default": ""
-        },
-        "spark_conf_mesos_task_labels": {
-          "type": "string",
-          "title": "spark.mesos.task.labels",
-          "description": "Set the Mesos labels to add to each task. Labels are free-form key-value pairs. Key-value pairs should be separated by a colon, and commas used to list more than one. If your label includes a colon or comma, you can escape it with a backslash. Ex. DCOS_SPACE:/jupyter,key:value,key2:a\\:b",
-          "default": ""
-        },
-        "spark_conf_executor_krb5_config": {
-          "type": "string",
-          "title": "spark.executorEnv.KRB5_CONFIG",
-          "description": "Location of the krb5.conf file passed via the KRB5_CONFIG environment variable to the Spark Executors",
-          "default": "/mnt/mesos/sandbox/krb5.conf"
         },
         "spark_conf_executor_java_home": {
           "type": "string",
@@ -487,25 +515,6 @@
           "title": "Spark User (Process Execution Context)",
           "description": "The Linux user under which the Spark Executors will run",
           "default": "nobody"
-        },
-        "start_spark_history_server": {
-          "type": "boolean",
-          "title": "Start Spark History Server?",
-          "description": "Start Spark History Server",
-          "default": false
-        },
-        "spark_history_fs_logdirectory": {
-          "type": "string",
-          "title": "Spark EventLog Directory",
-          "description": "Spark EvenLog Directory from which to load events for prior Spark job runs",
-          "default": "hdfs://hdfs/"
-        },
-        "spark_monitor_enabled": {
-          "type": "boolean",
-          "id": "https://github.com/krishnan-r/sparkmonitor",
-          "title": "Enable SparkMonitor?",
-          "description": "Enable the SparkMonitor Jupyter Notebook Server Extension to proxy the Spark Driver UI?",
-          "default": true
         }
       }
     },
@@ -530,6 +539,12 @@
           "type": "string",
           "title": "Home Directory",
           "description": "Your Home Directory (HOME)",
+          "default": "/mnt/mesos/sandbox"
+        },
+        "sandbox": {
+          "type": "string",
+          "title": "Sandbox Directory",
+          "description": "Your Sandbox Directory (MESOS_SANDBOX)",
           "default": "/mnt/mesos/sandbox"
         },
         "hadoop_conf_dir": {
@@ -585,6 +600,13 @@
           ],
           "default": "warn"
         },
+        "spark_monitor_enabled": {
+          "type": "boolean",
+          "id": "https://github.com/krishnan-r/sparkmonitor",
+          "title": "Enable SparkMonitor?",
+          "description": "Enable the SparkMonitor Jupyter Notebook Server Extension to proxy the Spark Driver UI?",
+          "default": true
+        },
         "start_dask_distributed": {
           "type": "boolean",
           "title": "Start Dask Distributed?",
@@ -601,13 +623,13 @@
           "type": "boolean",
           "title": "Start TensorBoard?",
           "description": "Start TensorBoard?",
-          "default": false
+          "default": true
         },
         "tensorboard_logdir": {
           "type": "string",
           "title": "TensorBoard Log Directory",
-          "description": "TensorBoard Log Directory",
-          "default": "hdfs://hdfs/"
+          "description": "TensorBoard Log Directory - e.g., hdfs://hdfs/ or s3://path/to/bucket",
+          "default": "/mnt/mesos/sandbox"
         },
         "term": {
           "type": "string",
