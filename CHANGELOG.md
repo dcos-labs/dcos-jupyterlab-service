@@ -88,7 +88,6 @@
 
 ### Configuration
 
-* [Moved `start_spark_history_server` into spark config section](https://github.com/dcos-labs/dcos-jupyterlab-service/pull/4)
 * The `OIDC_REDIRECT_URI` environment variable must now be specified as an absolute URI since [redirect_uri_path is deprecated](https://github.com/zmartzone/lua-resty-openidc/commit/0f2a68b82cf4849fc3efe4b25c389fc45377fc63)
 * Rename the `OIDC_AUTH_METHOD` environment variable to `OIDC_TOKEN_ENDPOINT_AUTH_METHOD` to disambiguate from the Introspection Endpoint Authentication method
 
