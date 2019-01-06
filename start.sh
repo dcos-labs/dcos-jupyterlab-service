@@ -6,7 +6,7 @@ set -e
 
 # Exec the specified command or fall back on bash
 if [ $# -eq 0 ]; then
-    cmd=bash
+    cmd=( "bash" )
 else
     # bootstrap requires that ${LIBPROCESS_IP} or ${MESOS_CONTAINER_IP} be set
     if [ -z ${LIBPROCESS_IP+x} ]; then
@@ -136,29 +136,38 @@ else
     # Start Openresty for (Optional) OpenID Connect Authentication: https://github.com/zmartzone/lua-resty-openidc
     openresty
 
-    cmd=$*
+    cmd=( "$@" )
 fi
 
-# Run additional scripts in /usr/local/bin/start-notebook.d/
-for f in /usr/local/bin/start-notebook.d/*; do
-    case "$f" in
-        *.sh)
-            echo "$0: running $f"; . "$f"
-            ;;
-        *)
-            if [ -x $f ]; then
+run-hooks () {
+    # Source scripts or run executable files in a directory
+    if [[ ! -d "$1" ]] ; then
+        return
+    fi
+    echo "$0: running hooks in $1"
+    for f in "$1/"*; do
+        case "$f" in
+            *.sh)
                 echo "$0: running $f"
-                $f
-            else
-                echo "$0: ignoring $f"
-            fi
-            ;;
-    esac
-    echo
-done
+                source "$f"
+                ;;
+            *)
+                if [[ -x "$f" ]] ; then
+                    echo "$0: running $f"
+                    "$f"
+                else
+                    echo "$0: ignoring $f"
+                fi
+                ;;
+        esac
+    done
+    echo "$0: done running hooks in $1"
+}
+
+run-hooks /usr/local/bin/start-notebook.d
 
 # Handle special flags if we're root
-if [ "$(id -u)" == '0' ] ; then
+if [ "$(id -u)" == "0" ] ; then
 
     # Only attempt to change the jovyan username if it exists
     if id jovyan &> /dev/null ; then
@@ -168,7 +177,7 @@ if [ "$(id -u)" == '0' ] ; then
 
     # Handle case where provisioned storage does not have the correct permissions by default
     # Ex: default NFS/EFS (no auto-uid/gid)
-    if [[ "${CHOWN_HOME}" == "1" || "${CHOWN_HOME}" == 'yes' ]]; then
+    if [[ "${CHOWN_HOME}" == "1" || "${CHOWN_HOME}" == "yes" ]]; then
         echo "Changing ownership of /home/${NB_USER} to ${NB_UID}:${NB_GID}"
         chown "${CHOWN_HOME_OPTS}" "${NB_UID}:${NB_GID}" "/home/${NB_USER}"
     fi
@@ -180,7 +189,7 @@ if [ "$(id -u)" == '0' ] ; then
     fi
 
     if [ -d "${MESOS_SANDBOX}" ];then
-        # Change ownership of $MESOS_SANDBOX so that $NB_USER can write to it
+        # Change ownership of $MESOS_SANDBOX so that ${NB_USER} can write to it
         chown -R "${NB_UID}:${NB_GID}" "${MESOS_SANDBOX}"
     fi
 
@@ -192,7 +201,7 @@ if [ "$(id -u)" == '0' ] ; then
             echo "Relocating home dir to /home/${NB_USER}"
             mv /home/jovyan "/home/${NB_USER}"
         fi
-        # if workdir is in /home/jovyan, cd to /home/$NB_USER
+        # if workdir is in /home/jovyan, cd to /home/${NB_USER}
         if [[ "${PWD}/" == "/home/jovyan/"* ]]; then
             newcwd="/home/${NB_USER}/${PWD:13}"
             echo "Setting CWD to ${newcwd}"
@@ -206,17 +215,18 @@ if [ "$(id -u)" == '0' ] ; then
         usermod -u "${NB_UID}" "${NB_USER}"
     fi
 
-    # Add NB_USER to NB_GID if it's not the default group
+    # Set NB_USER primary gid to NB_GID (after making the group).  Set
+    # supplementary gids to NB_GID and 100.
     if [ "${NB_GID}" != "$(id -g ${NB_USER})" ] ; then
-        echo "Add $NB_USER to group: $NB_GID"
-        groupadd -g $NB_GID -o $NB_USER
-        usermod -a -G $NB_GID $NB_USER
+        echo "Add ${NB_USER} to group: ${NB_GID}"
+        groupadd -g "${NB_GID}" -o "${NB_USER}"
+        usermod -g "${NB_GID}" -aG 100 "${NB_USER}"
     fi
 
     # Enable sudo if requested
-    #if [[ "$GRANT_SUDO" == "1" || "$GRANT_SUDO" == 'yes' ]]; then
-    #    echo "Granting $NB_USER sudo access and appending $CONDA_DIR/bin to sudo PATH"
-    #    echo "$NB_USER ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/notebook
+    #if [[ "${GRANT_SUDO}" == "1" || "${GRANT_SUDO}" == "yes" ]]; then
+    #    echo "Granting ${NB_USER} sudo access and appending ${CONDA_DIR}/bin to sudo PATH"
+    #    echo "${NB_USER} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/notebook
     #fi
 
     # Add $CONDA_DIR/bin to sudo secure_path
@@ -224,15 +234,15 @@ if [ "$(id -u)" == '0' ] ; then
 
     # Exec the command as NB_USER with the PATH and the rest of
     # the environment preserved
-    echo "Executing the command: ${cmd}"
-    exec sudo -E -H -u "${NB_USER}" PATH="${PATH}" PYTHONPATH="${PYTHONPATH}" ${cmd}
+    echo "Executing the command: ${cmd[@]}"
+    exec sudo -E -H -u "${NB_USER}" PATH="${PATH}" XDG_CACHE_HOME="/home/${NB_USER}/.cache" PYTHONPATH="${PYTHONPATH}" "${cmd[@]}"
 else
     if [[ "${NB_UID}" == "$(id -u jovyan)" && "${NB_GID}" == "$(id -g jovyan)" ]]; then
         # User is not attempting to override user/group via environment
         # variables, but they could still have overridden the uid/gid that
         # container runs as. Check that the user has an entry in the passwd
         # file and if not add an entry.
-	whoami &> /dev/null || STATUS=$? && true
+	STATUS=0 && whoami &> /dev/null || STATUS=$? && true
 	if [[ "${STATUS}" != "0" ]]; then
             if [[ -w /etc/passwd ]]; then
                 echo "Adding passwd file entry for $(id -u)"
@@ -241,32 +251,33 @@ else
                 cat /tmp/passwd > /etc/passwd
                 rm /tmp/passwd
             else
-                echo 'Container must be run with group root to update passwd file'
+                echo 'Container must be run with group "root" to update passwd file'
             fi
         fi
 
         # Warn if the user isn't going to be able to write files to $HOME.
         if [[ ! -w /home/jovyan ]]; then
-            echo 'Container must be run with group users to update files'
+            echo 'Container must be run with group "users" to update files'
         fi
     else
         # Warn if looks like user want to override uid/gid but hasn't
         # run the container as root.
         if [[ ! -z "${NB_UID}" && "${NB_UID}" != "$(id -u)" ]]; then
-            echo 'Container must be run as root to set ${NB_UID}'
+            echo 'Container must be run as "root" to set ${NB_UID}'
         fi
         if [[ ! -z "${NB_GID}" && "${NB_GID}" != "$(id -g)" ]]; then
-            echo 'Container must be run as root to set $NB_GID'
+            echo 'Container must be run as "root" to set ${NB_GID}'
         fi
     fi
 
     # Warn if looks like user want to run in sudo mode but hasn't run
     # the container as root.
-    #if [[ "${GRANT_SUDO}" == "1" || "${GRANT_SUDO}" == 'yes' ]]; then
-    #    echo 'Container must be run as root to grant sudo permissions'
+    #if [[ "${GRANT_SUDO}" == "1" || "${GRANT_SUDO}" == "yes" ]]; then
+    #    echo 'Container must be run as "root" to grant sudo permissions'
     #fi
 
     # Execute the command
-    echo "Executing the command: ${cmd}"
-    exec ${cmd}
+    run-hooks /usr/local/bin/before-notebook.d
+    echo "Executing the command: ${cmd[@]}"
+    exec "${cmd[@]}"
 fi
